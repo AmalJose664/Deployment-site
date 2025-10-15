@@ -1,0 +1,12 @@
+node_modules
+.env
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+build-server/script.js
+test-kafka/index.js
+
+output-try/
+output-try/*

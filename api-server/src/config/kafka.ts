@@ -1,0 +1,15 @@
+import { Kafka } from "kafkajs";
+
+export const kafka = new Kafka({
+	clientId: `api-server`,
+	brokers: ["pkc-l7pr2.ap-south-1.aws.confluent.cloud:9092"],
+	ssl: true,
+	sasl: {
+		username: process.env.KAFKA_USERNAME as string,
+		password: process.env.KAFKA_PASSWORD as string,
+		mechanism: "plain",
+	},
+});
+export const consumer = kafka.consumer({ groupId: "api-server-data-consumer" });
+
+
