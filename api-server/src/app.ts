@@ -18,12 +18,12 @@ dotenv.config();
 const httpServer = createServer(app);
 
 app.use(
-    cors({
-        origin: "*",
-        // methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-        credentials: true,
-        // allowedHeaders: ["Content-Type", "Authorization"],
-    }),
+	cors({
+		origin: "*",
+		// methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+		credentials: true,
+		// allowedHeaders: ["Content-Type", "Authorization"],
+	}),
 );
 app.use(express.json());
 app.use(cookieParser());
@@ -31,9 +31,9 @@ app.use(passport.initialize());
 
 //for logging purpose for requests
 app.use((req: any, res: any, next: any) => {
-    const time = new Date();
-    console.log(`\n----${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}----- ${req.path} ------${req.method}`);
-    next();
+	const time = new Date();
+	console.log(`\n----${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}----- ${req.path} ------${req.method}`);
+	next();
 });
 
 app.use("/api/auth", authRouter);
@@ -47,9 +47,8 @@ app.use("/api/internal", internalRoutes);
 // --------------------------------------
 
 app.get("/", (req, res) => {
-    console.log(req.query, "<<");
-    res.json({ status: "working" });
-    return;
+	res.json({ status: "working" });
+	return;
 });
 
 app.use(errorHandler);
