@@ -19,7 +19,7 @@ const httpServer = createServer(app);
 
 app.use(
 	cors({
-		origin: "*",
+		origin: process.env.FRONTEND_URL,
 		// methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
 		credentials: true,
 		// allowedHeaders: ["Content-Type", "Authorization"],
@@ -29,10 +29,20 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(passport.initialize());
 
-//for logging purpose for requests
 app.use((req: any, res: any, next: any) => {
 	const time = new Date();
 	console.log(`\n----${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}----- ${req.path} ------${req.method}`);
+	next();
+});
+app.use((req: Request, res: Response, next: NextFunction) => {
+	const originalJson = res.json;
+	res.json = function (body?: any) {
+		const result = originalJson.call(this, body);
+		console.log("Response stats>", res.statusCode, ">>> ", res.statusMessage);
+
+		return result;
+	};
+
 	next();
 });
 
@@ -50,6 +60,7 @@ app.get("/", (req, res) => {
 	res.json({ status: "working" });
 	return;
 });
+
 
 app.use(errorHandler);
 
