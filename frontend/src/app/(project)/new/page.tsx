@@ -1,11 +1,9 @@
 import Navbar from "@/components/Navbar"
-import ProjectContent from "./ProjectPageContent"
 
 const page = () => {
 	return (
 		<div>
 			<Navbar />
-			<ProjectContent />
 		</div>
 	)
 }

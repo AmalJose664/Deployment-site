@@ -9,6 +9,7 @@ export async function middleware(req: NextRequest) {
 	const path = req.nextUrl.pathname
 	const cookies = req.cookies
 	const accessToken = cookies.get("access_token")?.value
+	// return NextResponse.next()
 
 	if (exemptAfterAuthRoutes.includes(path)) {
 		if (accessToken) {

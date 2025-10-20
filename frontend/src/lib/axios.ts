@@ -24,6 +24,10 @@ const processQueue = (error: Error | null, token: string | null = null) => {
 	failedQueue = [];
 };
 
+// axiosInstance.interceptors.request.use((config) => {
+// 	console.log("used this instance")
+// 	return config
+// })
 
 axiosInstance.interceptors.response.use((response) => response,
 	async (error) => {

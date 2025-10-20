@@ -1,8 +1,7 @@
 'use client';
 import { Provider } from 'react-redux';
 import { AppStore, store } from './store';
-import { useEffect, useRef } from 'react';
-import { restoreAuth } from './slices/userSlice';
+import { useRef } from 'react';
 
 export default function ReduxProvider({
 	children

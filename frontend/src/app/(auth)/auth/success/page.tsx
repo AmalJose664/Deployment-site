@@ -1,6 +1,6 @@
 "use client"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
-import axiosInstance from "@/utils/axios"
+import axiosInstance from "@/lib/axios"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 
