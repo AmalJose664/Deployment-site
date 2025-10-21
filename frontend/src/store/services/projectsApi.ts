@@ -1,6 +1,7 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { axiosBaseQuery } from "../axiosBaseQuery";
 import { Project } from '@/types/Project';
+import { ProjectFormType } from '@/lib/schema/project';
 interface GetProjectsParams {
 	limit?: number;
 	search?: string;
@@ -20,11 +21,19 @@ export const projectApis = createApi({
 			},
 			providesTags: ['Projects'],
 		}),
+		createProject: builder.mutation<Project, ProjectFormType>({
+			query: (project) => ({
+				url: "/projects",
+				method: "POST",
+				data: project,
+			}),
+			invalidatesTags: ["Projects"]
+		})
 	})
 })
 
 
 export const {
-	useGetProjectsQuery
+	useGetProjectsQuery, useCreateProjectMutation
 } = projectApis;
 

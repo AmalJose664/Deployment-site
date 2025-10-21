@@ -4,20 +4,19 @@ import { CiClock1, CiSearch } from "react-icons/ci";
 import { IoMdGlobe, IoMdGitBranch } from "react-icons/io";
 import { FaChevronDown, FaPlus } from "react-icons/fa";
 import { FiMoreHorizontal } from "react-icons/fi";
-import { useAppDispatch, useAppSelector } from '@/store/store';
-import { useEffect, useState } from 'react';
-import { fetchProjects } from '@/store/slices/projectSlice';
+import { useState } from 'react';
 import { useGetProjectsQuery } from '@/store/services/projectsApi';
 import { useDebounce } from '@/hooks/useDebounce';
 import ProjectEmptyState from './ProjectEmptyState';
 import { ProjectStatus } from '@/types/Project';
+import { useRouter } from "next/navigation"
 
 
 export default function ProjectContent() {
 
+	const router = useRouter()
 	const [projectSeachState, setProjectSearchState] = useState("")
 	const [projectFilter, setProjectsFilter] = useState("")
-	const dispatch = useAppDispatch();
 	const [distance, setDistance] = useState(-1)
 	const debouncedSearch = useDebounce(projectSeachState, 450);
 
@@ -96,7 +95,7 @@ export default function ProjectContent() {
 									</div>
 								</nav>
 							</div>
-							<button className="px-4 py-2 rounded-lg bg-blue-600 text-sm border border-blue-900 font-medium flex items-center gap-2 ">
+							<button onClick={() => router.push("/new")} className="px-4 py-2 rounded-lg bg-blue-600 text-sm border border-blue-900 font-medium flex items-center gap-2 ">
 								<FaPlus size={16} />
 								Add New
 							</button>

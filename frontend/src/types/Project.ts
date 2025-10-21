@@ -28,3 +28,18 @@ export interface Project {
 	createdAt: Date;
 	updatedAt: Date;
 }
+
+export type ProjectFormInput = {
+	name: string;
+	repoURL: string;
+	buildCommand?: string;
+	installCommand?: string;
+	branch?: string;
+	rootDir?: string;
+	outputDirectory?: string;
+	env?: {
+		name: string
+		value: string
+	}[];
+}
+
