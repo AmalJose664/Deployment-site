@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { IProjectController } from "../interfaces/controller/IProjectController.js";
 import ProjectService from "../services/project.service.js";
 import { HTTP_STATUS_CODE } from "../utils/statusCodes.js";
-import { CreateProjectDTO, ProjectQueryScheme } from "../dtos/project.dto.js";
+import { CreateProjectDTO, ProjectQueryScheme, QueryProjectDTO } from "../dtos/project.dto.js";
 import { ProjectMapper } from "../mappers/ProjectMapper.js";
 
 class ProjectController implements IProjectController {
@@ -13,22 +13,24 @@ class ProjectController implements IProjectController {
 	}
 	async createProject(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
-			const dto = req.body as CreateProjectDTO;
+			const dto = req.validatedBody as CreateProjectDTO;
 			const user = req.user?.id;
 
 			const dbResult = await this.projectService.createProject(dto, user || "");
-			res.json(dbResult);
+
+			res.status(HTTP_STATUS_CODE.CREATED).json(dbResult);
 		} catch (error) {
 			next(error);
 		}
 	}
 	async getAllProjects(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
-			const userId = req.user?.id;
-			const query = ProjectQueryScheme.parse(req.query);
+			const userId = req.user?.id as string
 
-			const result = await this.projectService.getAllProjects(userId || "", query.page, query.limit, query.status, query.search);
-			const response = ProjectMapper.toProjectsResponse(result.projects, result.total)
+			const query = req.validatedQuery as unknown as QueryProjectDTO
+
+			const result = await this.projectService.getAllProjects(userId, query.page, query.limit, query.status, query.search);
+			const response = ProjectMapper.toProjectsResponse(result.projects, result.total, query.page, query.limit)
 
 			res.status(HTTP_STATUS_CODE.OK).json(response);
 		} catch (err) {
@@ -37,17 +39,38 @@ class ProjectController implements IProjectController {
 	}
 	async getProject(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
-			const userId = req.user?.id;
-			const query = ProjectQueryScheme.parse(req.query);
+			const userId = req.user?.id as string
+			const projectId = req.params.id
+			const userFill = !!req.query.user
 
-			const result = await this.projectService.getAllProjects(userId || "", query.page, query.limit, query.status, query.search);
-			const response = ProjectMapper.toProjectsResponse(result.projects, result.total)
+			const result = await this.projectService.getProjectById(projectId, userId, userFill);
+			if (result) {
 
-			res.status(HTTP_STATUS_CODE.OK).json(response);
+				const response = ProjectMapper.toProjectResponse(result, userFill)
+				res.status(HTTP_STATUS_CODE.OK).json(response);
+				return
+			}
+			res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ project: null });
+
 		} catch (err) {
 			next(err);
 		}
 	}
+	async deleteProject(req: Request, res: Response, next: NextFunction): Promise<void> {
+		try {
+			const userId = req.user?.id as string
+			const projectId = req.params.id
+
+			const result = await this.projectService.deleteProject(projectId, userId);
+
+			res.status(HTTP_STATUS_CODE.NO_CONTENT).json({ deleted: result });
+
+		} catch (err) {
+			next(err);
+		}
+	}
+
+
 
 
 

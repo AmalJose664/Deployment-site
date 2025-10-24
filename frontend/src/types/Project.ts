@@ -1,3 +1,5 @@
+import { User } from "./User";
+
 export enum ProjectStatus {
 	NOT_STARTED = "NOT_STARTED",
 	BUILDING = "BUILDING",
@@ -7,7 +9,7 @@ export enum ProjectStatus {
 }
 export interface Project {
 	_id: string;
-	user: string;
+	user: User | string;
 	name: string;
 	repoURL: string;
 	subdomain: string;
@@ -22,7 +24,7 @@ export interface Project {
 	}[];
 	lastDeployedAt?: Date;
 	status: string;
-	deployments?: string;
+	deployments?: string[];
 	isDeleted: boolean;
 
 	createdAt: Date;

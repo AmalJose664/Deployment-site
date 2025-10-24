@@ -21,6 +21,13 @@ export const projectApis = createApi({
 			},
 			providesTags: ['Projects'],
 		}),
+		getProjectById: builder.query<Project, { id: string, params: { user?: string } }>({
+			query: ({ id, params }) => ({ url: `/projects/${id}`, method: 'get', params }),
+			transformResponse(baseQueryReturnValue: any) {
+				return baseQueryReturnValue.project as Project
+			},
+			providesTags: (result, error, { id }) => [{ type: 'Projects', id }]
+		}),
 		createProject: builder.mutation<Project, ProjectFormType>({
 			query: (project) => ({
 				url: "/projects",
@@ -34,6 +41,6 @@ export const projectApis = createApi({
 
 
 export const {
-	useGetProjectsQuery, useCreateProjectMutation
+	useGetProjectsQuery, useCreateProjectMutation, useGetProjectByIdQuery
 } = projectApis;
 

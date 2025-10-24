@@ -10,7 +10,12 @@ interface DecodedUser {
 declare global {
 	namespace Express {
 		interface User extends DecodedUser { }
+		interface Request {
+			validatedQuery?: any;
+			validatedBody?: any;
+		}
 	}
+
 }
 
 export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {

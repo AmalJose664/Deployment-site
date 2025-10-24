@@ -74,7 +74,7 @@ axiosInstance.interceptors.response.use((response) => response,
 					null
 				);
 				isRefreshing = false;
-				// window.location.href = '/login';
+				window.location.href = '/login';
 
 				return Promise.reject(refreshError);
 			}

@@ -140,7 +140,9 @@ button {
 	h3 {
 		@apply text-2xl font-semibold text-primary;
 	}
-
+	span {
+		@apply text-less;
+	}
 	/* Paragraphs */
 	p {
 		@apply text-base leading-relaxed text-muted-foreground;

@@ -11,12 +11,16 @@ class ProjectRepository extends BaseRepository<IProject> implements IProjectRepo
 
 	async createProject(projectData: Partial<IProject>): Promise<IProject | null> {
 		const project = new Project(projectData);
+		console.log(project, projectData, "<<<<<<<")
 		const savedProject = await project.save();
 
 		return savedProject;
 	}
-	async findProject(projectId: string, userId: string): Promise<IProject | null> {
-		return await Project.findOne({ _id: projectId, user: userId });
+	async findProject(projectId: string, userId: string, userFill?: boolean): Promise<IProject | null> {
+		if (userFill) {
+			return await Project.findOne({ _id: projectId, user: userId }).populate("user", "name email profileImage")
+		}
+		return await Project.findOne({ _id: projectId, user: userId })
 	}
 	async getAllProjects(
 		userId: string,
@@ -42,8 +46,9 @@ class ProjectRepository extends BaseRepository<IProject> implements IProjectRepo
 		return { projects, total };
 	}
 
-	async deleteProject(projectId: string): Promise<void> {
-		await this.findOneAndUpdate({ _id: projectId }, { isDeleted: true });
+	async deleteProject(projectId: string, userId: string): Promise<IProject | null> {
+		return await Project.findOneAndUpdate({ _id: projectId, user: userId }, { isDeleted: true }, { new: true });
+
 	}
 	async updateProject(projectId: string, userId: string, updateData: Partial<IProject>): Promise<IProject | null> {
 		return await Project.findOneAndUpdate({ _id: projectId, user: userId }, { $set: { ...updateData } }, { new: true })

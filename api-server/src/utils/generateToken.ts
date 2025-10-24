@@ -11,7 +11,7 @@ export const generateAccessToken = (user: Express.User | undefined) => {
 			email: user?.email,
 		},
 		process.env.ACCESS_TOKEN_SECRET as string,
-		{ expiresIn: "15m" },
+		{ expiresIn: process.env.NODE_ENV === "production" ? "15m" : "1h" },
 	);
 	return token;
 };

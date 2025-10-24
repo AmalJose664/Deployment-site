@@ -12,10 +12,30 @@ class DeploymentRepository extends BaseRepository<IDeployment> implements IDeplo
 		return savedDeployment;
 	}
 
-	async findAllDeployments(userId: string): Promise<IDeployment[]> {
-		return await Deployment.find({ userId: userId }).exec();
+	async findAllDeployments(userId: string, query: {
+		page: number,
+		limit: number,
+		status?: DeploymentStatus,
+		search?: string,
+	}): Promise<IDeployment[]> {
+		let dbQuery: any = { user: userId };
+		if (query.search) {
+			dbQuery = { ...dbQuery, commit_hash: { $regex: query.search, $options: "i" } }
+		}
+		if (query.status) {
+			dbQuery.status = { $eq: query.status };
+		}
+
+		const deployments = await this.findMany(dbQuery)
+			.limit(query.limit)
+			.skip((query.page - 1) * query.limit)
+			.exec();
+		return deployments
 	}
-	async findProjectDeployments(userId: string, projectId: string): Promise<IDeployment[]> {
+	async findDeploymentById(id: string, userId: string): Promise<IDeployment | null> {
+		return await Deployment.findOne({ _id: id, userId })
+	}
+	async findProjectDeployments(userId: string, projectId: string): Promise<IDeployment[]> { // QUERY FIX
 		return await Deployment.find({ userId, project: projectId });
 	}
 

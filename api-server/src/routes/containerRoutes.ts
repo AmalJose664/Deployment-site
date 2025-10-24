@@ -8,10 +8,10 @@ const internalRoutes = Router();
 internalRoutes.get("/projects/:id", authenticaContainerteToken, validateObjectId, projectController.__getProjects.bind(projectController));
 
 internalRoutes.get(
-    "/deployments/:id",
-    authenticaContainerteToken,
-    validateObjectId,
-    deploymentController.__getDeployments.bind(deploymentController),
+	"/deployments/:id",
+	authenticaContainerteToken,
+	validateObjectId,
+	deploymentController.__getDeployment.bind(deploymentController),
 );
 
 export default internalRoutes;

@@ -22,8 +22,8 @@ export default function ProjectContent() {
 
 	const { data: projects, error, isLoading, refetch } = useGetProjectsQuery({ search: debouncedSearch });
 
-	if ((!projects || projects.length === 0) && !projectSeachState) {
-		<ProjectEmptyState />
+	if ((!projects || projects.length === 0) && !projectSeachState && !debouncedSearch) {
+		return <ProjectEmptyState />
 	}
 	const filteredProjects = projectFilter === ''
 		? projects

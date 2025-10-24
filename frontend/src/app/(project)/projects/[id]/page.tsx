@@ -1,8 +1,14 @@
+import Navbar from "@/components/Navbar"
+import { ProjectContent } from "./ProjectContent"
+
 export default async function Page({
 	params,
 }: {
-	params: Promise<{ id: string }>
+	params: { id: string }
 }) {
 	const { id } = await params
-	return <div>My Post: {id}</div>
+	return <div>
+		<Navbar />
+		<ProjectContent projectId={id} />
+	</div>
 }

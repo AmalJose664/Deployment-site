@@ -54,16 +54,23 @@ class ProjectService implements IProjectService {
 		const result = await this.projectRepository.getAllProjects(userId, page, limit, status, search);
 		return result;
 	}
-	async getProjectById(id: string, userId: string): Promise<IProject | null> {
-		const user = this.userRepository.findByUserId(userId);
+	async getProjectById(id: string, userId: string, userFill: boolean): Promise<IProject | null> {
+		const user = await this.userRepository.findByUserId(userId);
 		if (!user) {
 			throw new AppError("User not found", 404);
 		}
-		return await this.projectRepository.findProject(id, userId);
+		const project = await this.projectRepository.findProject(id, userId, userFill);
+
+		return project
 	}
 
-	async deleteProject(projectId: string): Promise<void> {
-		this.projectRepository.deleteProject(projectId);
+	async deleteProject(projectId: string, userId: string): Promise<boolean> {
+		const user = this.userRepository.findByUserId(userId);
+		if (!user) {
+			throw new AppError("User not found, Cant delete project", 404);
+		}
+		const result = await this.projectRepository.deleteProject(projectId, userId);
+		return result?.isDeleted ?? false
 	}
 
 	async __getProjectById(id: string): Promise<IProject | null> {

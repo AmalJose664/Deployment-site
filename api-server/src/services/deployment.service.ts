@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 import { IDeploymentRepository } from "../interfaces/repository/IDeploymentRepository.js";
 import { IProjectRepository } from "../interfaces/repository/IProjectRepository.js";
 import { IDeploymentService } from "../interfaces/service/IDeploymentService.js";
-import { IDeployment } from "../models/Deployment.js";
+import { DeploymentStatus, IDeployment } from "../models/Deployment.js";
 import AppError from "../utils/AppError.js";
 import { IProject, ProjectStatus } from "../models/Projects.js";
 import { RunTaskCommand } from "@aws-sdk/client-ecs";
@@ -36,14 +36,18 @@ class DeploymentService implements IDeploymentService {
 		return deployment;
 	}
 
-	async deleteDeployment(projectId: string, deploymentId: string, userId: string): Promise<number> {
-		const result = await this.deploymentRepository.deleteDeployment(projectId, deploymentId, userId);
-		await this.projectRepository.pullDeployments(projectId, userId, deploymentId)
-		return result;
+
+	async getDeploymentById(id: string, userId: string): Promise<IDeployment | null> {
+		return await this.deploymentRepository.findDeploymentById(id, userId);
 	}
 
-	async getAllDeployments(userId: string): Promise<IDeployment[]> {
-		return await this.deploymentRepository.findAllDeployments(userId);
+	async getAllDeployments(userId: string, query: {
+		page: number,
+		limit: number,
+		status?: DeploymentStatus,
+		search?: string,
+	}): Promise<IDeployment[]> {
+		return await this.deploymentRepository.findAllDeployments(userId, query);
 	}
 
 	async getProjectDeployments(userId: string, projectId: string): Promise<IDeployment[]> {
@@ -51,6 +55,11 @@ class DeploymentService implements IDeploymentService {
 	}
 
 
+	async deleteDeployment(projectId: string, deploymentId: string, userId: string): Promise<number> {
+		const result = await this.deploymentRepository.deleteDeployment(projectId, deploymentId, userId);
+		await this.projectRepository.pullDeployments(projectId, userId, deploymentId)
+		return result;
+	}
 
 	async __getDeploymentById(id: string): Promise<IDeployment | null> {
 		//container

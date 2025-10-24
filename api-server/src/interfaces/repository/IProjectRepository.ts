@@ -12,8 +12,8 @@ export interface IProjectRepository {
 		status?: ProjectStatus,
 		search?: string,
 	): Promise<{ projects: IProject[]; total: number }>;
-	findProject(projectId: string, userId: string): Promise<IProject | null>;
-	deleteProject(projectId: string): Promise<void>;
+	findProject(projectId: string, userId: string, userFill?: boolean): Promise<IProject | null>;
+	deleteProject(projectId: string, userId: string): Promise<IProject | null>;
 	updateProject(projectId: string, userId: string, updateData: Partial<IProject>): Promise<IProject | null>
 	pushToDeployments(prjectId: string, userId: string, newDeployment: string | Types.ObjectId): Promise<IProject | null>
 	pullDeployments(projectId: string, userId: string, newDeployment: string | Types.ObjectId): Promise<IProject | null>
