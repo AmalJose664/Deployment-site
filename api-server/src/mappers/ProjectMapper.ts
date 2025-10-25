@@ -11,6 +11,7 @@ interface ProjectResponseDTO {
 		subdomain: string;
 		buildCommand: string;
 		installCommand: string;
+		techStack: string;
 		branch: string;
 		rootDir: string;
 		outputDirectory: string;
@@ -50,6 +51,7 @@ export class ProjectMapper {
 				installCommand: project.installCommand,
 				outputDirectory: project.outputDirectory,
 				repoURL: project.repoURL,
+				techStack: project.techStack || "NA",
 				rootDir: project.rootDir,
 				status: project.status,
 				subdomain: project.subdomain,

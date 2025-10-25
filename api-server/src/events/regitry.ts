@@ -1,3 +1,4 @@
+import { ZodError } from "zod";
 import DeploymentEventHandler from "./handlers/deployment.handler.js"
 import { DeploymentLogEventSchema, DeploymentUpdatesEventSchema } from "./schemas/deployment.schema.js";
 import { ZodObject } from "zod";
@@ -25,6 +26,9 @@ export const EVENT_REGISTRY: Record<string, EventConfig> = {
 		description: 'Deployment status transitions'
 	}
 }
+const maxRetries = 3
+const initialDelay = 750
+
 export function getALlTopics() {
 	return Object.values(EVENT_REGISTRY).map((c) => c.topic)
 }
@@ -38,7 +42,34 @@ export async function processEvent(data: unknown, topic: string) {
 	if (!config) {
 		throw new Error(`No handler registered for topic: ${topic}`);
 	}
-	const parsedData = config.schema.parse(data)
+	let attempt = 0;
+	let processed = false;
 
-	await config.handler(parsedData)
+	while (!processed && attempt < maxRetries) {
+		try {
+			const parsedData = config.schema.parse(data)
+			await config.handler(parsedData)
+			processed = true
+
+		}
+		catch (error: any) {
+			if (error instanceof ZodError) {
+				console.log("Error on parsing data ", error, data, "\nReturning...")
+				return
+			}
+			attempt++;
+			console.error(`Error processing message (attempt ${attempt}):`, {
+				value: data,
+				error: error.message,
+			});
+			if (attempt < maxRetries && !processed) {
+				const baseDelay = initialDelay * 2 ** (attempt - 1);
+				const jitter = Math.random() * 0.3 * baseDelay;
+				const delay = Math.min(baseDelay + jitter, 30000);
+				await new Promise((resolve) => setTimeout(resolve, delay))
+			} else {
+				console.log("Max retries reached skipping message")
+			}
+		}
+	}
 }

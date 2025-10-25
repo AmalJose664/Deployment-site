@@ -20,6 +20,7 @@ export interface IProject extends Document {
 	subdomain: string;
 	buildCommand: string;
 	installCommand: string;
+	techStack?: string;
 	branch: string;
 	rootDir: string;
 	outputDirectory: string;
@@ -43,6 +44,7 @@ const projectSchema = new Schema<IProject>(
 		branch: { type: String, required: true, default: "main" },
 		rootDir: { type: String, required: true, default: "/" },
 		installCommand: { type: String, required: true, default: "npm install" },
+		techStack: { type: String },
 		outputDirectory: { type: String, required: true, default: "dist" },
 		env: [{ name: String, value: String }],
 		lastDeployedAt: { type: Date, default: Date.now() },

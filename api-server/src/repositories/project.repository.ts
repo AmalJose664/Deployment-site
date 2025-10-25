@@ -3,6 +3,7 @@ import { IProjectRepository } from "../interfaces/repository/IProjectRepository.
 import { IProject, Project, ProjectStatus } from "../models/Projects.js";
 import { IUser, User } from "../models/User.js";
 import { BaseRepository } from "./base/base.repository.js";
+import { QueryProjectDTO } from "../dtos/project.dto.js";
 
 class ProjectRepository extends BaseRepository<IProject> implements IProjectRepository {
 	constructor() {
@@ -11,9 +12,7 @@ class ProjectRepository extends BaseRepository<IProject> implements IProjectRepo
 
 	async createProject(projectData: Partial<IProject>): Promise<IProject | null> {
 		const project = new Project(projectData);
-		console.log(project, projectData, "<<<<<<<")
 		const savedProject = await project.save();
-
 		return savedProject;
 	}
 	async findProject(projectId: string, userId: string, userFill?: boolean): Promise<IProject | null> {
@@ -24,24 +23,21 @@ class ProjectRepository extends BaseRepository<IProject> implements IProjectRepo
 	}
 	async getAllProjects(
 		userId: string,
-		page: number,
-		limit: number,
-		status?: ProjectStatus,
-		search?: string,
+		query: QueryProjectDTO
 	): Promise<{ projects: IProject[]; total: number }> {
-		const query: any = { user: userId };
-		if (search) {
-			query.$or = [{ name: { $regex: search, $options: "i" } }, { subdomain: { $regex: search, $options: "i" } }];
+		const dbQuery: any = { user: userId };
+		if (query.search) {
+			dbQuery.$or = [{ name: { $regex: query.search, $options: "i" } }, { subdomain: { $regex: query.search, $options: "i" } }];
 		}
-		if (status) {
-			query.status = { $eq: status };
+		if (query.status) {
+			dbQuery.status = { $eq: query.status };
 		}
 
-		const projects = await this.findMany(query)
-			.limit(limit)
-			.skip((page - 1) * limit)
+		const projects = await this.findMany(dbQuery)
+			.limit(query.limit)
+			.skip((query.page - 1) * query.limit)
 			.exec();
-		const total = await this.count(query);
+		const total = await this.count(dbQuery);
 
 		return { projects, total };
 	}

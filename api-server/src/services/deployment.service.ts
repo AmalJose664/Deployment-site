@@ -8,6 +8,9 @@ import { IProject, ProjectStatus } from "../models/Projects.js";
 import { RunTaskCommand } from "@aws-sdk/client-ecs";
 import { config, ecsClient } from "../config/awsClient.js";
 
+import { exec } from "child_process"
+import { QueryDeploymentDTO } from "../dtos/deployment.dto.js";
+
 class DeploymentService implements IDeploymentService {
 	private deploymentRepository: IDeploymentRepository;
 	private projectRepository: IProjectRepository;
@@ -22,6 +25,9 @@ class DeploymentService implements IDeploymentService {
 		}
 		if (correspondindProject.status === ProjectStatus.BUILDING) {
 			throw new AppError("Project deployment already in progress", 400);
+		}
+		if (correspondindProject.isDeleted) {
+			throw new AppError("Project not available for deployment", 400);
 		}
 
 		deploymentData.overWrite = false;
@@ -41,17 +47,16 @@ class DeploymentService implements IDeploymentService {
 		return await this.deploymentRepository.findDeploymentById(id, userId);
 	}
 
-	async getAllDeployments(userId: string, query: {
-		page: number,
-		limit: number,
-		status?: DeploymentStatus,
-		search?: string,
-	}): Promise<IDeployment[]> {
+	async getAllDeployments(userId: string, query: QueryDeploymentDTO): Promise<IDeployment[]> {
 		return await this.deploymentRepository.findAllDeployments(userId, query);
 	}
 
-	async getProjectDeployments(userId: string, projectId: string): Promise<IDeployment[]> {
-		return await this.deploymentRepository.findProjectDeployments(userId, projectId);
+	async getProjectDeployments(userId: string, projectId: string, query: QueryDeploymentDTO): Promise<IDeployment[]> {
+		const correspondindProject = await this.projectRepository.findProject(projectId, userId);
+		if (!correspondindProject) {
+			throw new AppError("Project not found", 404);
+		}
+		return await this.deploymentRepository.findProjectDeployments(userId, projectId, query);
 	}
 
 
@@ -67,9 +72,35 @@ class DeploymentService implements IDeploymentService {
 	}
 	async __updateDeployment(projectId: string, deploymentId: string, updateData: Partial<IDeployment>): Promise<IDeployment | null> {
 		const result = await this.deploymentRepository.__updateDeployment(projectId, deploymentId, updateData)
-		const status = updateData.status as string as ProjectStatus
-		await this.projectRepository.__updateProject(projectId, { status })
 		return result
+	}
+	async deployLocal(deploymentId: string, projectId: string) {
+		const command = exec(
+			"node script.js",
+			{
+				cwd: "../build-server/",
+				env: {
+					DEPLOYMENT_ID: deploymentId + " hey this is working for deploy",
+					PROJECT_ID: projectId + " hey this is working"
+				}
+			}
+		);
+
+		command.stdout?.on("data", (data) => {
+			console.log(`[stdout]: ${data.toString().trim()}`);
+		});
+
+		command.stderr?.on("data", (data) => {
+			console.error(`[stderr]: ${data.toString().trim()}`);
+		});
+
+		command.on("exit", (code) => {
+			console.log(`Process exited with code ${code}`);
+		});
+
+		command.on("error", (err) => {
+			console.error("Failed to start process:", err);
+		});
 	}
 	async deployAws(project: IProject, deployment: IDeployment) {
 		const command = new RunTaskCommand({

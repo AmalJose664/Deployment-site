@@ -1,4 +1,5 @@
-import { deploymentService, logsService } from "../../instances.js"
+import { deploymentService, logsService, projectService } from "../../instances.js"
+import { ProjectStatus } from "../../models/Projects.js"
 import { DeploymentLogEvent, DeploymentUpdatesEvent } from "../schemas/deployment.schema.js"
 import { UpdateTypes } from "../types/event.js"
 
@@ -6,11 +7,10 @@ class DeploymentEventHandler {
 	static async handleLogs(event: DeploymentLogEvent): Promise<void> {
 		//service call
 		const { data } = event
-		console.log("returnings")
 
 		const { log, deploymentId, projectId } = data
 		const r = await logsService.__insertLog(log.message, projectId, deploymentId, new Date(log.timestamp), log.level)
-		console.log("logs inserted...", r)
+		console.log("logs inserted...", log.message)
 		//stream
 	}
 
@@ -24,6 +24,9 @@ class DeploymentEventHandler {
 					status: updates.status,
 					commit_hash: updates.commit_hash
 				})
+				await projectService.__updateProjectById(projectId, {
+					status: updates.status as unknown as ProjectStatus
+				})
 				console.log("updates event ==>>>", data.updateType)
 				break
 			}
@@ -31,15 +34,24 @@ class DeploymentEventHandler {
 				await deploymentService.__updateDeployment(projectId, deploymentId, {
 					status: updates.status,
 					complete_at: new Date(updates.complete_at || ""),
+					install_ms: updates.install_ms,
+					build_ms: updates.build_ms,
 					duration_ms: updates.duration_ms
 				})
-				console.log("updates event ==>>>", data.updateType)
+				await projectService.__updateProjectById(projectId, {
+					status: updates.status as unknown as ProjectStatus,
+					techStack: updates.techStack
+				})
+				console.log("updates event ==>>>", data.updateType, updates)
 				break
 			}
 			case UpdateTypes.ERROR: {
 				await deploymentService.__updateDeployment(projectId, deploymentId, {
 					status: updates.status,
 					error_message: updates.error_message
+				})
+				await projectService.__updateProjectById(projectId, {
+					status: updates.status as unknown as ProjectStatus
 				})
 				console.log("updates event ==>>>", data.updateType)
 				break
@@ -50,7 +62,11 @@ class DeploymentEventHandler {
 					...updates,
 					complete_at: new Date()
 				})
-				console.log("updates event ==>>>", data.updateType)
+				await projectService.__updateProjectById(projectId, {
+					status: updates.status as unknown as ProjectStatus,
+					techStack: updates.techStack
+				})
+				console.log("updates event ==>>>", data.updateType, updates.techStack)
 				break
 			}
 			default: {

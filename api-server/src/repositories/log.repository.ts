@@ -1,6 +1,6 @@
 import { v4 as uuidV4 } from "uuid";
 import { ILogRepository, LogModel } from "../interfaces/repository/ILogRepository.js";
-import { ClickHouseClient, ResultSet } from "@clickhouse/client"
+import { ClickHouseClient, ResponseJSON } from "@clickhouse/client"
 
 class LogRepository implements ILogRepository {
 	private client: ClickHouseClient
@@ -8,7 +8,7 @@ class LogRepository implements ILogRepository {
 		this.client = client
 	}
 
-	async getProjectLogs(projectId: string): Promise<ResultSet<"JSON">> {
+	async getProjectLogs(projectId: string): Promise<ResponseJSON<unknown>> {
 		const result = await this.client.query({
 			query: "SELECT * FROM log_events WHERE deployment_id={project_id:String}",
 			query_params: {
@@ -17,10 +17,10 @@ class LogRepository implements ILogRepository {
 			format: "JSON"
 		})
 
-		return result
+		return await result.json()
 	}
 
-	async getLogs(deploymentId: string): Promise<ResultSet<"JSON">> {
+	async getLogs(deploymentId: string): Promise<ResponseJSON<unknown>> {
 		const result = await this.client.query({
 			query: "SELECT * FROM log_events WHERE deployment_id={deployment_id:String}",
 			query_params: {
@@ -28,7 +28,7 @@ class LogRepository implements ILogRepository {
 			},
 			format: "JSON"
 		})
-		return result
+		return await result.json()
 	}
 
 	async __insertLogs(data: LogModel): Promise<void> {

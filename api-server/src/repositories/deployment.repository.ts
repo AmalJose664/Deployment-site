@@ -1,3 +1,4 @@
+import { QueryDeploymentDTO } from "../dtos/deployment.dto.js";
 import { IDeploymentRepository } from "../interfaces/repository/IDeploymentRepository.js";
 import { Deployment, DeploymentStatus, IDeployment } from "../models/Deployment.js";
 import { BaseRepository } from "./base/base.repository.js";
@@ -18,7 +19,7 @@ class DeploymentRepository extends BaseRepository<IDeployment> implements IDeplo
 		status?: DeploymentStatus,
 		search?: string,
 	}): Promise<IDeployment[]> {
-		let dbQuery: any = { user: userId };
+		let dbQuery: any = { userId };
 		if (query.search) {
 			dbQuery = { ...dbQuery, commit_hash: { $regex: query.search, $options: "i" } }
 		}
@@ -35,8 +36,20 @@ class DeploymentRepository extends BaseRepository<IDeployment> implements IDeplo
 	async findDeploymentById(id: string, userId: string): Promise<IDeployment | null> {
 		return await Deployment.findOne({ _id: id, userId })
 	}
-	async findProjectDeployments(userId: string, projectId: string): Promise<IDeployment[]> { // QUERY FIX
-		return await Deployment.find({ userId, project: projectId });
+
+	async findProjectDeployments(userId: string, projectId: string, query: QueryDeploymentDTO): Promise<IDeployment[]> {
+		let dbQuery: any = { userId, project: projectId };
+		if (query.search) {
+			dbQuery = { ...dbQuery, commit_hash: { $regex: query.search, $options: "i" } }
+		}
+		if (query.status) {
+			dbQuery.status = { $eq: query.status };
+		}
+		const deployments = await this.findMany(dbQuery)
+			.limit(query.limit)
+			.skip((query.page - 1) * query.limit)
+			.exec();
+		return deployments
 	}
 
 

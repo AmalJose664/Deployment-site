@@ -11,7 +11,12 @@ export interface IDeploymentService {
 	}): Promise<IDeployment[]>;
 
 	getDeploymentById(id: string, userId: string): Promise<IDeployment | null>
-	getProjectDeployments(userId: string, projectId: string): Promise<IDeployment[]>;
+	getProjectDeployments(userId: string, projectId: string, query: {
+		page: number,
+		limit: number,
+		status?: DeploymentStatus,
+		search?: string,
+	}): Promise<IDeployment[]>;
 
 	deleteDeployment(projectId: string, deploymentId: string, userId: string): Promise<number>;
 

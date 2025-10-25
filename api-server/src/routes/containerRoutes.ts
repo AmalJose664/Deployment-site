@@ -5,12 +5,12 @@ import { deploymentController, projectController } from "../instances.js";
 
 const internalRoutes = Router();
 
-internalRoutes.get("/projects/:id", authenticaContainerteToken, validateObjectId, projectController.__getProjects.bind(projectController));
+internalRoutes.get("/projects/:id", authenticaContainerteToken, validateObjectId("id"), projectController.__getProjects.bind(projectController));
 
 internalRoutes.get(
 	"/deployments/:id",
 	authenticaContainerteToken,
-	validateObjectId,
+	validateObjectId("id"),
 	deploymentController.__getDeployment.bind(deploymentController),
 );
 

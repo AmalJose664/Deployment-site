@@ -1,7 +1,7 @@
-import { ResultSet } from "@clickhouse/client";
+import { ResponseJSON, ResultSet } from "@clickhouse/client";
 
 export interface ILogsService {
-	getDeploymentLog(deploymentId: string): Promise<ResultSet<"JSON">>
-	getProjectsLogs(projectId: string): Promise<ResultSet<"JSON">>
+	getDeploymentLog(deploymentId: string): Promise<ResponseJSON<unknown>>
+	getProjectsLogs(projectId: string): Promise<ResponseJSON<unknown>>
 	__insertLog(log: string, projectId: string, deploymentId: string, reportTime: Date, info: string): Promise<void>
 } 

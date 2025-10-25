@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { IProjectController } from "../interfaces/controller/IProjectController.js";
 import ProjectService from "../services/project.service.js";
 import { HTTP_STATUS_CODE } from "../utils/statusCodes.js";
-import { CreateProjectDTO, ProjectQueryScheme, QueryProjectDTO } from "../dtos/project.dto.js";
+import { CreateProjectDTO, QueryProjectDTO } from "../dtos/project.dto.js";
 import { ProjectMapper } from "../mappers/ProjectMapper.js";
 
 class ProjectController implements IProjectController {
@@ -29,7 +29,7 @@ class ProjectController implements IProjectController {
 
 			const query = req.validatedQuery as unknown as QueryProjectDTO
 
-			const result = await this.projectService.getAllProjects(userId, query.page, query.limit, query.status, query.search);
+			const result = await this.projectService.getAllProjects(userId, query);
 			const response = ProjectMapper.toProjectsResponse(result.projects, result.total, query.page, query.limit)
 
 			res.status(HTTP_STATUS_CODE.OK).json(response);
@@ -40,7 +40,7 @@ class ProjectController implements IProjectController {
 	async getProject(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
 			const userId = req.user?.id as string
-			const projectId = req.params.id
+			const projectId = req.params.projectId
 			const userFill = !!req.query.user
 
 			const result = await this.projectService.getProjectById(projectId, userId, userFill);
@@ -59,7 +59,7 @@ class ProjectController implements IProjectController {
 	async deleteProject(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
 			const userId = req.user?.id as string
-			const projectId = req.params.id
+			const projectId = req.params.projectId
 
 			const result = await this.projectService.deleteProject(projectId, userId);
 

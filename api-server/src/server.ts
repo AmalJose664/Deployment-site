@@ -3,7 +3,7 @@ import { startKafkaConsumer, stopKafkaConsumer } from "./events/index.js";
 const PORT = process.env.PORT || 8000;
 const startServer = async () => {
 	httpServer.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
-	// await startKafkaConsumer()
+	await startKafkaConsumer()
 };
 
 startServer().catch((e) => console.log(e));

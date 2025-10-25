@@ -54,47 +54,26 @@ class KafkaEventConsumer implements IKafkaEventConsumer {
 
 
 	private async processEvent({ batch, heartbeat, commitOffsetsIfNecessary, resolveOffset }: EachBatchPayload): Promise<void> {
-		const messages = batch.messages
-		let attempt = 0;
-		const maxRetries = 3
-		const initialDelay = 750
-		let processed = false
 
-		for (const msg of messages) {
-			async function processMessage() {
-				while (!processed && attempt < maxRetries) {
-					try {
-						const stringMessage = msg.value?.toString()
-						const data = JSON.parse(stringMessage || "{}")
-						await processEvent(data, batch.topic)
+		await Promise.all(
+			batch.messages.map(async (msg) => {
+				try {
+					const data = JSON.parse(msg.value?.toString() || "{}")
 
-						processed = true
+					await processEvent(data, batch.topic)
 
-					} catch (error: any) {
-						attempt++;
-						console.error(`Error processing message (attempt ${attempt}):`, {
-							value: msg.value?.toString(),
-							error: error.message,
-						});
-						if (attempt < maxRetries && !processed) {
-							const baseDelay = initialDelay * 2 ** (attempt - 1);
-							const jitter = Math.random() * 0.3 * baseDelay;
-							const delay = Math.min(baseDelay + jitter, 30000);
-							await new Promise((resolve) => setTimeout(resolve, delay))
-						} else {
-							console.log("Max retries reached skipping message")
-						}
-					}
+					resolveOffset(msg.offset)
+					await heartbeat()
+				} catch (error: any) {
+					console.error('Failed to process message:', error) // send to dlq task!!!!!
+					resolveOffset(msg.offset)
 				}
 
+				commitOffsetsIfNecessary(msg.offset as unknown as Offsets)
+				await heartbeat()
+			})
+		)
 
-			}
-			await processMessage()
-
-			resolveOffset(msg.offset)
-			commitOffsetsIfNecessary(msg.offset as unknown as Offsets)
-			await heartbeat()
-		}
 	}
 
 }

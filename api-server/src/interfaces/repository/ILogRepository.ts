@@ -1,4 +1,4 @@
-import { ResultSet } from "@clickhouse/client"
+import { ResponseJSON, ResultSet } from "@clickhouse/client"
 
 export interface LogModel {
 	info: string
@@ -8,7 +8,7 @@ export interface LogModel {
 	reportTime: Date
 }
 export interface ILogRepository {
-	getLogs(deploymentId: string): Promise<ResultSet<"JSON">>
-	getProjectLogs(projectId: string): Promise<ResultSet<"JSON">>
+	getLogs(deploymentId: string): Promise<ResponseJSON<unknown>>
+	getProjectLogs(projectId: string): Promise<ResponseJSON<unknown>>
 	__insertLogs(data: LogModel): Promise<void>
 }

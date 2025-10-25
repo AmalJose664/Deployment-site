@@ -4,6 +4,8 @@ import { IDeploymentService } from "../interfaces/service/IDeploymentService.js"
 import { DeploymentMapper } from "../mappers/DeploymentMapper.js";
 import { HTTP_STATUS_CODE } from "../utils/statusCodes.js";
 import { CreateDeploymentDTO, QueryDeploymentDTO } from "../dtos/deployment.dto.js";
+
+
 class DeploymentController implements IDeploymentController {
 	private deploymentService: IDeploymentService;
 	constructor(deployService: IDeploymentService) {
@@ -30,9 +32,9 @@ class DeploymentController implements IDeploymentController {
 	async getDeployment(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
 			const userId = req.user?.id as string;
-			const id = req.params.id
+			const deploymentId = req.params.deploymentId
 
-			const result = await this.deploymentService.getDeploymentById(id, userId)
+			const result = await this.deploymentService.getDeploymentById(deploymentId, userId)
 			if (result) {
 				const response = DeploymentMapper.toDeploymentResponse(result)
 				res.status(HTTP_STATUS_CODE.OK).json(response);
@@ -45,13 +47,13 @@ class DeploymentController implements IDeploymentController {
 		}
 	}
 
-	async getProjectDeployments(req: Request, res: Response, next: NextFunction): Promise<void> {
+	async getDeploymentsByProject(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
 			const userId = req.user?.id as string;
 			const query = req.validatedQuery as QueryDeploymentDTO
-			const projectId = req.params.id
+			const projectId = req.params.projectId
 
-			const result = await this.deploymentService.getProjectDeployments(userId, projectId);
+			const result = await this.deploymentService.getProjectDeployments(userId, projectId, query);
 			const response = DeploymentMapper.toDeploymentsResponse(result, result.length, query.page, query.limit)
 			res.status(HTTP_STATUS_CODE.OK).json(response);
 		} catch (error) {
@@ -85,13 +87,16 @@ class DeploymentController implements IDeploymentController {
 	async __getDeployment(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
 			const deploymentId = req.params.id;
+			console.log("triyng")
 			const deployment = await this.deploymentService.__getDeploymentById(deploymentId);
+			console.log("finded")
 			if (deployment) {
 				const response = DeploymentMapper.toDeploymentResponse(deployment)
-				res.status(HTTP_STATUS_CODE.CREATED).json(response);
+				res.status(HTTP_STATUS_CODE.OK).json(response);
 				return
 			}
-			res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ deployment: null });
+			res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ deployment: null });
+			console.log("not finded")
 		} catch (error) {
 			next(error);
 		}

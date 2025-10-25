@@ -5,7 +5,7 @@ import { IProjectService } from "../interfaces/service/IProjectService.js";
 import { IProject, ProjectStatus } from "../models/Projects.js";
 import { IUser } from "../models/User.js";
 import { generateSlug } from "random-word-slugs";
-import { CreateProjectDTO } from "../dtos/project.dto.js";
+import { CreateProjectDTO, QueryProjectDTO } from "../dtos/project.dto.js";
 import AppError from "../utils/AppError.js";
 import { HTTP_STATUS_CODE } from "../utils/statusCodes.js";
 
@@ -46,12 +46,9 @@ class ProjectService implements IProjectService {
 
 	async getAllProjects(
 		userId: string,
-		page: number,
-		limit: number,
-		status?: ProjectStatus,
-		search?: string,
+		query: QueryProjectDTO
 	): Promise<{ projects: IProject[]; total: number }> {
-		const result = await this.projectRepository.getAllProjects(userId, page, limit, status, search);
+		const result = await this.projectRepository.getAllProjects(userId, query);
 		return result;
 	}
 	async getProjectById(id: string, userId: string, userFill: boolean): Promise<IProject | null> {
@@ -76,6 +73,15 @@ class ProjectService implements IProjectService {
 	async __getProjectById(id: string): Promise<IProject | null> {
 		//container
 		return await this.projectRepository.__findProject(id);
+	}
+	async __updateProjectById(projectId: string, updateData: Partial<IProject>): Promise<IProject | null> {
+		//container
+		const status = updateData.status as string as ProjectStatus
+		return await this.projectRepository.__updateProject(projectId, {
+			status, ...(updateData.techStack && {
+				techStack: updateData.techStack
+			})
+		})
 	}
 }
 

@@ -1,4 +1,4 @@
-import { CreateProjectDTO } from "../../dtos/project.dto.js";
+import { CreateProjectDTO, QueryProjectDTO } from "../../dtos/project.dto.js";
 import { IProject, ProjectStatus } from "../../models/Projects.js";
 import { IUser } from "../../models/User.js";
 
@@ -7,10 +7,7 @@ export interface IProjectService {
 
 	getAllProjects(
 		userId: string,
-		page: number,
-		limit: number,
-		status?: ProjectStatus,
-		search?: string,
+		query: QueryProjectDTO
 	): Promise<{ projects: IProject[]; total: number }>;
 	getProjectById(id: string, userId: string, userFill: boolean): Promise<IProject | null>;
 	deleteProject(projectId: string, userId: string): Promise<boolean>;

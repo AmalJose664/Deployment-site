@@ -6,12 +6,13 @@ import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import passport from "passport";
 import "./config/passport.js";
-import authRouter from "./routes/authRoute.js";
+import authRouter from "./routes/authRoutes.js";
 
 import { errorHandler } from "./middlewares/globalErrorHandler.js";
 import projectRouter from "./routes/projectRoutes.js";
-import deploymentRouter from "./routes/deploymentRoute.js";
+import deploymentRouter from "./routes/deploymentRoutes.js";
 import internalRoutes from "./routes/containerRoutes.js";
+import logsRouter from "./routes/logsRoutes.js";
 
 const app = express();
 dotenv.config();
@@ -46,9 +47,11 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 	next();
 });
 
-app.use("/api/auth", authRouter);
+
+app.use("/api/logs", logsRouter);
+app.use("/api/deployments", deploymentRouter);
 app.use("/api/projects", projectRouter);
-app.use("/api/deployment", deploymentRouter);
+app.use("/api/auth", authRouter);
 
 // ------- CONTAINER ROUTES--------------
 
