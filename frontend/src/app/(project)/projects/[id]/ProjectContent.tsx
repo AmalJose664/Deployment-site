@@ -1,10 +1,8 @@
 'use client'
-
 import { FiMoreHorizontal } from "react-icons/fi";
 import { TiArrowLeft } from "react-icons/ti";
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-
 
 import { useGetProjectByIdQuery } from "@/store/services/projectsApi";
 import ProjectLoading from "@/app/(project)/projects/[id]/components/ProjectLoading";
@@ -15,6 +13,12 @@ import ProjectCurrentDeployment from "./components/ProjectCurrentDeployment";
 import ProjectSimpleStats from "./components/ProjectSimpleStats";
 import NoDeployment from "./components/NoDeployment";
 import { useGetDeploymentByIdQuery } from "@/store/services/deploymentApi";
+import { Logs } from "@/components/LogsComponent";
+
+
+
+
+
 
 interface ProjectDetailProps {
 	projectId: string;
@@ -31,8 +35,7 @@ export function ProjectContent({ projectId, onBack }: ProjectDetailProps) {
 	)
 
 
-
-	const [showBuild, setShowBuild] = useState(false)
+	const [showBuild, setShowBuild] = useState(true)
 	const [showDeployment, setshowDeployment] = useState(false)
 	console.log("re render", project, deployment)
 	if (isLoading) return <ProjectLoading />
@@ -88,11 +91,23 @@ export function ProjectContent({ projectId, onBack }: ProjectDetailProps) {
 							{showBuild && (
 								<motion.div initial={{ opacity: 0, height: 0 }}
 
-									animate={{ opacity: 1, height: "20rem" }}
+									animate={{ opacity: 1, height: "auto" }}
 									exit={{ opacity: 0, height: 0 }}
 									transition={{ duration: 0.4, ease: "easeInOut" }}
-									className='h-80 bg-stone-900'>
-									Content
+									className='bg-stone-900 h-auto'>
+									<div >
+										<Logs logsArray={
+											[
+												{
+													event_id: Math.random().toString(36).slice(2, 12),
+													project_id: "", deployment_id: "",
+													report_time: '2025-10-26 10:23:01',
+													level: 'info',
+													message: 'Starting deployment process...'
+												}
+											]
+										} />
+									</div>
 								</motion.div>
 							)}
 						</AnimatePresence >
@@ -116,8 +131,9 @@ export function ProjectContent({ projectId, onBack }: ProjectDetailProps) {
 					</motion.div>
 				</div>
 
-				{(project.deployments && project.deployments.length > 0 && deployment) && <
-					ProjectCurrentDeployment deployment={deployment} projectBranch={project.branch} />}
+				{(project.deployments && project.deployments.length > 0 && deployment) &&
+					<ProjectCurrentDeployment deployment={deployment} projectBranch={project.branch} />}
+
 				{project.deployments && project.deployments.length > 0 && <ProjectSimpleStats />}
 
 			</main>

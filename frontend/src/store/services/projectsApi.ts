@@ -23,7 +23,7 @@ export const projectApis = createApi({
 		}),
 		getProjectById: builder.query<Project, { id: string, params: { user?: string } }>({
 			query: ({ id, params }) => ({ url: `/projects/${id}`, method: 'get', params }),
-			transformResponse(baseQueryReturnValue: any) {
+			transformResponse(baseQueryReturnValue: any, meta) {
 				return baseQueryReturnValue.project as Project
 			},
 			providesTags: (result, error, { id }) => [{ type: 'Projects', id }]

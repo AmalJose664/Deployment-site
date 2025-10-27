@@ -103,7 +103,7 @@ const ProjectOverview = ({ project, deploymentCommitHash, deploymentDuration }: 
 						</button>
 					</div>
 				</div>
-				<TechStack stack='react' />
+				<TechStack stack={project.techStack.toLowerCase()} />
 			</div>
 
 		</>

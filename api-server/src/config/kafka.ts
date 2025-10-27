@@ -10,6 +10,5 @@ export const kafka = new Kafka({
 		password: process.env.KAFKA_PASSWORD as string,
 	},
 });
-export const consumer = kafka.consumer({ groupId: "api-server-data-consumer" });
 
 

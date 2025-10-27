@@ -7,21 +7,47 @@ export const deployemntApis = createApi({
 	baseQuery: axiosBaseQuery({
 		baseUrl: process.env.NEXT_PUBLIC_API_SERVER_ENDPOINT as string
 	}),
-	tagTypes: ['Deployments',],
+	tagTypes: ['Deployments'],
 	endpoints: (builder) => ({
 		getDeployments: builder.query<Deployment[], {}>({
-			query: () => ({ url: '/deployment', method: 'get' }),
-			providesTags: ['Deployments']
+			query: () => ({ url: '/deployments', method: 'get' }),
+			transformResponse: (data: any) => {
+				return data.deployments
+			},
+			providesTags: (result) =>
+				result
+					? [
+						...result.map(({ _id }) => ({ type: 'Deployments' as const, _id })),
+						{ type: 'Deployments', id: 'LIST' }
+					]
+					: [{ type: 'Deployments', id: 'LIST' }]
 		}),
+		getProjectDeployments: builder.query<Deployment[], string>({
+			query: (projectId) => ({ url: `/projects/${projectId}/deployments`, method: 'get' }),
+			transformResponse: (data: any) => {
+				return data.deployments
+			},
+			providesTags: (result, error, projectId) =>
+				result
+					? [
+						...result.map(({ _id }) => ({ type: 'Deployments' as const, _id })),
+						{ type: 'Deployments', id: `PROJECT_${projectId}` }
+					]
+					: [{ type: 'Deployments', id: `PROJECT_${projectId}` }]
+
+		}),
+
+
+
 		getDeploymentById: builder.query<Deployment, { id: string, params: {} }>({
-			query: ({ id, params }) => ({ url: '/deployment/' + id, method: 'get', params }),
+			query: ({ id, params }) => ({ url: '/deployments/' + id, method: 'get', params }),
 			transformResponse: (data: any) => {
 				return data.deployment
 			},
 			providesTags: (result, error, { id }) => [{ type: 'Deployments', id }]
 		}),
 		createDeployment: builder.mutation<Deployment, string>({
-			query: (projectId) => ({ url: "/deployment/new", method: "POST", data: { projectId } }),
+			query: (projectId) => ({ url: `/project/${projectId}/deployments`, method: "POST", data: { projectId } }),
 			invalidatesTags: (result, error, projectId) => [{ type: 'Deployments', id: 'LIST' }],
 		})
 	})
@@ -30,5 +56,5 @@ export const deployemntApis = createApi({
 
 export const {
 	useCreateDeploymentMutation,
-	useGetDeploymentByIdQuery,
+	useGetDeploymentByIdQuery, useGetProjectDeploymentsQuery,
 	useGetDeploymentsQuery } = deployemntApis

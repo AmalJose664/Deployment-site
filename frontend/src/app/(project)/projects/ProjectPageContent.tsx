@@ -122,7 +122,7 @@ export default function ProjectContent() {
 
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
 						{filteredProjects && filteredProjects.map((project) => (
-							<div
+							<div onClick={() => router.push("/projects/" + project._id)}
 								key={project._id}
 								className="dark:bg-zinc-900 bg-[#fdfdfd] border dark:border-gray-800 border-gray-300  shadow-gray-200 shadow dark:shadow-none  rounded-xl p-5 hover:border-blue-500 dark:hover:border-blue-900 transition-all duration-200 group cursor-pointer leading-5 "
 							>

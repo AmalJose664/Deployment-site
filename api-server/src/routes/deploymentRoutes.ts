@@ -31,5 +31,10 @@ deploymentRouter.get('/:deploymentId/logs',
 	validateObjectId("deploymentId"),
 	logsController.getLogsByDeployment.bind(logsController)
 );
+deploymentRouter.get('/:deploymentId/logs/stream',
+	authenticateToken,
+	validateObjectId("deploymentId"),
+	logsController.streamLogs.bind(logsController)
+);
 
 export default deploymentRouter;

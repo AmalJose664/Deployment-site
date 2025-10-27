@@ -8,6 +8,4 @@ const logsRouter = Router({ mergeParams: true });
 logsRouter.get("/", authenticateToken, logsController.test.bind(logsController))
 
 
-
-
 export default logsRouter

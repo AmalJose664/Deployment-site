@@ -1,5 +1,6 @@
 import { deploymentService, logsService, projectService } from "../../instances.js"
 import { ProjectStatus } from "../../models/Projects.js"
+import { deploymentEmitter } from "../deploymentEmitter.js"
 import { DeploymentLogEvent, DeploymentUpdatesEvent } from "../schemas/deployment.schema.js"
 import { UpdateTypes } from "../types/event.js"
 
@@ -9,7 +10,15 @@ class DeploymentEventHandler {
 		const { data } = event
 
 		const { log, deploymentId, projectId } = data
-		const r = await logsService.__insertLog(log.message, projectId, deploymentId, new Date(log.timestamp), log.level)
+		deploymentEmitter.emitLog(deploymentId, {
+			event_id: event.eventId,
+			deployment_id: deploymentId,
+			project_id: projectId,
+			...log,
+		}
+		)
+
+		await logsService.__insertLog(log.message, projectId, deploymentId, new Date(log.timestamp), log.level)
 		console.log("logs inserted...", log.message)
 		//stream
 	}
@@ -18,6 +27,10 @@ class DeploymentEventHandler {
 		//service call
 		const { data } = event
 		const { updates, deploymentId, projectId } = data
+		console.log("Updates >>>>", data.updateType)
+		deploymentEmitter.emitUpdates(deploymentId, {
+			...updates, deploymentId, projectId
+		})
 		switch (data.updateType) {
 			case UpdateTypes.START: {
 				await deploymentService.__updateDeployment(projectId, deploymentId, {
@@ -27,7 +40,6 @@ class DeploymentEventHandler {
 				await projectService.__updateProjectById(projectId, {
 					status: updates.status as unknown as ProjectStatus
 				})
-				console.log("updates event ==>>>", data.updateType)
 				break
 			}
 			case UpdateTypes.END: {
@@ -42,7 +54,6 @@ class DeploymentEventHandler {
 					status: updates.status as unknown as ProjectStatus,
 					techStack: updates.techStack
 				})
-				console.log("updates event ==>>>", data.updateType, updates)
 				break
 			}
 			case UpdateTypes.ERROR: {
@@ -53,7 +64,6 @@ class DeploymentEventHandler {
 				await projectService.__updateProjectById(projectId, {
 					status: updates.status as unknown as ProjectStatus
 				})
-				console.log("updates event ==>>>", data.updateType)
 				break
 			}
 			case UpdateTypes.CUSTOM: {
@@ -66,7 +76,6 @@ class DeploymentEventHandler {
 					status: updates.status as unknown as ProjectStatus,
 					techStack: updates.techStack
 				})
-				console.log("updates event ==>>>", data.updateType, updates.techStack)
 				break
 			}
 			default: {

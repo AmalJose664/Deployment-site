@@ -1,9 +1,11 @@
+import { Kafka } from "kafkajs"
 import { Deployment } from "./src/models/Deployment"
 import { Project } from "./src/models/Projects"
 import repo from "./src/repositories/project.repository"
 import mongoose, { Types } from "mongoose";
 import connectDb from "./src/config/db";
-import pg from "pg"
+import pg from "pg" // COnsider  ------------------------------------------------------------------------------
+
 async function create() {
 	try {
 		await connectDb();
@@ -19,17 +21,43 @@ async function create() {
 	}
 }
 
-// create();
-async function main() {
+async function commitAllMessages() {
+	const kafka = new Kafka({
+		clientId: `api-server`,
+		brokers: ["pkc-l7pr2.ap-south-1.aws.confluent.cloud:9092"],
+		ssl: true,
+		sasl: {
+			mechanism: "plain",
+			username: process.env.KAFKA_USERNAME as string,
+			password: process.env.KAFKA_PASSWORD as string,
+		},
+	});
 
-	const { Pool } = pg;
-	const pool = new Pool({
-		connectionString: "postgres://tsdbadmin:rfncnunbzyd4bmf4@bzwcde53qk.i2vg267re8.tsdb.cloud.timescale.com:32460/tsdb"
-	})
-	await pool.connect()
-	const res = await pool.query('SELECT NOW()');
-	console.log(res, res.rows)
 
+	const topic = "deployment.logs"
+	const groupId = "vercel-api-clone"
+	const admin = kafka.admin()
+	await admin.connect()
+
+	try {
+		const topicMetadata = await admin.fetchTopicMetadata({ topics: [topic] })
+		const partitions = topicMetadata.topics[0].partitions.map(p => p.partitionId)
+
+		const endOffsets = await admin.fetchTopicOffsets(topic)
+
+		const offsetsToCommit = endOffsets.map(({ partition, offset }) => ({
+			topic,
+			partition,
+			offset,
+		}))
+
+		await admin.setOffsets({ groupId, topic, partitions: offsetsToCommit })
+		console.log("configs====>>>>>>>", { partitions })
+		console.log(`✅ All uncommitted messages marked as consumed for group "${groupId}" on topic "${topic}".`)
+	} catch (err) {
+		console.error('❌ Error committing offsets:', err)
+	} finally {
+		await admin.disconnect()
+	}
 }
-
-main()
+commitAllMessages()

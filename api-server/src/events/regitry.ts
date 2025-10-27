@@ -26,8 +26,8 @@ export const EVENT_REGISTRY: Record<string, EventConfig> = {
 		description: 'Deployment status transitions'
 	}
 }
-const maxRetries = 3
-const initialDelay = 750
+const KAFKA_MESSAGE_SAVE_RETRIES = 3
+const KAFKA_MESSAGE_RETRY_INITIAL_DELAY = 750
 
 export function getALlTopics() {
 	return Object.values(EVENT_REGISTRY).map((c) => c.topic)
@@ -45,7 +45,7 @@ export async function processEvent(data: unknown, topic: string) {
 	let attempt = 0;
 	let processed = false;
 
-	while (!processed && attempt < maxRetries) {
+	while (!processed && attempt < KAFKA_MESSAGE_SAVE_RETRIES) {
 		try {
 			const parsedData = config.schema.parse(data)
 			await config.handler(parsedData)
@@ -62,8 +62,8 @@ export async function processEvent(data: unknown, topic: string) {
 				value: data,
 				error: error.message,
 			});
-			if (attempt < maxRetries && !processed) {
-				const baseDelay = initialDelay * 2 ** (attempt - 1);
+			if (attempt < KAFKA_MESSAGE_SAVE_RETRIES && !processed) {
+				const baseDelay = KAFKA_MESSAGE_RETRY_INITIAL_DELAY * 2 ** (attempt - 1);
 				const jitter = Math.random() * 0.3 * baseDelay;
 				const delay = Math.min(baseDelay + jitter, 30000);
 				await new Promise((resolve) => setTimeout(resolve, delay))

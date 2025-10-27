@@ -21,7 +21,7 @@ export const logRepo = new LogRepo(client)
 export const userService = new UserService(userRepo);
 export const projectService = new ProjectService(projectRepo, userRepo);
 export const deploymentService = new DeploymentService(deploymentRepo, projectRepo);
-export const logsService = new LogsService(logRepo)
+export const logsService = new LogsService(logRepo, deploymentRepo)
 
 export const projectController = new ProjectController(projectService);
 export const deploymentController = new DeploymentController(deploymentService);
