@@ -1,11 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { logsService } from "../instances.js";
 import { ILogsController } from "../interfaces/controller/ILogsController.js";
 import { ILogsService } from "../interfaces/service/ILogsService.js";
 import { client } from "../config/clickhouse.js";
 import { deploymentEmitter } from "../events/deploymentEmitter.js";
-import { HTTP_STATUS_CODE } from "../utils/statusCodes.js";
-import { generateSlug } from "random-word-slugs";
 
 class LogsController implements ILogsController {
 
@@ -53,11 +50,11 @@ class LogsController implements ILogsController {
 			res.setHeader('Connection', 'keep-alive');
 			res.write(`data: ${JSON.stringify({ message: 'Connected to logs' })}\n\n`);
 
-			const responseHandler = (log: any) => {
+			const responseHandler = (event: any) => {
 				if (!res.writableEnded) {
-					console.log("sending...", deploymentEmitter.eventNames())
+					console.log("sending...")
 
-					res.write(`data: ${JSON.stringify(log)}\n\n`);
+					res.write(`data: ${JSON.stringify(event)}\n\n`);
 				}
 			};
 			deploymentEmitter.onLog(id, responseHandler)

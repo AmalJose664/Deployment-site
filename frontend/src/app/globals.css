@@ -164,3 +164,14 @@ button {
 		@apply text-primary hover:underline hover:text-primary/80;
 	}
 }
+.logs-container-build {
+	@apply [&::-webkit-scrollbar]:w-2
+    [&::-webkit-scrollbar-track]:rounded-full
+    [&::-webkit-scrollbar-thumb]:rounded-full
+    [&::-webkit-scrollbar-track]:bg-gray-100
+    [&::-webkit-scrollbar-thumb]:bg-gray-400
+    hover:[&::-webkit-scrollbar-thumb]:bg-gray-500
+    dark:[&::-webkit-scrollbar-track]:bg-neutral-800
+    dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
+    dark:hover:[&::-webkit-scrollbar-thumb]:bg-neutral-400;
+}

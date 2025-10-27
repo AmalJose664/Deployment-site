@@ -3,6 +3,7 @@ import { User } from "./User";
 export enum ProjectStatus {
 	NOT_STARTED = "NOT_STARTED",
 	BUILDING = "BUILDING",
+	QUEUED = "QUEUED",
 	READY = "READY",
 	FAILED = "FAILED",
 	CANCELED = "CANCELLED",

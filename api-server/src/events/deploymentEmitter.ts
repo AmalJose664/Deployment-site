@@ -4,7 +4,8 @@ class DeploymentEmitter extends EventEmitter {
 
 	emitLog(eventString: string, log: any) {
 		// console.log(`log:${eventString} --- from logs`)
-		this.emit(`log:${eventString}`, log);
+		const emitData = { type: "LOG", data: log }
+		this.emit(`log:${eventString}`, emitData);
 	}
 	onLog(eventString: string, callback: (log: any) => void) {
 		// console.log(`log:${eventString}`)
@@ -15,8 +16,9 @@ class DeploymentEmitter extends EventEmitter {
 		this.off(`log:${eventString}`, callback);
 	}
 
-	emitUpdates(eventString: string, log: any) {
-		this.emit(`update:${eventString}`, log);
+	emitUpdates(eventString: string, update: any) {
+		const emitData = { type: "UPDATE", data: update }
+		this.emit(`update:${eventString}`, emitData);
 	}
 	onUpdate(eventString: string, callback: (log: any) => void) {
 		this.on(`update:${eventString}`, callback);

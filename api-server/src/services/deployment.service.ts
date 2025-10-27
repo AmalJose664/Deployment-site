@@ -30,6 +30,7 @@ class DeploymentService implements IDeploymentService {
 			throw new AppError("Project not available for deployment", 400);
 		}
 
+		deploymentData.status = DeploymentStatus.QUEUED
 		deploymentData.overWrite = false;
 		deploymentData.commit_hash = "000000";
 		deploymentData.s3Path = correspondindProject._id.toString();
@@ -38,7 +39,9 @@ class DeploymentService implements IDeploymentService {
 
 		const deployment = await this.deploymentRepository.createDeployment(deploymentData);
 		await this.projectRepository.pushToDeployments(correspondindProject.id, userId, deployment?.id)
-
+		if (deployment?._id) {
+			this.deployLocal(deployment?._id, projectId)
+		}
 		return deployment;
 	}
 
@@ -80,8 +83,9 @@ class DeploymentService implements IDeploymentService {
 			{
 				cwd: "../build-server/",
 				env: {
-					DEPLOYMENT_ID: deploymentId + " hey this is working for deploy",
-					PROJECT_ID: projectId + " hey this is working"
+					...process.env,
+					DEPLOYMENT_ID: deploymentId,
+					PROJECT_ID: projectId
 				}
 			}
 		);

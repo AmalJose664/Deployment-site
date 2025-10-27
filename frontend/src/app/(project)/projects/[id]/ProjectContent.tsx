@@ -14,6 +14,12 @@ import ProjectSimpleStats from "./components/ProjectSimpleStats";
 import NoDeployment from "./components/NoDeployment";
 import { useGetDeploymentByIdQuery } from "@/store/services/deploymentApi";
 import { Logs } from "@/components/LogsComponent";
+import { ProjectStatus } from "@/types/Project";
+import { useDispatch } from "react-redux";
+import { addLog } from "@/store/slices/logSlice";
+import { Log } from "@/types/Log";
+import { MdKeyboardArrowRight } from "react-icons/md";
+import { useRouter } from "next/navigation"
 
 
 
@@ -26,6 +32,7 @@ interface ProjectDetailProps {
 }
 
 export function ProjectContent({ projectId, onBack }: ProjectDetailProps) {
+	const router = useRouter()
 
 	const { data: project, isLoading, isError, error, refetch } = useGetProjectByIdQuery({ id: projectId, params: { user: "true" } })
 
@@ -33,11 +40,65 @@ export function ProjectContent({ projectId, onBack }: ProjectDetailProps) {
 		{ id: project?.deployments ? project.deployments[project.deployments.length - 1] : "", params: {} }
 		, { skip: !project?.deployments?.[0] }
 	)
+	const dispatch = useDispatch()
+	useEffect(() => {
+		if (!deployment?._id) return;
+		if (
+			deployment.status !== ProjectStatus.BUILDING &&
+			deployment.status !== ProjectStatus.QUEUED
+		) {
+			return;
+		}
 
+		console.log("Starting SSE for deployment:", deployment._id);
 
-	const [showBuild, setShowBuild] = useState(true)
-	const [showDeployment, setshowDeployment] = useState(false)
+		const eventSource = new EventSource(
+			`${process.env.NEXT_PUBLIC_API_SERVER_ENDPOINT}/deployments/${deployment._id}/logs/stream`,
+			{ withCredentials: true }
+		);
+		setShowBuild(true)
+		eventSource.onmessage = (event) => {
+			const receivedData = JSON.parse(event.data);
+			if (receivedData.type === "LOG") {
+				const log = receivedData.data as Log
+				dispatch(addLog(log))
+			}
+		};
+
+		eventSource.onerror = (error) => {
+			console.log(eventSource.readyState)
+			if (eventSource.readyState === EventSource.CLOSED) {
+				console.log('SSE connection closed by server');
+				eventSource.close();
+				return;
+			}
+
+			if (eventSource.readyState === EventSource.CONNECTING) {
+				console.log('SSE reconnecting...');
+				return;
+			}
+
+			console.error('SSE connection failed');
+			eventSource.close();
+		};
+		eventSource.addEventListener('done', () => {
+			console.log('Stream complete');
+			eventSource.close();
+		});
+		eventSource.addEventListener('close', () => {
+			console.log('Stream completed -------');
+			eventSource.close();
+		});
+
+		return () => {
+			eventSource.close();
+		};
+	}, [deployment?._id]);
+
+	const [showBuild, setShowBuild] = useState(false)
+
 	console.log("re render", project, deployment)
+
 	if (isLoading) return <ProjectLoading />
 
 	if (isError) return <ProjectError error={error} />
@@ -56,7 +117,7 @@ export function ProjectContent({ projectId, onBack }: ProjectDetailProps) {
 				<div className="max-w-7xl mx-auto px-6 py-4">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-4">
-							<button
+							<button onClick={() => router.back()}
 								className="p-2 dark:hover:bg-zinc-800 hover:bg-zinc-200 rounded-lg transition-colors"
 							>
 								<TiArrowLeft size={20} />
@@ -73,7 +134,7 @@ export function ProjectContent({ projectId, onBack }: ProjectDetailProps) {
 				</div>
 			</header>
 
-			<main className="max-w-7xl mx-auto px-6 py-8">
+			<main className="max-w-[1400px] mx-auto px-6 py-8">
 				<ProjectTabs />
 				<div className='dark:bg-neutral-900 bg-white w-full  rounded-md mb-6 px-4 py-6'>
 
@@ -81,10 +142,12 @@ export function ProjectContent({ projectId, onBack }: ProjectDetailProps) {
 						projectId={project._id} refetch={refetch} />}
 
 					<ProjectOverview project={project} deploymentCommitHash={deployment?.commitHash} deploymentDuration={deployment?.performance.totalDuration} />
-					<hr />
-					<div>
-						<button onClick={() => setShowBuild(!showBuild)}>
-							Build
+
+					<div className="border rounded-md">
+						<button className="p-4 w-full " onClick={() => setShowBuild(!showBuild)}>
+							<span className="flex flex-row-reverse gap-2 items-center justify-end text-primary">
+								Build Logs<MdKeyboardArrowRight className="size-6 transition-all duration-200" style={{ transform: `rotateZ(${showBuild ? "90" : "0"}deg)` }} />
+							</span>
 						</button>
 						<AnimatePresence mode="sync">
 
@@ -94,45 +157,19 @@ export function ProjectContent({ projectId, onBack }: ProjectDetailProps) {
 									animate={{ opacity: 1, height: "auto" }}
 									exit={{ opacity: 0, height: 0 }}
 									transition={{ duration: 0.4, ease: "easeInOut" }}
-									className='bg-stone-900 h-auto'>
+									className='dark:bg-stone-900 bg-stone-100 h-auto'>
 									<div >
-										<Logs logsArray={
-											[
-												{
-													event_id: Math.random().toString(36).slice(2, 12),
-													project_id: "", deployment_id: "",
-													report_time: '2025-10-26 10:23:01',
-													level: 'info',
-													message: 'Starting deployment process...'
-												}
-											]
-										} />
+										<Logs />
 									</div>
 								</motion.div>
 							)}
 						</AnimatePresence >
 					</div>
-					<motion.div transition={{ duration: 0.4, ease: "easeInOut" }}>
-						<button onClick={() => setshowDeployment(!showDeployment)}>
-							Deployed
-						</button>
 
-						<AnimatePresence mode="sync" >
-							{showDeployment && (
-								<motion.div initial={{ opacity: 0, height: 0 }}
-									animate={{ opacity: 1, height: "20rem" }}
-									exit={{ opacity: 0, height: 0 }}
-									transition={{ duration: 0.4, ease: "easeInOut" }}
-									className='h-80 bg-gray-900'>
-									Content D
-								</motion.div>
-							)}
-						</AnimatePresence>
-					</motion.div>
 				</div>
 
 				{(project.deployments && project.deployments.length > 0 && deployment) &&
-					<ProjectCurrentDeployment deployment={deployment} projectBranch={project.branch} />}
+					<ProjectCurrentDeployment deployment={deployment} projectBranch={project.branch} repoURL={project.repoURL} />}
 
 				{project.deployments && project.deployments.length > 0 && <ProjectSimpleStats />}
 

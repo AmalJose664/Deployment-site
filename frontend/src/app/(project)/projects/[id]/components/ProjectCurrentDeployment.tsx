@@ -6,21 +6,25 @@ import { IoMdGitBranch } from "react-icons/io";
 import { LiaExternalLinkAltSolid } from "react-icons/lia";
 import { MdAccessTime } from "react-icons/md";
 import { Deployment } from "@/types/Deployment";
+import { getElapsedTime, getGithubBranchUrl, getGithubCommitUrl, timeToSeconds } from "@/lib/utils";
+import Link from "next/link";
 
 
 
 
+interface ProjectDeploymentProps {
+	deployment: Deployment;
+	projectBranch: string;
+	repoURL: string
+}
 
 
 
-
-
-const ProjectCurrentDeployment = ({ deployment, projectBranch }: { deployment: Deployment, projectBranch: string }) => {
+const ProjectCurrentDeployment = ({ deployment, projectBranch, repoURL }: ProjectDeploymentProps) => {
 	const getStatusIcon = (status: string) => {
-		console.log("show status ", status)
-		return
+
 		switch (status.toLowerCase()) {
-			case 'success':
+			case 'ready':
 				return <GoCheckCircleFill className="text-emerald-500" size={18} />;
 			case 'failed':
 				return <GoXCircleFill className="text-red-500" size={18} />;
@@ -32,11 +36,8 @@ const ProjectCurrentDeployment = ({ deployment, projectBranch }: { deployment: D
 	};
 
 	const getStatusColor = (status: string) => {
-		console.log("show status ", status)
-		return
-
 		switch (status.toLowerCase()) {
-			case 'success':
+			case 'ready':
 				return 'text-emerald-500 bg-emerald-500/10';
 			case 'failed':
 				return 'text-red-500 bg-red-500/10';
@@ -74,17 +75,17 @@ const ProjectCurrentDeployment = ({ deployment, projectBranch }: { deployment: D
 									<span className="text-xs  font-mono">
 										{deployment.commitHash}
 									</span>
-									<span className="text-xs text-gray-500">2m ago</span>
+									<span className="text-xs text-gray-500">{getElapsedTime(deployment.completedAt)} ago</span>
 								</div>
-								<p className="text-sm text-primary mb-1">{deployment.commitHash}</p>
+								<Link href={getGithubCommitUrl(repoURL, deployment.commitHash)} target="_blank" className="hover:underline text-sm text-primary mb-1">{deployment.commitHash}</Link>
 								<div className="flex items-center gap-4 text-xs text-gray-400">
 									<div className="flex items-center text-xs gap-1.5">
 										<IoMdGitBranch size={12} />
-										<span>{projectBranch}</span>
+										<Link target="_blank" href={getGithubBranchUrl(repoURL, projectBranch)} className="hover:undeline">{projectBranch}</Link>
 									</div>
 									<div className="flex items-center text-xs gap-1.5">
 										<MdAccessTime size={12} />
-										<span>{deployment.performance.totalDuration}</span>
+										<span>{timeToSeconds(deployment.performance.totalDuration)}</span>
 									</div>
 								</div>
 							</div>

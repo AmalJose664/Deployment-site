@@ -9,6 +9,8 @@ import { User } from "@/types/User";
 import { Project } from "@/types/Project";
 import Link from "next/link";
 import TechStack from "@/components/TechStack";
+import { getGithubBranchUrl, getGithubCommitUrl, timeToSeconds } from "@/lib/utils";
+
 
 interface ProjectOverviewProps {
 	project: Project,
@@ -17,9 +19,12 @@ interface ProjectOverviewProps {
 }
 
 const ProjectOverview = ({ project, deploymentCommitHash, deploymentDuration }: ProjectOverviewProps) => {
+	const repoValues = project.repoURL.split("/")
+	const repoWithUser = repoValues[3] + "/" + repoValues[4]
+
 	return (
 		<>
-			<div className='flex items-stretch gap-4 h-full w-full p-4'>
+			<div className="flex flex-col items-stretch  sm:flex-row  md:flex-row gap-2 sm:gap-4 lg:gap-6 p-2 sm:p-4 lg:p-6 w-full h-full">
 
 				<div className='flex flex-col justify-between w-3/5 border  rounded-xl p-6 shadow-sm'>
 
@@ -27,16 +32,16 @@ const ProjectOverview = ({ project, deploymentCommitHash, deploymentDuration }: 
 						<h3 className='text-2xl font-bold'>{project.name}</h3>
 
 						<div className='flex items-center gap-3'>
-							<span className="flex gap-2">
-								<img className="size-5 rounded-full" src={project ? ((project.user as User).profileImage) : ""} alt="User image" />
+							<span className="flex gap-2 text-sm">
+								<img className="size-4 rounded-full" src={project ? ((project.user as User).profileImage) : ""} alt="User image" />
 								{(project.user as User).name}
 							</span>
-							<span className='flex gap-2 items-center'>
-								<CiCalendarDate /><span>Setp-06</span>
+							<span className='flex gap-2 items-center text-sm'>
+								<CiCalendarDate /><span>{new Date(project.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
 							</span>
 							<Link href={project.repoURL} target="_blank">
-								<button className='p-2 border dark:bg-gray-950 bg-gray-100  rounded-lg transition-colors'>
-									<FiGithub className='size-5 text-primary' />
+								<button className='p-2 border flex gap-1 text-xs items-center dark:bg-gray-950 bg-gray-100  rounded-lg transition-colors'>
+									<FiGithub className='size-3 text-primary' /> {repoWithUser}
 								</button>
 							</Link>
 						</div>
@@ -63,7 +68,7 @@ const ProjectOverview = ({ project, deploymentCommitHash, deploymentDuration }: 
 									<IoMdGitBranch className='size-4 text-less' />
 								</div>
 								<div>
-									<p className='text-sm font-medium '>{project.branch}</p>
+									<Link target="_blank" href={getGithubBranchUrl(project.repoURL, project.branch)} className='text-sm hover:underline font-medium '>{project.branch}</Link>
 								</div>
 							</div>
 							<div className='flex items-center gap-2'>
@@ -71,7 +76,7 @@ const ProjectOverview = ({ project, deploymentCommitHash, deploymentDuration }: 
 									<FiGitCommit className='size-4 text-less' />
 								</div>
 								<div>
-									<p className='text-sm font-medium '>{deploymentCommitHash || ""}</p>
+									<Link target="_blank" href={getGithubCommitUrl(project.repoURL, deploymentCommitHash || "")} className='text-sm font-medium hover:underline'>{deploymentCommitHash || ""}</Link>
 								</div>
 							</div>
 						</div>
@@ -89,7 +94,7 @@ const ProjectOverview = ({ project, deploymentCommitHash, deploymentDuration }: 
 								<MdAccessTime className='size-4 text-less' />
 							</div>
 							<div>
-								<p className='text-sm font-medium '>{deploymentDuration || "- - - -"}</p>
+								<p className='text-sm font-medium '>{timeToSeconds(deploymentDuration) || "- - - -"}</p>
 							</div>
 						</div>
 					</div>

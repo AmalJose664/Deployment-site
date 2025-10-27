@@ -14,7 +14,7 @@ class DeploymentController implements IDeploymentController {
 
 	async createDeployment(req: Request, res: Response, next: NextFunction): Promise<void> {
 		const userId = req.user?.id as string;
-		const projectId = (req.validatedBody as CreateDeploymentDTO).projectId;
+		const projectId = req.params.projectId
 		try {
 			const deployment = await this.deploymentService.newDeployment({}, userId, projectId);
 			if (deployment) {

@@ -4,5 +4,5 @@ export interface Log {
 	deployment_id: string;
 	project_id: string;
 	message: string;
-	report_time: Date | string
+	timestamp: Date | string
 }

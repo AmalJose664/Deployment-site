@@ -22,6 +22,7 @@ interface ProjectResponseDTO {
 		lastDeployedAt?: Date;
 		status: "NOT_STARTED" | "QUEUED" | "BUILDING" | "READY" | "FAILED" | "CANCELLED";
 		deployments?: string[];
+		createdAt: Date | string
 	}
 
 }
@@ -62,7 +63,8 @@ export class ProjectMapper {
 					profileImage: project.user.profileImage
 				}),
 				deployments: project.deployments?.map(d => d.toString()),
-				lastDeployedAt: project.lastDeployedAt
+				lastDeployedAt: project.lastDeployedAt,
+				createdAt: project.createdAt
 			}
 		}
 	}

@@ -10,42 +10,22 @@ import { MdFileDownload } from "react-icons/md";
 import { GoTrash } from "react-icons/go";
 import { IoSearch } from "react-icons/io5";
 import { LuRotateCw } from "react-icons/lu";
+import { ansiConverter } from '@/lib/ansiToHtml';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
+import { clearLogs } from '@/store/slices/logSlice';
 
 interface LogsProps {
 	logsArray?: Log[]
 }
 
-export function Logs({ logsArray }: LogsProps) {
-	const [logs, setLogs] = useState<Log[]>(logsArray || []);
+export function Logs() {
+	const dispatch = useDispatch()
+	const logs = useSelector((state: RootState) => state.logs)
 	const [filter, setFilter] = useState('all');
 	const [searchTerm, setSearchTerm] = useState('');
 	const [autoScroll, setAutoScroll] = useState(true);
 	const listRef = useRef<ListType>(null);
-
-
-	const addNewLog = () => {
-		const levels = ['info', 'success', 'warn', 'error'];
-		const messages = [
-			'Processing request...',
-			'Connection established',
-			'Memory usage: 45%',
-			'Cache cleared',
-			'Database query executed',
-			'API response received',
-			'Websocket connected',
-			'File uploaded successfully'
-		];
-
-		const newLog = {
-			event_id: Math.random().toString(36).slice(2, 12),
-			report_time: new Date().toISOString().replace('T', ' ').substring(0, 19),
-			level: levels[Math.floor(Math.random() * levels.length)],
-			message: messages[Math.floor(Math.random() * messages.length)],
-			deployment_id: "", project_id: ""
-		};
-
-		setLogs(prev => [...prev, newLog]);
-	};
 
 	useEffect(() => {
 		if (autoScroll && listRef.current && filteredLogs.length > 0) {
@@ -54,24 +34,26 @@ export function Logs({ logsArray }: LogsProps) {
 	}, [logs, autoScroll]);
 
 	const filteredLogs = logs.filter(log => {
+
+		if (!log) return false
 		const matchesFilter = filter === 'all' || log.level === filter;
 		const matchesSearch = log.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
-			log.report_time.toLocaleString().includes(searchTerm);
+			new Date(log.timestamp).toLocaleString().includes(searchTerm);
 		return matchesFilter && matchesSearch;
 	});
 
 	const getLevelColor = (level: string) => {
 		switch (level) {
-			case 'error': return 'text-red-400';
-			case 'warn': return 'text-yellow-500';
-			case 'success': return 'text-green-400';
+			case 'ERROR': return 'text-red-400';
+			case 'WARN': return 'text-yellow-500';
+			case 'SUCCESS': return 'text-green-400';
 			default: return 'text-gray-500';
 		}
 	};
 
 	const downloadLogs = () => {
 		const logText = logs.map(log =>
-			`[${log.report_time}] [${log.level.toUpperCase()}] ${log.message}`
+			`[${log.timestamp}] [${log.level.toUpperCase()}] ${log.message}`
 		).join('\n');
 
 		const blob = new Blob([logText], { type: 'text/plain' });
@@ -83,8 +65,8 @@ export function Logs({ logsArray }: LogsProps) {
 		URL.revokeObjectURL(url);
 	};
 
-	const clearLogs = () => {
-		setLogs([]);
+	const clearLog = () => {
+		dispatch(clearLogs())
 	};
 
 	const getFilterCount = (level: string) => {
@@ -94,22 +76,23 @@ export function Logs({ logsArray }: LogsProps) {
 
 	const rowRenderer = ({ index, key, style }: any) => { // FIX TYPE
 		const log = filteredLogs[index];
-
+		const htmlMessage = ansiConverter.toHtml(log.message);
 		return (
 			<div
 				key={key}
 				style={style}
-				className="px-2 py-0.5 hover:bg-gray-900/50 border-b border-gray-900"
+				className="px-2 py-0.5 dark:hover:bg-neutral-800 hover:bg-neutral-300 border-b dark:border-gray-900 border-gray-300 active:bg-blue-950"
 			>
-				<div className="flex items-start gap-2 text-xs font-mono">
-					<span className="text-gray-600 shrink-0">
-						{log.report_time.toString()}
+				<div className="flex items-start gap-2 dark:text-xs text-sm font-mono">
+					<span className="text-primary shrink-0 mt-[2px]">
+						{log.timestamp.toString()}
 					</span>
-					<span className={`${getLevelColor(log.level)} uppercase shrink-0 w-14`}>
+					<span className={`${getLevelColor(log.level)} uppercase shrink-0 w-16 mt-[2px]`}>
 						{log.level}
 					</span>
-					<span className="text-gray-300 flex-1 break-words leading-relaxed">
-						{log.message}
+					<span className="dark:text-gray-300 text-gray-900  flex-1 break-words leading-relaxed whitespace-nowrap overflow-hidden text-ellipsis "
+						dangerouslySetInnerHTML={{ __html: htmlMessage }}>
+						{/* {log.message} */}
 					</span>
 				</div>
 			</div>
@@ -117,34 +100,33 @@ export function Logs({ logsArray }: LogsProps) {
 	};
 
 	return (
-		<div className="bg-black text-gray-100 p-1 rounded-sm">
-			<div className="max-w-7xl mx-auto">
-				<div className="bg-gray-950 border border-gray-900">
+		<div className="dark:bg-black bg-gray-50 text-gray-100 p-1 rounded-md">
+			<div className="max-w-[1300px] mx-auto">
+				<div className="dark:bg-neutral-950 bg-gray-50 border ">
 					{/* Header */}
-					<div className="border-b border-gray-900 px-3 py-2">
+					<div className="border-b  px-3 py-2">
 						<div className="flex items-center justify-between mb-2">
 							<div className="flex items-center gap-2">
 								<GoTerminal className="w-4 h-4 text-gray-600" />
-								<span className="text-sm font-medium text-gray-400">Console Logs</span>
+								<span className="text-sm font-medium text-gray-400">Logs</span>
 							</div>
 							<div className="flex gap-1">
 								<button
-									onClick={addNewLog}
-									className="px-2 py-1 text-xs bg-gray-900 hover:bg-gray-800 text-gray-400 flex items-center gap-1"
+									className="px-2 py-1 text-xs dark:bg-gray-900  dark:hover:bg-gray-800 hover:bg-gray-200 text-less  flex items-center gap-1"
 									title="Add test log"
 								>
 									<LuRotateCw className="w-3 h-3" />
 								</button>
 								<button
 									onClick={downloadLogs}
-									className="px-2 py-1 text-xs bg-gray-900 hover:bg-gray-800 text-gray-400"
+									className="px-2 py-1 text-xs dark:bg-gray-900  dark:hover:bg-gray-800 hover:bg-gray-200 text-less "
 									title="Download"
 								>
 									<MdFileDownload className="w-3 h-3" />
 								</button>
 								<button
-									onClick={clearLogs}
-									className="px-2 py-1 text-xs bg-gray-900 hover:bg-gray-800 text-gray-400"
+									onClick={clearLog}
+									className="px-2 py-1 text-xs dark:bg-gray-900  dark:hover:bg-gray-800 hover:bg-gray-200 text-less "
 									title="Clear"
 								>
 									<GoTrash className="w-3 h-3" />
@@ -155,13 +137,13 @@ export function Logs({ logsArray }: LogsProps) {
 						{/* Filters */}
 						<div className="flex gap-2 items-center text-xs">
 							<div className="flex gap-1">
-								{['all', 'info', 'success', 'warn', 'error'].map(level => (
+								{['all', 'INFO', 'SUCCESS', 'WARN', 'ERROR'].map(level => (
 									<button
 										key={level}
 										onClick={() => setFilter(level)}
 										className={`px-2 py-0.5 ${filter === level
-											? 'bg-gray-800 text-gray-300'
-											: 'bg-gray-900 text-gray-600 hover:text-gray-400'
+											? 'dark:bg-gray-800 bg-gray-400 rounded-sm text-some-less'
+											: 'dark:bg-gray-900 bg-gray-100 text-gray-600 hover:text-gray-900 dark:hover:text-gray-300'
 											}`}
 									>
 										{level} ({getFilterCount(level)})
@@ -177,7 +159,7 @@ export function Logs({ logsArray }: LogsProps) {
 										placeholder="Search..."
 										value={searchTerm}
 										onChange={(e) => setSearchTerm(e.target.value)}
-										className="w-full h-6 pl-7 pr-2 py-0.5 bg-gray-900 border border-gray-800 text-xs text-gray-400 focus:outline-none focus:border-gray-700"
+										className="w-full h-6 pl-7 pr-2 py-0.5  border border-gray-400 dark:border-gray-800 text-xs text-gray-400 focus:outline-none focus:border-gray-700"
 									/>
 								</div>
 							</div>
@@ -194,8 +176,7 @@ export function Logs({ logsArray }: LogsProps) {
 						</div>
 					</div>
 
-					{/* Virtualized Log Content */}
-					<div className="bg-black" style={{ height: '420px' }}>
+					<div className="dark:bg-black bg-white logs-container-build " style={{ height: '420px' }}>
 						{filteredLogs.length === 0 ? (
 							<div className="flex items-center justify-center h-full text-gray-700">
 								<div className="text-center text-xs">
@@ -213,7 +194,7 @@ export function Logs({ logsArray }: LogsProps) {
 										rowCount={filteredLogs.length}
 										rowHeight={24}
 										rowRenderer={rowRenderer}
-										overscanRowCount={10}
+										overscanRowCount={10} className='logs-container-build'
 									/>
 								)}
 							</AutoSizer>
@@ -221,7 +202,7 @@ export function Logs({ logsArray }: LogsProps) {
 					</div>
 
 					{/* Footer */}
-					<div className="border-t border-gray-900 px-3 py-1 bg-gray-950">
+					<div className="border-t  px-3 py-1 dark:bg-gray-950 bg-white">
 						<div className="flex justify-between text-xs text-gray-700">
 							<span>{filteredLogs.length} / {logs.length}</span>
 							<span>virtualized</span>
