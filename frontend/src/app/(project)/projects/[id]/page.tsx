@@ -1,5 +1,5 @@
 import Navbar from "@/components/Navbar"
-import { ProjectContent } from "./ProjectContent"
+import { ProjectPageContainer } from "./ProjectPageContainer"
 
 export default async function Page({
 	params,
@@ -7,8 +7,13 @@ export default async function Page({
 	params: { id: string }
 }) {
 	const { id } = await params
-	return <div>
-		<Navbar />
-		<ProjectContent projectId={id} />
-	</div>
+	return (
+		<div className="min-h-screen flex flex-col">
+
+			<Navbar />
+			<main className="flex-1">
+				<ProjectPageContainer projectId={id as string} />
+			</main>
+		</div>
+	)
 }

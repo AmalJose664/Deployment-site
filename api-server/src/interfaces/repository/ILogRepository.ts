@@ -8,7 +8,7 @@ export interface LogModel {
 	reportTime: Date
 }
 export interface ILogRepository {
-	getLogs(deploymentId: string): Promise<ResponseJSON<unknown>>
-	getProjectLogs(projectId: string): Promise<ResponseJSON<unknown>>
+	getProjectLogs(deploymentId: string, page: number, limit: number): Promise<ResponseJSON<unknown>>
+	getLogs(projectId: string, page: number, limit: number): Promise<ResponseJSON<unknown>>
 	__insertLogs(data: LogModel): Promise<void>
 }

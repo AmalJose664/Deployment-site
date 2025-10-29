@@ -70,7 +70,7 @@ class DeploymentEventHandler {
 				await deploymentService.__updateDeployment(projectId, deploymentId, {
 					status: updates.status,
 					...updates,
-					complete_at: new Date()
+					complete_at: new Date(updates.complete_at || "")
 				})
 				await projectService.__updateProjectById(projectId, {
 					status: updates.status as unknown as ProjectStatus,

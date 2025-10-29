@@ -1,3 +1,4 @@
+
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -8,6 +9,8 @@ export const timeToSeconds = (time: number | undefined) => {
 	if (!time) return time
 	return (time / 1000).toFixed(2) + " s";
 }
+
+
 export const getElapsedTime = (oldTime: Date) => {
 	const diff = Date.now() - new Date(oldTime).getTime();
 	const seconds = Math.floor(diff / 1000);
@@ -18,6 +21,9 @@ export const getElapsedTime = (oldTime: Date) => {
 	if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
 	return `${seconds}s`;
 }
+
+
+
 export const getGithubBranchUrl = (repoUrl: string, branch: string) => {
 	if (repoUrl.includes(".git")) {
 		repoUrl = repoUrl.replace(/\.git$/, "");
@@ -33,3 +39,40 @@ export const getGithubCommitUrl = (repoUrl: string, commitId: string) => {
 
 	return `${repoUrl}/commit/${commitId}`;
 };
+
+
+export const getStatusColor = (status: string) => {
+	switch (status.toLowerCase()) {
+		case 'ready':
+			return 'text-emerald-500 bg-emerald-500/10';
+		case 'failed':
+			return 'text-red-500 bg-red-500/10';
+		case 'cancelled':
+			return 'text-red-500 bg-red-500/10';
+		case 'building':
+			return 'text-amber-500 bg-amber-500/10';
+		default:
+			return 'text-gray-500 bg-gray-500/10';
+	}
+};
+export const getLevelColor = (level: string) => {
+	switch (level) {
+		case 'ERROR': return 'text-red-400';
+		case 'WARN': return 'text-yellow-500';
+		case 'SUCCESS': return 'text-green-400';
+		default: return 'text-gray-500';
+	}
+};
+
+
+export const formatLogTime = (time: string | Date) => {
+	const date = new Date(time)
+	let hours = date.getHours()
+	const minutes = date.getMinutes().toString().padStart(2, "0")
+	const seconds = date.getSeconds().toString().padStart(2, "0")
+
+	const ampm = hours >= 12 ? "PM" : "AM"
+	hours = hours % 12 || 12
+
+	return `${date.getMonth() + 1}/${date.getDate()} - ${hours}:${minutes}:${seconds} ${ampm}`
+}

@@ -12,17 +12,37 @@ class LogsService implements ILogsService {
 		this.logsRepository = logRepo
 		this.deploymentRepository = depRepo
 	}
-	async getDeploymentLog(deploymentId: string, userId: string): Promise<ResponseJSON<unknown>> {
+	async getDeploymentLog(deploymentId: string, userId: string, pagination: { page?: number, limit: number }): Promise<{
+		logs: ResponseJSON<unknown>['data'],
+		total: number, page: number, limit: number
+	}> {
 
-		const deployment = this.deploymentRepository.findDeploymentById(deploymentId, userId)
+		const deployment = this.deploymentRepository.findDeploymentById(deploymentId, userId,)
 		if (!deployment) {
 			throw new AppError("Deployment not found ", 404)
 		}
-		return await this.logsRepository.getLogs(deploymentId)
-	}
-	async getProjectsLogs(projectId: string, userId: string): Promise<ResponseJSON<unknown>> {
+		const { limit, page } = pagination
 
-		return await this.logsRepository.getProjectLogs(projectId)
+		const data = await this.logsRepository.getLogs(deploymentId, page || 1, limit || 100)
+		return {
+			logs: data.data,
+			total: Number((data.data[0] as { total: number })?.total || 0),
+			page: page || 1,
+			limit: limit || 100
+		};
+	}
+	async getProjectsLogs(projectId: string, userId: string, pagination: { page?: number, limit?: number }): Promise<{
+		logs: ResponseJSON<unknown>['data'],
+		total: number, page: number, limit: number
+	}> {
+		const { limit, page } = pagination // projet check herer ------------------------------------------------------
+		const data = await this.logsRepository.getProjectLogs(projectId, page || 1, limit || 100)
+		return {
+			logs: data.data,
+			total: Number((data.data[0] as { total: number })?.total || 0),
+			page: page || 1,
+			limit: limit || 100
+		};
 
 	}
 

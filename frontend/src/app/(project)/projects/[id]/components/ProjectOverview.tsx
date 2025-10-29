@@ -9,7 +9,8 @@ import { User } from "@/types/User";
 import { Project } from "@/types/Project";
 import Link from "next/link";
 import TechStack from "@/components/TechStack";
-import { getGithubBranchUrl, getGithubCommitUrl, timeToSeconds } from "@/lib/utils";
+import { getGithubBranchUrl, getGithubCommitUrl, getStatusColor, timeToSeconds } from "@/lib/utils";
+import StatusIcon from "@/components/ui/StatusIcon";
 
 
 interface ProjectOverviewProps {
@@ -82,11 +83,11 @@ const ProjectOverview = ({ project, deploymentCommitHash, deploymentDuration }: 
 						</div>
 						<div className='flex items-center gap-2'>
 							<div className='p-2  rounded-lg'>
-								<GiCheckMark className='size-3 text-emerald-400' />
+								<StatusIcon status={project.status} />
 							</div>
-							<div className='flex gap-2'>
+							<div className='flex gap-2 items-center'>
 								<p className='text-xs text-less font-medium'>Status</p>
-								<p className='text-sm font-bold text-emerald-400'>{project.status}</p>
+								<p className={`text-sm font-bold ${getStatusColor(project.status)}`}>{project.status}</p>
 							</div>
 						</div>
 						<div className='flex items-center gap-2'>
@@ -94,7 +95,11 @@ const ProjectOverview = ({ project, deploymentCommitHash, deploymentDuration }: 
 								<MdAccessTime className='size-4 text-less' />
 							</div>
 							<div>
-								<p className='text-sm font-medium '>{timeToSeconds(deploymentDuration) || "- - - -"}</p>
+								<p className='text-sm font-medium '>
+									<span className="text-less">
+										Duration{" "}</span>
+									{timeToSeconds(deploymentDuration) || "- - - -"}
+								</p>
 							</div>
 						</div>
 					</div>

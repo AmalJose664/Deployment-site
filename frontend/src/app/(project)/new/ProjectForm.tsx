@@ -26,12 +26,14 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select"
+import { useRouter } from "next/navigation";
 
 const ProjectForm = () => {
+	const router = useRouter()
 	const form = useForm<ProjectFormInput>({
 
 		defaultValues: {
-			name: '',
+			name: 'new-ui-projectsqq',
 			repoURL: '',
 			branch: "main",
 			installCommand: "install",
@@ -42,7 +44,7 @@ const ProjectForm = () => {
 
 		resolver: zodResolver(ProjectFormSchema)
 	})
-	const [createProject, { isLoading }] = useCreateProjectMutation()
+	const [createProject, { isLoading, isSuccess }] = useCreateProjectMutation()
 
 	const [showAdvanced, setShowAdvanced] = useState(false)
 	const [branches, setBranches] = useState<[string] | undefined>()
@@ -54,11 +56,12 @@ const ProjectForm = () => {
 		const user = values[values.length - 2]
 		if (!user || !repoName) return false
 		try {
-			const res = await axios.get("https://api.github.com/repos/" + user + "/" + repoName)
+			const res = await axios.get("https://api.github.com/repos/" + user + "/" + repoName.replace(".git", ""))
 			const data = res.data
 			console.log(data, '<<<<')
 			return res.status === 200
 		} catch (error) {
+
 			return false
 		}
 	}
@@ -68,7 +71,7 @@ const ProjectForm = () => {
 		watch
 	} = form
 	const { errors, isDirty, isValid, isSubmitted,
-		isSubmitting, isSubmitSuccessful, submitCount
+		isSubmitting, isSubmitSuccessful, submitCount,
 	} = formState
 
 	const repoUrl = watch("repoURL")
@@ -76,9 +79,9 @@ const ProjectForm = () => {
 		const repo = form.getValues("repoURL")
 		if (!repo) return
 		const values = repo.replace(/\/$/, "").split("/")
-		const repoName = values[values.length - 1]
+		const repoName = values[values.length - 1].replace(".git", "")
 		const user = values[values.length - 2]
-		if (!user || repoName) return
+		if (!user || !repoName) return
 		try {
 			const res = await axios.get(`https://api.github.com/repos/${user}/${repoName}/branches`)
 			const { data } = res
@@ -89,6 +92,7 @@ const ProjectForm = () => {
 		}
 	}
 	useEffect(() => {
+
 		getBranches()
 	}, [repoUrl])
 
@@ -97,9 +101,7 @@ const ProjectForm = () => {
 		control
 	})
 
-	const onError = (fieldValues: FieldErrors<ProjectFormInput>) => {
-		console.log("Error ------------", fieldValues)
-	}
+
 	const onSubmit = async (data: ProjectFormInput) => {
 		const repoExists = await repoCheck(data.repoURL)
 		if (!repoExists) {
@@ -109,8 +111,14 @@ const ProjectForm = () => {
 		} else {
 			form.clearErrors("repoURL")
 		}
-		const result = createProject(data)
-		console.log("Form submitted ", data, result)
+		try {
+			const result = await createProject(data).unwrap()
+			router.push(`/projects/${result._id}`)
+
+			console.log("Form submitted ", data)
+		} catch (error) {
+			console.log("Error!", error)
+		}
 
 	}
 
@@ -183,18 +191,20 @@ const ProjectForm = () => {
 									transition={{ duration: 0.4, ease: "easeInOut" }}
 									className="border px-4 py-3 bg-zinc-900 mb-6 rounded-xl overflow-hidden"
 								>
-									<div className="mb-3 px-3 py-2">
+									<div className="mb-3 px-3 py-2 relative">
 										<label className="flex items-center gap-2  mb-1 font-medium text-sm" htmlFor="">
 											<FiTerminal />{" "}<span>Build Command</span>
 										</label>
-										<Input {...register("buildCommand")} className="text-primary" />
+										<span className="absolute top-[38px] left-6">npm</span>
+										<Input maxLength={20} {...register("buildCommand")} className="text-primary pl-13" />
 										{errors.buildCommand && <p className="text-sm text-red-500 mt-1">{errors.buildCommand.message}</p>}
 									</div>
-									<div className="mb-3 px-3 py-2">
+									<div className="mb-3 px-3 py-2 relative">
 										<label className="flex items-center gap-2  mb-1 font-medium text-sm" htmlFor="">
 											<FiTerminal />{" "}<span>Install Command </span>
 										</label>
-										<Input {...register("installCommand")} className="text-primary" />
+										<span className="absolute top-[38px] left-6">npm</span>
+										<Input maxLength={20} {...register("installCommand")} className="text-primary pl-13" />
 										{errors.installCommand && <p className="text-sm text-red-500 mt-1">{errors.installCommand.message}</p>}
 									</div>
 
@@ -250,10 +260,11 @@ const ProjectForm = () => {
 						</AnimatePresence>
 						<div className="mb-4 px-3 py-4">
 							<button
-								type="submit" disabled={isSubmitting || isSubmitSuccessful}
-								className="w-full py-2 rounded font-semibold border border-primary hover:border-2 transition"
+								type="submit"
+								// disabled={isSubmitting || isSubmitSuccessful}
+								className="w-full py-2 rounded font-semibold border border-primary transition"
 							>
-								{isSubmitting ? "Loading..." : "Deploy"}
+								{(isSubmitting || isLoading) ? "Loading..." : "Deploy"}
 							</button>
 						</div>
 					</motion.form>

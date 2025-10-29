@@ -17,12 +17,14 @@ class DeploymentController implements IDeploymentController {
 		const projectId = req.params.projectId
 		try {
 			const deployment = await this.deploymentService.newDeployment({}, userId, projectId);
-			if (deployment) {
-				const response = DeploymentMapper.toDeploymentResponse(deployment)
-				res.status(HTTP_STATUS_CODE.CREATED).json(response);
+
+			if (!deployment) {
+				res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ deployment: null });
 				return
 			}
-			res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ deployment: null });
+			const response = DeploymentMapper.toDeploymentResponse(deployment)
+			res.status(HTTP_STATUS_CODE.CREATED).json(response);
+
 		} catch (error) {
 			next(error);
 		}
@@ -54,7 +56,7 @@ class DeploymentController implements IDeploymentController {
 			const projectId = req.params.projectId
 
 			const result = await this.deploymentService.getProjectDeployments(userId, projectId, query);
-			const response = DeploymentMapper.toDeploymentsResponse(result, result.length, query.page, query.limit)
+			const response = DeploymentMapper.toDeploymentsResponse(result.deployments, result.total, query.page, query.limit)
 			res.status(HTTP_STATUS_CODE.OK).json(response);
 		} catch (error) {
 			next(error);
@@ -70,7 +72,7 @@ class DeploymentController implements IDeploymentController {
 				page: query.page, limit: query.limit,
 				status: query.status, search: query.search
 			});
-			const response = DeploymentMapper.toDeploymentsResponse(result, result.length, query.page, query.limit)
+			const response = DeploymentMapper.toDeploymentsResponse(result.deployments, result.total, query.page, query.limit)
 			res.status(HTTP_STATUS_CODE.OK).json(response);
 		} catch (error) {
 			next(error);

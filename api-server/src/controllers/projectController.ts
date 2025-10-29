@@ -4,6 +4,7 @@ import ProjectService from "../services/project.service.js";
 import { HTTP_STATUS_CODE } from "../utils/statusCodes.js";
 import { CreateProjectDTO, QueryProjectDTO } from "../dtos/project.dto.js";
 import { ProjectMapper } from "../mappers/ProjectMapper.js";
+import AppError from "../utils/AppError.js";
 
 class ProjectController implements IProjectController {
 	private projectService: ProjectService;
@@ -16,9 +17,17 @@ class ProjectController implements IProjectController {
 			const dto = req.validatedBody as CreateProjectDTO;
 			const user = req.user?.id;
 
-			const dbResult = await this.projectService.createProject(dto, user || "");
+			// await new Promise(reso => setTimeout(reso, 4000))
+			// res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ error: "something" })
+			// return
 
-			res.status(HTTP_STATUS_CODE.CREATED).json(dbResult);
+			const dbResult = await this.projectService.createProject(dto, user || "");
+			if (!dbResult) {
+				throw new AppError("Cannot create project", HTTP_STATUS_CODE.BAD_REQUEST)
+			}
+			const response = ProjectMapper.toProjectResponse(dbResult)
+
+			res.status(HTTP_STATUS_CODE.CREATED).json(response);
 		} catch (error) {
 			next(error);
 		}
@@ -44,13 +53,12 @@ class ProjectController implements IProjectController {
 			const userFill = !!req.query.user
 
 			const result = await this.projectService.getProjectById(projectId, userId, userFill);
-			if (result) {
-
-				const response = ProjectMapper.toProjectResponse(result, userFill)
-				res.status(HTTP_STATUS_CODE.OK).json(response);
+			if (!result) {
+				res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ project: null });
 				return
 			}
-			res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ project: null });
+			const response = ProjectMapper.toProjectResponse(result, userFill)
+			res.status(HTTP_STATUS_CODE.OK).json(response);
 
 		} catch (err) {
 			next(err);

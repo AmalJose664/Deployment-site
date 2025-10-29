@@ -2,7 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import { ILogsController } from "../interfaces/controller/ILogsController.js";
 import { ILogsService } from "../interfaces/service/ILogsService.js";
 import { client } from "../config/clickhouse.js";
-import { deploymentEmitter } from "../events/deploymentEmitter.js";
+import { deploymentEmitter, sseManager } from "../events/deploymentEmitter.js";
+import { v4 } from "uuid";
+import { LogMapper } from "../mappers/LogsMapper.js";
 
 class LogsController implements ILogsController {
 
@@ -16,11 +18,10 @@ class LogsController implements ILogsController {
 		try {
 			const projectId = req.params.projectId
 			const user = req.user?.id as string
-			const result = await this.logsService.getProjectsLogs(projectId, user)
+			const result = await this.logsService.getProjectsLogs(projectId, user, {})
 
-			const { data } = result
-
-			res.json({ hey: data.map((d: any) => d.log) })
+			const response = LogMapper.toLogsResponse(result.logs, result.total)
+			res.json(response)
 			return
 		} catch (error) {
 			next(error);
@@ -30,11 +31,10 @@ class LogsController implements ILogsController {
 		try {
 			const deploymentId = req.params.deploymentId
 			const user = req.user?.id as string
-			const result = await this.logsService.getDeploymentLog(deploymentId, user)
+			const result = await this.logsService.getDeploymentLog(deploymentId, user, {})
 
-			const { data } = result
-
-			res.json({ hey: data.map((d: any) => d.log), length: data.length })
+			const response = LogMapper.toLogsResponse(result.logs, result.total)
+			res.json(response)
 			return
 		} catch (error) {
 			next(error)
@@ -45,38 +45,23 @@ class LogsController implements ILogsController {
 		const id = req.params.deploymentId
 		try {
 
-			res.setHeader('Content-Type', 'text/event-stream');
-			res.setHeader('Cache-Control', 'no-cache');
-			res.setHeader('Connection', 'keep-alive');
-			res.write(`data: ${JSON.stringify({ message: 'Connected to logs' })}\n\n`);
+			sseManager.addClient(v4(), id, res, req)
 
-			const responseHandler = (event: any) => {
-				if (!res.writableEnded) {
-					console.log("sending...")
-
-					res.write(`data: ${JSON.stringify(event)}\n\n`);
-				}
-			};
-			deploymentEmitter.onLog(id, responseHandler)
-			deploymentEmitter.onUpdate(id, responseHandler)
-
-
-			req.on('close', () => {
-				if (!res.writableEnded) {
-					res.write('event: close\ndata: {"status":"complete"}\n\n');
-					res.end();
-				}
-				deploymentEmitter.offLog(id, responseHandler)
-				deploymentEmitter.onUpdate(id, responseHandler)
-				console.log('Client disconnected');
-			});
 		} catch (error) {
 			deploymentEmitter.offAll(id)
 			next(error)
 		}
 	}
 
+	async getData(req: Request, res: Response, next: NextFunction): Promise<void> {
 
+		res.json({
+			clientCount: sseManager.getClientCount(),
+			listerCount: sseManager.getListeners(),
+			listerners: sseManager.getEventFns()
+		})
+
+	}
 	async test(req: Request, res: Response, next: NextFunction): Promise<void> {
 
 		const result = await client.query({

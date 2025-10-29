@@ -6,12 +6,8 @@ import { HiMiniArrowUpRight } from "react-icons/hi2"
 import { IoRocketOutline } from "react-icons/io5"
 import { LuFolderCode } from "react-icons/lu"
 
-const NoDeployment = ({ projectId, refetch }: { projectId: string, refetch: () => void }) => {
-	const [createDeployment, { }] = useCreateDeploymentMutation()
-	const handleCreateDeployment = async () => {
-		await createDeployment(projectId)
-		refetch()
-	}
+const NoDeployment = ({ onCreateDeployment }: { onCreateDeployment: () => void }) => {
+
 	return (
 		<div className="mt-6 flex items-center justify-center">
 			<Empty>
@@ -26,7 +22,7 @@ const NoDeployment = ({ projectId, refetch }: { projectId: string, refetch: () =
 				</EmptyHeader>
 				<EmptyContent>
 					<div className="flex gap-2">
-						<Button onClick={handleCreateDeployment}>Create Deployment <IoRocketOutline /> </Button>
+						<Button onClick={onCreateDeployment}>Create Deployment <IoRocketOutline /> </Button>
 					</div>
 				</EmptyContent>
 				<Button

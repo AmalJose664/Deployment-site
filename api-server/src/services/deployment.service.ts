@@ -32,7 +32,7 @@ class DeploymentService implements IDeploymentService {
 
 		deploymentData.status = DeploymentStatus.QUEUED
 		deploymentData.overWrite = false;
-		deploymentData.commit_hash = "000000";
+		deploymentData.commit_hash = "------";
 		deploymentData.s3Path = correspondindProject._id.toString();
 		deploymentData.project = new Types.ObjectId(correspondindProject._id);
 		deploymentData.userId = correspondindProject.user;
@@ -40,7 +40,7 @@ class DeploymentService implements IDeploymentService {
 		const deployment = await this.deploymentRepository.createDeployment(deploymentData);
 		await this.projectRepository.pushToDeployments(correspondindProject.id, userId, deployment?.id)
 		if (deployment?._id) {
-			this.deployLocal(deployment?._id, projectId)
+			// this.deployLocal(deployment?._id, projectId)
 		}
 		return deployment;
 	}
@@ -50,11 +50,11 @@ class DeploymentService implements IDeploymentService {
 		return await this.deploymentRepository.findDeploymentById(id, userId);
 	}
 
-	async getAllDeployments(userId: string, query: QueryDeploymentDTO): Promise<IDeployment[]> {
+	async getAllDeployments(userId: string, query: QueryDeploymentDTO): Promise<{ deployments: IDeployment[], total: number }> {
 		return await this.deploymentRepository.findAllDeployments(userId, query);
 	}
 
-	async getProjectDeployments(userId: string, projectId: string, query: QueryDeploymentDTO): Promise<IDeployment[]> {
+	async getProjectDeployments(userId: string, projectId: string, query: QueryDeploymentDTO): Promise<{ deployments: IDeployment[], total: number }> {
 		const correspondindProject = await this.projectRepository.findProject(projectId, userId);
 		if (!correspondindProject) {
 			throw new AppError("Project not found", 404);

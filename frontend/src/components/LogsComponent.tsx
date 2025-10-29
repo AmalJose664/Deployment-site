@@ -13,15 +13,20 @@ import { LuRotateCw } from "react-icons/lu";
 import { ansiConverter } from '@/lib/ansiToHtml';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
-import { clearLogs } from '@/store/slices/logSlice';
+import { addLogs, clearLogs } from '@/store/slices/logSlice';
+import { formatLogTime, getLevelColor } from '@/lib/utils';
+import { useGetDeploymentLogsQuery } from '@/store/services/logsApi';
 
 interface LogsProps {
 	logsArray?: Log[]
 }
 
-export function Logs() {
+export function Logs({ deploymentId }: { deploymentId: string }) {
 	const dispatch = useDispatch()
+
 	const logs = useSelector((state: RootState) => state.logs)
+
+
 	const [filter, setFilter] = useState('all');
 	const [searchTerm, setSearchTerm] = useState('');
 	const [autoScroll, setAutoScroll] = useState(true);
@@ -33,7 +38,10 @@ export function Logs() {
 		}
 	}, [logs, autoScroll]);
 
-	const filteredLogs = logs.filter(log => {
+	const [logss, setLogs] = useState([])
+
+
+	const filteredLogs = (logss.length ? logss : logs).filter(log => {
 
 		if (!log) return false
 		const matchesFilter = filter === 'all' || log.level === filter;
@@ -42,14 +50,7 @@ export function Logs() {
 		return matchesFilter && matchesSearch;
 	});
 
-	const getLevelColor = (level: string) => {
-		switch (level) {
-			case 'ERROR': return 'text-red-400';
-			case 'WARN': return 'text-yellow-500';
-			case 'SUCCESS': return 'text-green-400';
-			default: return 'text-gray-500';
-		}
-	};
+
 
 	const downloadLogs = () => {
 		const logText = logs.map(log =>
@@ -69,6 +70,7 @@ export function Logs() {
 		dispatch(clearLogs())
 	};
 
+
 	const getFilterCount = (level: string) => {
 		if (level === 'all') return logs.length;
 		return logs.filter(log => log.level === level).length;
@@ -81,16 +83,16 @@ export function Logs() {
 			<div
 				key={key}
 				style={style}
-				className="px-2 py-0.5 dark:hover:bg-neutral-800 hover:bg-neutral-300 border-b dark:border-gray-900 border-gray-300 active:bg-blue-950"
+				className="px-2 py-0.5 dark:hover:bg-neutral-800 hover:bg-neutral-300    active:bg-blue-950"
 			>
 				<div className="flex items-start gap-2 dark:text-xs text-sm font-mono">
 					<span className="text-primary shrink-0 mt-[2px]">
-						{log.timestamp.toString()}
+						{formatLogTime(log.timestamp)}
 					</span>
 					<span className={`${getLevelColor(log.level)} uppercase shrink-0 w-16 mt-[2px]`}>
 						{log.level}
 					</span>
-					<span className="dark:text-gray-300 text-gray-900  flex-1 break-words leading-relaxed whitespace-nowrap overflow-hidden text-ellipsis "
+					<span className="dark:text-neutral-200 text-gray-900   flex-1 break-words leading-relaxed whitespace-nowrap overflow-hidden text-ellipsis "
 						dangerouslySetInnerHTML={{ __html: htmlMessage }}>
 						{/* {log.message} */}
 					</span>
@@ -100,8 +102,8 @@ export function Logs() {
 	};
 
 	return (
-		<div className="dark:bg-black bg-gray-50 text-gray-100 p-1 rounded-md">
-			<div className="max-w-[1300px] mx-auto">
+		<div className="dark:bg-neutral-950 bg-gray-50 text-gray-100 p-1 rounded-md">
+			<div className="max-w-full mx-auto">
 				<div className="dark:bg-neutral-950 bg-gray-50 border ">
 					{/* Header */}
 					<div className="border-b  px-3 py-2">
@@ -142,8 +144,8 @@ export function Logs() {
 										key={level}
 										onClick={() => setFilter(level)}
 										className={`px-2 py-0.5 ${filter === level
-											? 'dark:bg-gray-800 bg-gray-400 rounded-sm text-some-less'
-											: 'dark:bg-gray-900 bg-gray-100 text-gray-600 hover:text-gray-900 dark:hover:text-gray-300'
+											? 'dark:bg-neutral-800 border dark:border-neutral-100 border-neutral-900 bg-gray-400 rounded-sm text-some-less'
+											: 'dark:bg-neutral-900 bg-gray-100 text-gray-600 hover:text-gray-900 dark:hover:text-gray-300'
 											}`}
 									>
 										{level} ({getFilterCount(level)})
@@ -176,7 +178,7 @@ export function Logs() {
 						</div>
 					</div>
 
-					<div className="dark:bg-black bg-white logs-container-build " style={{ height: '420px' }}>
+					<div className="dark:bg-neutral-950 bg-white logs-container-build " style={{ height: '420px' }}>
 						{filteredLogs.length === 0 ? (
 							<div className="flex items-center justify-center h-full text-gray-700">
 								<div className="text-center text-xs">
@@ -202,7 +204,7 @@ export function Logs() {
 					</div>
 
 					{/* Footer */}
-					<div className="border-t  px-3 py-1 dark:bg-gray-950 bg-white">
+					<div className="border-t  px-3 py-1 dark:bg-neutral-950 bg-white">
 						<div className="flex justify-between text-xs text-gray-700">
 							<span>{filteredLogs.length} / {logs.length}</span>
 							<span>virtualized</span>

@@ -5,12 +5,13 @@ import repo from "./src/repositories/project.repository"
 import mongoose, { Types } from "mongoose";
 import connectDb from "./src/config/db";
 import pg from "pg" // COnsider  ------------------------------------------------------------------------------
+import { User } from "./src/models/User";
 
 async function create() {
 	try {
 		await connectDb();
-		await Project.updateOne({ _id: "68fb1ccb10b93de245fa9f55" }, { deployments: [] })
-		// console.log(await Deployment.deleteMany())
+		// await Project.updateOne({ _id: "68fb1ccb10b93de245fa9f55" }, { deployments: [] })
+		console.log(await Project.deleteOne({ name: "new-ui-projectsqq" },))
 		// const r = await new repo().pullDeployments("68fa78e47e6c4401f35402d8", "68e4a04f1e57fa3fe5b1a81e", "68fa79c47e6c4401f35402f2")
 
 		// await mongoose.disconnect()

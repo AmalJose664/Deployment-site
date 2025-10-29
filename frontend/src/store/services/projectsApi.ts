@@ -34,6 +34,10 @@ export const projectApis = createApi({
 				method: "POST",
 				data: project,
 			}),
+			transformResponse(data: any) {
+				return data.project
+			},
+
 			invalidatesTags: ["Projects"]
 		})
 	})

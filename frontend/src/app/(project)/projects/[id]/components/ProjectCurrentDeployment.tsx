@@ -1,15 +1,12 @@
-import { GoCheckCircleFill, GoXCircleFill } from "react-icons/go";
-import { IoAlertCircleSharp } from "react-icons/io5";
 
 
 import { IoMdGitBranch } from "react-icons/io";
 import { LiaExternalLinkAltSolid } from "react-icons/lia";
 import { MdAccessTime } from "react-icons/md";
 import { Deployment } from "@/types/Deployment";
-import { getElapsedTime, getGithubBranchUrl, getGithubCommitUrl, timeToSeconds } from "@/lib/utils";
+import { getElapsedTime, getGithubBranchUrl, getGithubCommitUrl, getStatusColor, timeToSeconds } from "@/lib/utils";
 import Link from "next/link";
-
-
+import StatusIcon from "@/components/ui/StatusIcon";
 
 
 interface ProjectDeploymentProps {
@@ -18,37 +15,8 @@ interface ProjectDeploymentProps {
 	repoURL: string
 }
 
-
-
 const ProjectCurrentDeployment = ({ deployment, projectBranch, repoURL }: ProjectDeploymentProps) => {
-	const getStatusIcon = (status: string) => {
 
-		switch (status.toLowerCase()) {
-			case 'ready':
-				return <GoCheckCircleFill className="text-emerald-500" size={18} />;
-			case 'failed':
-				return <GoXCircleFill className="text-red-500" size={18} />;
-			case 'building':
-				return <IoAlertCircleSharp className="text-amber-500" size={18} />;
-			default:
-				return null;
-		}
-	};
-
-	const getStatusColor = (status: string) => {
-		switch (status.toLowerCase()) {
-			case 'ready':
-				return 'text-emerald-500 bg-emerald-500/10';
-			case 'failed':
-				return 'text-red-500 bg-red-500/10';
-			case 'cancelled':
-				return 'text-red-500 bg-red-500/10';
-			case 'building':
-				return 'text-amber-500 bg-amber-500/10';
-			default:
-				return 'text-gray-500 bg-gray-500/10';
-		}
-	};
 	return (
 		<div className="border  rounded-xl overflow-hidden">
 			<div className="px-6 py-4 border-b border-gray-800">
@@ -62,7 +30,7 @@ const ProjectCurrentDeployment = ({ deployment, projectBranch, repoURL }: Projec
 				>
 					<div className="flex items-start justify-between">
 						<div className="flex items-start gap-4 flex-1">
-							<div className="pt-1">{getStatusIcon(deployment.status)}</div>
+							<div className="pt-1"><StatusIcon status={deployment.status} /></div>
 							<div className="flex-1 min-w-0">
 								<div className="flex items-center gap-3 mb-2">
 									<span

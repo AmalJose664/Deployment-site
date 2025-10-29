@@ -1,3 +1,4 @@
+import { FilterQuery } from "mongoose";
 import { QueryDeploymentDTO } from "../dtos/deployment.dto.js";
 import { IDeploymentRepository } from "../interfaces/repository/IDeploymentRepository.js";
 import { Deployment, DeploymentStatus, IDeployment } from "../models/Deployment.js";
@@ -13,13 +14,16 @@ class DeploymentRepository extends BaseRepository<IDeployment> implements IDeplo
 		return savedDeployment;
 	}
 
+	async findDeploymentById(id: string, userId: string): Promise<IDeployment | null> {
+		return await Deployment.findOne({ _id: id, userId })
+	}
 	async findAllDeployments(userId: string, query: {
 		page: number,
 		limit: number,
 		status?: DeploymentStatus,
 		search?: string,
-	}): Promise<IDeployment[]> {
-		let dbQuery: any = { userId };
+	}): Promise<{ deployments: IDeployment[], total: number }> {
+		let dbQuery: FilterQuery<IDeployment> = { userId };
 		if (query.search) {
 			dbQuery = { ...dbQuery, commit_hash: { $regex: query.search, $options: "i" } }
 		}
@@ -31,14 +35,12 @@ class DeploymentRepository extends BaseRepository<IDeployment> implements IDeplo
 			.limit(query.limit)
 			.skip((query.page - 1) * query.limit)
 			.exec();
-		return deployments
-	}
-	async findDeploymentById(id: string, userId: string): Promise<IDeployment | null> {
-		return await Deployment.findOne({ _id: id, userId })
+		const total = await this.count(dbQuery)
+		return { deployments, total }
 	}
 
-	async findProjectDeployments(userId: string, projectId: string, query: QueryDeploymentDTO): Promise<IDeployment[]> {
-		let dbQuery: any = { userId, project: projectId };
+	async findProjectDeployments(userId: string, projectId: string, query: QueryDeploymentDTO): Promise<{ deployments: IDeployment[], total: number }> {
+		let dbQuery: FilterQuery<IDeployment> = { userId, project: projectId };
 		if (query.search) {
 			dbQuery = { ...dbQuery, commit_hash: { $regex: query.search, $options: "i" } }
 		}
@@ -49,7 +51,8 @@ class DeploymentRepository extends BaseRepository<IDeployment> implements IDeplo
 			.limit(query.limit)
 			.skip((query.page - 1) * query.limit)
 			.exec();
-		return deployments
+		const total = await this.count(dbQuery)
+		return { deployments, total }
 	}
 
 

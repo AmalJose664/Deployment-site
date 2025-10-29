@@ -19,3 +19,17 @@ export interface Deployment {
 	createdAt: Date;
 	updatedAt: Date;
 }
+
+export interface DeploymentUpdates {
+	deploymentId: string;
+	projectId: string;
+	status?: ProjectStatus;
+	techStack?: string;
+	commit_hash?: string;
+	error_message?: string;
+	install_ms?: number;
+	build_ms?: number;
+	duration_ms?: number;
+	complete_at?: string;
+
+}

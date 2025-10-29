@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import { FilterQuery, Types } from "mongoose";
 import { IProjectRepository } from "../interfaces/repository/IProjectRepository.js";
 import { IProject, Project, ProjectStatus } from "../models/Projects.js";
 import { IUser, User } from "../models/User.js";
@@ -25,7 +25,7 @@ class ProjectRepository extends BaseRepository<IProject> implements IProjectRepo
 		userId: string,
 		query: QueryProjectDTO
 	): Promise<{ projects: IProject[]; total: number }> {
-		const dbQuery: any = { user: userId };
+		const dbQuery: FilterQuery<IProject> = { user: userId };
 		if (query.search) {
 			dbQuery.$or = [{ name: { $regex: query.search, $options: "i" } }, { subdomain: { $regex: query.search, $options: "i" } }];
 		}
@@ -51,7 +51,10 @@ class ProjectRepository extends BaseRepository<IProject> implements IProjectRepo
 	}
 
 	async pushToDeployments(projectId: string, userId: string, newDeployment: string | Types.ObjectId): Promise<IProject | null> {
-		return await Project.findOneAndUpdate({ _id: projectId, user: userId }, { $addToSet: { deployments: newDeployment } }, { new: true })
+		return await Project.findOneAndUpdate(
+			{ _id: projectId, user: userId },
+			{ lastDeployedAt: new Date(), $addToSet: { deployments: newDeployment } }, { new: true }
+		)
 	}
 
 	async pullDeployments(projectId: string, userId: string, deployment: string | Types.ObjectId): Promise<IProject | null> {

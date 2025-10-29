@@ -6,6 +6,7 @@ import logsReducer from "./slices/logSlice"
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { projectApis } from './services/projectsApi'
 import { deployemntApis } from './services/deploymentApi'
+import { logsApis } from './services/logsApi'
 
 export const makeStore = () => {
 	return configureStore({
@@ -14,9 +15,10 @@ export const makeStore = () => {
 			projects: projectsReducer,
 			logs: logsReducer,
 			[projectApis.reducerPath]: projectApis.reducer,
-			[deployemntApis.reducerPath]: deployemntApis.reducer
+			[deployemntApis.reducerPath]: deployemntApis.reducer,
+			[logsApis.reducerPath]: logsApis.reducer,
 		},
-		middleware: (gDM) => gDM().concat(projectApis.middleware, deployemntApis.middleware),
+		middleware: (gDM) => gDM().concat(projectApis.middleware, deployemntApis.middleware, logsApis.middleware),
 	})
 }
 

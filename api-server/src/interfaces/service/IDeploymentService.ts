@@ -8,7 +8,7 @@ export interface IDeploymentService {
 		limit: number,
 		status?: DeploymentStatus,
 		search?: string,
-	}): Promise<IDeployment[]>;
+	}): Promise<{ deployments: IDeployment[], total: number }>;
 
 	getDeploymentById(id: string, userId: string): Promise<IDeployment | null>
 	getProjectDeployments(userId: string, projectId: string, query: {
@@ -16,7 +16,7 @@ export interface IDeploymentService {
 		limit: number,
 		status?: DeploymentStatus,
 		search?: string,
-	}): Promise<IDeployment[]>;
+	}): Promise<{ deployments: IDeployment[], total: number }>;
 
 	deleteDeployment(projectId: string, deploymentId: string, userId: string): Promise<number>;
 
