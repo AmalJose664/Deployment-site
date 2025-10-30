@@ -1,10 +1,10 @@
 import Navbar from "@/components/Navbar"
-import ProjectForm from "./ProjectForm"
+import ProjectForm from "./FormContainer"
 
 const page = () => {
 	return (
 		<div>
-			<Navbar />
+			<Navbar className="" />
 			<ProjectForm />
 		</div>
 	)

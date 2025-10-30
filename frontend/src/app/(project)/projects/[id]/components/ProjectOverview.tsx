@@ -6,7 +6,7 @@ import { CiCalendarDate } from "react-icons/ci";
 import { MdAccessTime } from "react-icons/md";
 
 import { User } from "@/types/User";
-import { Project } from "@/types/Project";
+import { Project, ProjectStatus } from "@/types/Project";
 import Link from "next/link";
 import TechStack from "@/components/TechStack";
 import { getGithubBranchUrl, getGithubCommitUrl, getStatusColor, timeToSeconds } from "@/lib/utils";
@@ -17,9 +17,10 @@ interface ProjectOverviewProps {
 	project: Project,
 	deploymentCommitHash?: string
 	deploymentDuration: number | undefined
+	errorMessage?: string
 }
 
-const ProjectOverview = ({ project, deploymentCommitHash, deploymentDuration }: ProjectOverviewProps) => {
+const ProjectOverview = ({ project, deploymentCommitHash, deploymentDuration, errorMessage }: ProjectOverviewProps) => {
 	const repoValues = project.repoURL.split("/")
 	const repoWithUser = repoValues[3] + "/" + repoValues[4]
 
@@ -87,9 +88,20 @@ const ProjectOverview = ({ project, deploymentCommitHash, deploymentDuration }: 
 							</div>
 							<div className='flex gap-2 items-center'>
 								<p className='text-xs text-less font-medium'>Status</p>
-								<p className={`text-sm font-bold ${getStatusColor(project.status)}`}>{project.status}</p>
+								<p className={`text-sm font-bold rounded-xs px-1 ${getStatusColor(project.status)}`}>{project.status}</p>
 							</div>
 						</div>
+						{project.status === ProjectStatus.CANCELED && (
+							<div className='flex items-center gap-2'>
+								<div className='p-2  rounded-lg'>
+									<StatusIcon status={project.status} />
+								</div>
+								<div className='flex gap-2 items-center'>
+									<p className='text-xs text-less font-medium'>Reason</p>
+									<p className={`text-sm font-bold rounded-xs px-1 ${getStatusColor(project.status)}`}>{errorMessage}</p>
+								</div>
+							</div>
+						)}
 						<div className='flex items-center gap-2'>
 							<div className='p-2 rounded-lg'>
 								<MdAccessTime className='size-4 text-less' />

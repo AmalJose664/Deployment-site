@@ -17,7 +17,7 @@ const ProjectSimpleStats = () => {
 
 
 	return (
-		<div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mt-8">
+		<div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mt-8 dark:bg-neutral-900 bg-white">
 			<div className=" border rounded-xl p-5">
 				<div className="flex items-center gap-3 mb-2">
 					<div className="p-2 bg-blue-500/10 rounded-lg">

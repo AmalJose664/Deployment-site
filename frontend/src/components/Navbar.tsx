@@ -1,10 +1,11 @@
 import Link from "next/link";
 import ThemeSwitcher from "./ThemeIcon";
 import { GoBell } from "react-icons/go";
-export default function Navbar() {
+import { cn } from "@/lib/utils";
+export default function Navbar({ className }: { className: string }) {
 
 	return (
-		<nav className="flex w-full items-center justify-between px-6 py-3 border-b dark:border-gray-800 border-gray-300">
+		<nav className={cn(className, "flex w-full items-center justify-between px-6 py-3 border-b dark:border-gray-800 border-gray-300")}>
 
 			<div className="flex items-center space-x-3">
 				<svg
@@ -36,28 +37,28 @@ export default function Navbar() {
 				</Link>
 			</div>
 
-			{/* Center: Nav Links */}
-			<ul className="hidden md:flex items-center gap-6 text-sm dark:text-white text-black">
-				<li>
-					<Link href="/projects" className="hover:text-blue-400">
-						Projects
-					</Link>
-				</li>
-				<li>
-					<Link href="/ai" className="hover:text-blue-400">
-						Ship AI
-					</Link>
-				</li>
-				<li>
-					<Link href="/feedback" className="hover:text-blue-400">
-						Feedback
-					</Link>
-				</li>
-			</ul>
 
-			{/* Right: Icons */}
+
+
 			<div className="flex items-center gap-6">
 
+				<ul className="hidden md:flex items-center gap-6 text-sm dark:text-white text-black">
+					<li>
+						<Link href="/projects" className="hover:text-blue-400">
+							Projects
+						</Link>
+					</li>
+					<li>
+						<Link href="/ai" className="hover:text-blue-400">
+							Ship AI
+						</Link>
+					</li>
+					<li>
+						<Link href="/feedback" className="hover:text-blue-400">
+							Feedback
+						</Link>
+					</li>
+				</ul>
 				<button
 					aria-label="Notifications"
 					className="relative p-2 rounded-full dark:hover:bg-gray-100 hover:bg-gray-400 border-1 dark:border-gray-800 border-gray-500 dark:text-gray-200 text-gray-800 hover:text-gray-200 dark:hover:text-gray-800 duration-200"

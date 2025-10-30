@@ -1,10 +1,10 @@
 import Navbar from "@/components/Navbar"
-import ProjectContent from "./ProjectPageContent"
+import ProjectContent from "./ProjectsPageContent"
 
 const page = () => {
 	return (
 		<div>
-			<Navbar />
+			<Navbar className="" />
 			<ProjectContent />
 		</div>
 	)

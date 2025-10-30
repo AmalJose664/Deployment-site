@@ -15,6 +15,9 @@ import { Logs } from "@/components/LogsComponent"
 
 import { Project } from "@/types/Project"
 import { Deployment } from "@/types/Deployment"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs"
+import AllDeployments from "./AllDeployments"
+import { useState } from "react"
 
 interface ProjectContentProps {
 	project: Project
@@ -35,7 +38,7 @@ export function ProjectContent({
 	setShowBuild,
 	onCreateDeployment
 }: ProjectContentProps) {
-
+	const [tab, setTabs] = useState("project")
 	return (
 		<div className="min-h-screen">
 
@@ -60,62 +63,80 @@ export function ProjectContent({
 				</div>
 			</header>
 
-			<main className="max-w-[1400px] mx-auto px-6 py-8">
-				<ProjectTabs />
+			<main className="max-w-[1400px] mx-auto px-6 py-4">
+				<Tabs defaultValue="project" value={tab} onValueChange={setTabs} className="w-full ">
+					<ProjectTabs />
+					<TabsContent value="project">
+						<>
+							<div className="dark:bg-neutral-900 border bg-white w-full rounded-md mb-6 px-4 py-6">
 
-				<div className="dark:bg-neutral-900 bg-white w-full rounded-md mb-6 px-4 py-6">
+								{(!project.deployments || project.deployments.length === 0) && (
+									<NoDeployment onCreateDeployment={onCreateDeployment} />
+								)}
 
-					{(!project.deployments || project.deployments.length === 0) && (
-						<NoDeployment onCreateDeployment={onCreateDeployment} />
-					)}
-
-					<ProjectOverview
-						project={project}
-						deploymentCommitHash={deployment?.commitHash}
-						deploymentDuration={deployment?.performance?.totalDuration}
-					/>
-
-					<div className="border rounded-md">
-						<button
-							className="p-4 w-full"
-							onClick={() => setShowBuild(!showBuild)}
-						>
-							<span className="flex flex-row-reverse gap-2 items-center justify-end text-primary">
-								Build Logs
-								<MdKeyboardArrowRight
-									className="size-6 transition-all duration-200"
-									style={{
-										transform: `rotateZ(${showBuild ? "90deg" : "0deg"})`,
-									}}
+								<ProjectOverview
+									project={project}
+									deploymentCommitHash={deployment?.commitHash}
+									deploymentDuration={deployment?.performance?.totalDuration}
+									errorMessage={deployment?.errorMessage}
 								/>
-							</span>
-						</button>
 
-						<AnimatePresence mode="sync">
-							{showBuild && (
-								<motion.div
-									initial={{ opacity: 0, y: 20, height: 0 }}
-									animate={{ opacity: 1, y: 0, height: "auto", }}
-									exit={{ opacity: 0, y: -40, height: 0 }}
-									transition={{ duration: 0.4, ease: "easeInOut" }}
-									className="dark:bg-stone-900 bg-stone-100 h-auto"
-								>
-									<Logs deploymentId={deployment?._id || ""} />
-								</motion.div>
+								<div className="border dark:border-neutral-600 border-neutral-400 rounded-md">
+									<button
+										className="p-4 w-full"
+										onClick={() => setShowBuild(!showBuild)}
+									>
+										<span className="flex flex-row-reverse gap-2 items-center justify-end text-primary">
+											Build Logs
+											<MdKeyboardArrowRight
+												className="size-6 transition-all duration-200"
+												style={{
+													transform: `rotateZ(${showBuild ? "90deg" : "0deg"})`,
+												}}
+											/>
+										</span>
+									</button>
+
+									<AnimatePresence mode="sync">
+										{showBuild && (
+											<motion.div
+												initial={{ opacity: 0, y: 20, height: 0 }}
+												animate={{ opacity: 1, y: 0, height: "auto", }}
+												exit={{ opacity: 0, y: -40, height: 0 }}
+												transition={{ duration: 0.4, ease: "easeInOut" }}
+												className="dark:bg-stone-900 bg-stone-100 h-auto"
+											>
+												<Logs deploymentId={deployment?._id || ""} />
+											</motion.div>
+										)}
+									</AnimatePresence>
+								</div>
+							</div>
+
+							{project.deployments && project.deployments?.length > 0 && deployment && (
+								<ProjectCurrentDeployment
+									deployment={deployment}
+									projectBranch={project.branch}
+									repoURL={project.repoURL}
+									showLogs={() => setShowBuild(true)}
+								/>
 							)}
-						</AnimatePresence>
-					</div>
-				</div>
 
-				{project.deployments && project.deployments?.length > 0 && deployment && (
-					<ProjectCurrentDeployment
-						deployment={deployment}
-						projectBranch={project.branch}
-						repoURL={project.repoURL}
-					/>
-				)}
+							{project.deployments && project.deployments?.length > 0 && <ProjectSimpleStats />}
+						</>
+					</TabsContent>
+					<TabsContent value="deployments">
+						<AllDeployments projectId={project._id} projectBranch={project.branch} repoURL={project.repoURL} setTab={() => setTabs("project")} />
+					</TabsContent>
+					<TabsContent value="settings">
+						settings
+					</TabsContent>
+					<TabsContent value="analytics">
+						hey
+					</TabsContent>
+				</Tabs>
 
-				{project.deployments && project.deployments?.length > 0 && <ProjectSimpleStats />}
+
 			</main>
 		</div>
 	)

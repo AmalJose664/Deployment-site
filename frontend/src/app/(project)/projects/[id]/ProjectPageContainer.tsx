@@ -64,15 +64,13 @@ export function ProjectPageContainer({ projectId }: ProjectPageContainerProps) {
 
 	if (!project && !isLoading) {
 		return (
-			<div className="min-h-screen flex items-center justify-center">
-				<p className="text-muted-foreground">Project not found</p>
-			</div>
+			<ProjectError error={{ message: "project not found" }} />
 		)
 	}
 
+	if (isError) return <ProjectError error={error} />
 
 	if (isLoading) return <ProjectLoading />
-	if (isError) return <ProjectError error={error} />
 
 
 

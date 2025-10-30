@@ -13,12 +13,13 @@ interface ProjectDeploymentProps {
 	deployment: Deployment;
 	projectBranch: string;
 	repoURL: string
+	showLogs: () => void
 }
 
-const ProjectCurrentDeployment = ({ deployment, projectBranch, repoURL }: ProjectDeploymentProps) => {
+const ProjectCurrentDeployment = ({ deployment, projectBranch, repoURL, showLogs }: ProjectDeploymentProps) => {
 
 	return (
-		<div className="border  rounded-xl overflow-hidden">
+		<div className="border  rounded-xl overflow-hidden dark:bg-neutral-900 bg-white">
 			<div className="px-6 py-4 border-b border-gray-800">
 				<h2 className="text-lg font-semibold">Current Deployment</h2>
 			</div>
@@ -58,7 +59,7 @@ const ProjectCurrentDeployment = ({ deployment, projectBranch, repoURL }: Projec
 								</div>
 							</div>
 						</div>
-						<button className="text-xs text-gray-400 hover:text-white transition-colors flex items-center gap-1">
+						<button onClick={showLogs} className="text-xs text-gray-400 hover:text-white transition-colors flex items-center gap-1">
 							View Logs
 							<LiaExternalLinkAltSolid size={12} />
 						</button>

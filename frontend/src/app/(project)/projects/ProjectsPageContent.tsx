@@ -10,6 +10,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import ProjectEmptyState from './ProjectEmptyState';
 import { ProjectStatus } from '@/types/Project';
 import { useRouter } from "next/navigation"
+import { getStatusBg } from '@/lib/utils';
 
 
 export default function ProjectContent() {
@@ -22,7 +23,7 @@ export default function ProjectContent() {
 
 	const { data: projects, error, isLoading, refetch } = useGetProjectsQuery({ search: debouncedSearch });
 
-	if ((!projects || projects.length === 0) && !projectSeachState && !debouncedSearch) {
+	if ((!projects || projects.length === 0) && !projectSeachState && !debouncedSearch && !isLoading) {
 		return <ProjectEmptyState />
 	}
 	const filteredProjects = projectFilter === ''
@@ -35,20 +36,7 @@ export default function ProjectContent() {
 		});
 	if (isLoading) return <p>Loading...</p>;
 
-	const getStatusColor = (status: string) => {
-		switch (status) {
-			case 'READY':
-				return 'bg-emerald-500';
-			case 'BUILDING':
-				return 'bg-amber-500';
-			case 'FAILED':
-				return 'bg-red-500';
-			case 'CANCELLED':
-				return 'bg-red-500';
-			default:
-				return 'bg-gray-500';
-		}
-	};
+
 	const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setProjectSearchState(e.target.value)
 		// refetch()
@@ -66,7 +54,6 @@ export default function ProjectContent() {
 			setProjectsFilter(status)
 		}
 	}
-	console.log("re render.....", distance)
 	return (
 		<div>
 			<div className="min-h-screen">
@@ -156,11 +143,11 @@ export default function ProjectContent() {
 								{/* Status and Framework */}
 								<div className="flex items-center justify-between pt-4 border-t text-less border-gray-800">
 									<div className="flex items-center gap-2">
-										<div className={`w-2 h-2 rounded-full ${getStatusColor(project.status)}`}></div>
+										<div className={`w-2 h-2 rounded-full ${getStatusBg(project.status)}`}></div>
 										<span className="text-sm ">{project.status}</span>
 									</div>
 									<span className="text-xs border rounded-full  px-2.5 py-1  text-some-less">
-										{project.isDeleted}
+										{project.techStack}
 									</span>
 								</div>
 							</div>

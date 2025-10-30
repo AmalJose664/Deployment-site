@@ -87,7 +87,7 @@ button {
 	--sidebar-ring: oklch(0.707 0.022 261.325);
 }
 .dark {
-	--background: oklch(0.155 0 208.77);
+	--background: oklch(0.1957 0 0);
 	--foreground: oklch(0.9702 0 0);
 	--less: #959595;
 	--some-less: #c5c4c4;
