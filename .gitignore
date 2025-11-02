@@ -6,7 +6,15 @@ yarn-debug.log*
 yarn-error.log*
 
 build-server/script.js
-test-kafka/index.js
+test-server/index.js
+test-server/public/user-projects/
 
 output-try/
 output-try/*
+
+nginx-1.28.0/logs/
+nginx-1.28.0/temp/
+nginx-1.28.0/*.pid
+nginx-1.28.0/*.lock
+nginx-1.28.0/*.exe
+

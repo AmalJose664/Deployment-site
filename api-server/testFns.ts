@@ -21,7 +21,7 @@ async function create() {
 		process.exit(0)
 	}
 }
-create()
+// create()
 async function commitAllMessages() {
 	const kafka = new Kafka({
 		clientId: `api-server`,
@@ -61,5 +61,5 @@ async function commitAllMessages() {
 		await admin.disconnect()
 	}
 }
-// commitAllMessages()
+commitAllMessages()
 

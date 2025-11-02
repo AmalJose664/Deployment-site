@@ -60,6 +60,7 @@ app.use("/api/internal", internalRoutes);
 // --------------------------------------
 
 app.get("/", (req, res) => {
+	console.log(req.headers)
 	res.json({ status: "working" });
 	return;
 });
