@@ -39,12 +39,26 @@ export const projectApis = createApi({
 			},
 
 			invalidatesTags: ["Projects"]
+		}),
+		deleteProject: builder.mutation<Project, string>({
+			query: (projectId) => ({
+				url: "/projects/" + projectId,
+				method: "DELETE",
+			}),
+			transformResponse: (data) => {
+				console.log(data, "from api")
+				return data as Project
+			},
+			invalidatesTags: (result, error, projectId) => ([
+				{ type: "Projects", id: projectId },
+				{ type: "Projects", id: "LIST" },
+			])
 		})
 	})
 })
 
 
 export const {
-	useGetProjectsQuery, useCreateProjectMutation, useGetProjectByIdQuery
+	useGetProjectsQuery, useCreateProjectMutation, useGetProjectByIdQuery, useDeleteProjectMutation
 } = projectApis;
 

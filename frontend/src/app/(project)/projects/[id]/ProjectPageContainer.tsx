@@ -16,9 +16,10 @@ import { addLogs, clearLogs } from "@/store/slices/logSlice"
 
 interface ProjectPageContainerProps {
 	projectId: string
+	tab: string | undefined
 }
 
-export function ProjectPageContainer({ projectId }: ProjectPageContainerProps) {
+export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerProps) {
 	const router = useRouter()
 	const dispatch = useDispatch()
 
@@ -78,6 +79,7 @@ export function ProjectPageContainer({ projectId }: ProjectPageContainerProps) {
 		<ProjectContent
 			project={project}
 			deployment={deployment}
+			tabFromUrl={tab}
 			refetch={refetch}
 			onBack={() => router.push('/projects')}
 			showBuild={showBuild}

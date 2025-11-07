@@ -3,6 +3,7 @@ import { Roboto } from "next/font/google";
 import "./globals.css";
 import ReduxProvider from "@/store/ReduxProvider";
 import ThemeProviderComponent from "@/components/ThemeProvider";
+import { Toaster } from "@/components/ui/sonner"
 
 
 const roboto = Roboto({
@@ -28,6 +29,8 @@ export default function RootLayout({
 				<ReduxProvider>
 					<ThemeProviderComponent>
 						{children}
+						<Toaster position="top-right"
+							richColors closeButton />
 					</ThemeProviderComponent>
 				</ReduxProvider>
 			</body>

@@ -2,17 +2,19 @@ import Navbar from "@/components/Navbar"
 import { ProjectPageContainer } from "./ProjectPageContainer"
 
 export default async function Page({
-	params,
+	params, searchParams
 }: {
-	params: { id: string }
+	params: { id: string }, searchParams: { [key: string]: string | string[] | undefined };
 }) {
 	const { id } = await params
+	const { tab } = await searchParams
+	const filteredTab = ['analytics', 'settings', 'deployments', 'project'].includes((tab as string) || "") ? tab : ""
 	return (
 		<div className="min-h-screen flex flex-col">
 
-			<Navbar />
+			<Navbar className="" />
 			<main className="flex-1">
-				<ProjectPageContainer projectId={id as string} />
+				<ProjectPageContainer projectId={id as string} tab={filteredTab as string} />
 			</main>
 		</div>
 	)

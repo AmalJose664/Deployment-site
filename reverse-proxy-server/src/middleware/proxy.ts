@@ -19,10 +19,14 @@ export const proxy = createProxyMiddleware({
 		proxyReq: (proxyReq, req, res) => {
 			proxyReq.setHeader('Host', req.project?.subdomain || "");
 			proxyReq.setHeader('X-Forwarded-Host', req.headers.host || '');
+			req.startTime = performance.now();
 		},
 
 		proxyRes: (proxyRes, req, res) => {
 			res.setHeader('Access-Control-Allow-Origin', '*');
+			const endTime = performance.now();
+			const startTime = (req as any).startTime || endTime;
+			const responseTime = (endTime - startTime).toFixed(2);
 		},
 
 		error: (err, req, res) => {

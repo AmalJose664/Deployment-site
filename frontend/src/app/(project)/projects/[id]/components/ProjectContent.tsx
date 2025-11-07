@@ -18,6 +18,7 @@ import { Deployment } from "@/types/Deployment"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs"
 import AllDeployments from "./AllDeployments"
 import { useState } from "react"
+import ProjectSettings from "./ProjectSettings"
 
 interface ProjectContentProps {
 	project: Project
@@ -25,7 +26,8 @@ interface ProjectContentProps {
 	refetch: () => void
 	onBack: () => void
 	showBuild: boolean
-	setShowBuild: (state: boolean) => void
+	setShowBuild: (state: boolean) => void;
+	tabFromUrl?: string
 	onCreateDeployment: () => void
 }
 
@@ -34,11 +36,12 @@ export function ProjectContent({
 	deployment,
 	refetch,
 	onBack,
+	tabFromUrl,
 	showBuild,
 	setShowBuild,
 	onCreateDeployment
 }: ProjectContentProps) {
-	const [tab, setTabs] = useState("project")
+	const [tab, setTabs] = useState(tabFromUrl || "project")
 	return (
 		<div className="min-h-screen">
 
@@ -129,7 +132,7 @@ export function ProjectContent({
 						<AllDeployments projectId={project._id} projectBranch={project.branch} repoURL={project.repoURL} setTab={() => setTabs("project")} />
 					</TabsContent>
 					<TabsContent value="settings">
-						settings
+						<ProjectSettings project={project} />
 					</TabsContent>
 					<TabsContent value="analytics">
 						hey

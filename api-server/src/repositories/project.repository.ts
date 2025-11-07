@@ -6,64 +6,64 @@ import { BaseRepository } from "./base/base.repository.js";
 import { QueryProjectDTO } from "../dtos/project.dto.js";
 
 class ProjectRepository extends BaseRepository<IProject> implements IProjectRepository {
-    constructor() {
-        super(Project);
-    }
+	constructor() {
+		super(Project);
+	}
 
-    async createProject(projectData: Partial<IProject>): Promise<IProject | null> {
-        const project = new Project(projectData);
-        const savedProject = await project.save();
-        return savedProject;
-    }
-    async findProject(projectId: string, userId: string, userFill?: boolean): Promise<IProject | null> {
-        if (userFill) {
-            return await Project.findOne({ _id: projectId, user: userId }).populate("user", "name email profileImage");
-        }
-        return await Project.findOne({ _id: projectId, user: userId });
-    }
-    async getAllProjects(userId: string, query: QueryProjectDTO): Promise<{ projects: IProject[]; total: number }> {
-        const dbQuery: FilterQuery<IProject> = { user: userId };
-        if (query.search) {
-            dbQuery.$or = [{ name: { $regex: query.search, $options: "i" } }, { subdomain: { $regex: query.search, $options: "i" } }];
-        }
-        if (query.status) {
-            dbQuery.status = { $eq: query.status };
-        }
+	async createProject(projectData: Partial<IProject>): Promise<IProject | null> {
+		const project = new Project(projectData);
+		const savedProject = await project.save();
+		return savedProject;
+	}
+	async findProject(projectId: string, userId: string, userFill?: boolean): Promise<IProject | null> { // FIX ISDELETE FLAG
+		if (userFill) {
+			return await Project.findOne({ _id: projectId, user: userId, }).populate("user", "name email profileImage");
+		}
+		return await Project.findOne({ _id: projectId, user: userId, isDeleted: false });
+	}
+	async getAllProjects(userId: string, query: QueryProjectDTO): Promise<{ projects: IProject[]; total: number }> {
+		const dbQuery: FilterQuery<IProject> = { user: userId, }; //FIX ISDELETE FLAG
+		if (query.search) {
+			dbQuery.$or = [{ name: { $regex: query.search, $options: "i" } }, { subdomain: { $regex: query.search, $options: "i" } }];
+		}
+		if (query.status) {
+			dbQuery.status = { $eq: query.status };
+		}
 
-        const projects = await this.findMany(dbQuery)
-            .limit(query.limit)
-            .skip((query.page - 1) * query.limit)
-            .exec();
-        const total = await this.count(dbQuery);
+		const projects = await this.findMany(dbQuery)
+			.limit(query.limit)
+			.skip((query.page - 1) * query.limit)
+			.exec();
+		const total = await this.count(dbQuery);
 
-        return { projects, total };
-    }
+		return { projects, total };
+	}
 
-    async deleteProject(projectId: string, userId: string): Promise<IProject | null> {
-        return await Project.findOneAndUpdate({ _id: projectId, user: userId }, { isDeleted: true }, { new: true });
-    }
-    async updateProject(projectId: string, userId: string, updateData: Partial<IProject>): Promise<IProject | null> {
-        return await Project.findOneAndUpdate({ _id: projectId, user: userId }, { $set: { ...updateData } }, { new: true });
-    }
+	async deleteProject(projectId: string, userId: string): Promise<IProject | null> {
+		return await Project.findOneAndUpdate({ _id: projectId, user: userId }, { isDeleted: true }, { new: true });
+	}
+	async updateProject(projectId: string, userId: string, updateData: Partial<IProject>): Promise<IProject | null> {
+		return await Project.findOneAndUpdate({ _id: projectId, user: userId }, { $set: { ...updateData } }, { new: true });
+	}
 
-    async pushToDeployments(projectId: string, userId: string, newDeployment: string | Types.ObjectId): Promise<IProject | null> {
-        return await Project.findOneAndUpdate(
-            { _id: projectId, user: userId },
-            { lastDeployedAt: new Date(), $addToSet: { deployments: newDeployment } },
-            { new: true },
-        );
-    }
+	async pushToDeployments(projectId: string, userId: string, newDeployment: string | Types.ObjectId): Promise<IProject | null> {
+		return await Project.findOneAndUpdate(
+			{ _id: projectId, user: userId },
+			{ lastDeployedAt: new Date(), $addToSet: { deployments: newDeployment } },
+			{ new: true },
+		);
+	}
 
-    async pullDeployments(projectId: string, userId: string, deployment: string | Types.ObjectId): Promise<IProject | null> {
-        return await Project.findOneAndUpdate({ _id: projectId, user: userId }, { $pull: { deployments: deployment } }, { new: true });
-    }
-    async __findProject(projectId: string): Promise<IProject | null> {
-        // container
-        return await Project.findOne({ _id: projectId });
-    }
-    async __updateProject(projectId: string, updateData: Partial<IProject>): Promise<IProject | null> {
-        // container
-        return await Project.findOneAndUpdate({ _id: projectId }, { $set: { ...updateData } }, { new: true });
-    }
+	async pullDeployments(projectId: string, userId: string, deployment: string | Types.ObjectId): Promise<IProject | null> {
+		return await Project.findOneAndUpdate({ _id: projectId, user: userId }, { $pull: { deployments: deployment } }, { new: true });
+	}
+	async __findProject(projectId: string): Promise<IProject | null> {
+		// container
+		return await Project.findOne({ _id: projectId });
+	}
+	async __updateProject(projectId: string, updateData: Partial<IProject>): Promise<IProject | null> {
+		// container
+		return await Project.findOneAndUpdate({ _id: projectId }, { $set: { ...updateData } }, { new: true });
+	}
 }
 export default ProjectRepository;
