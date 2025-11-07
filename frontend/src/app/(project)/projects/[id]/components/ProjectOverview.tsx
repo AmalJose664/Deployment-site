@@ -56,7 +56,7 @@ const ProjectOverview = ({ project, deploymentCommitHash, deploymentDuration, er
 									<IoMdGlobe className='size-4 text-less' />
 								</div>
 								<div>
-									<Link href={'https://' + project.subdomain + '.com'} className='text-sm font-medium '>
+									<Link href={'http://' + project.subdomain + '.localhost'} className='text-sm font-medium '>
 										{project.subdomain}
 									</Link>
 								</div>

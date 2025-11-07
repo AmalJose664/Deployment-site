@@ -1,11 +1,11 @@
 import { v4 as uuidV4 } from "uuid";
 import { ILogRepository, LogModel } from "../interfaces/repository/ILogRepository.js";
-import { ClickHouseClient, ResponseJSON } from "@clickhouse/client"
+import { ClickHouseClient, ResponseJSON } from "@clickhouse/client";
 
 class LogRepository implements ILogRepository {
-	private client: ClickHouseClient
+	private client: ClickHouseClient;
 	constructor(client: ClickHouseClient) {
-		this.client = client
+		this.client = client;
 	}
 
 	async getProjectLogs(projectId: string, page: number = 1, limit: number = 100): Promise<ResponseJSON<unknown>> {
@@ -15,13 +15,12 @@ class LogRepository implements ILogRepository {
 			query_params: {
 				project_id: projectId,
 				limit: limit > 1000 ? 1000 : limit,
-				offset
+				offset,
 			},
-			format: "JSON"
+			format: "JSON",
 		});
 
 		return await result.json();
-
 	}
 
 	async getLogs(deploymentId: string, page: number = 1, limit: number = 100): Promise<ResponseJSON<unknown>> {
@@ -31,28 +30,28 @@ class LogRepository implements ILogRepository {
 			query_params: {
 				deployment_id: deploymentId,
 				limit,
-				offset
+				offset,
 			},
-			format: "JSON"
-		})
+			format: "JSON",
+		});
 		return await result.json();
 	}
 
 	async __insertLogs(data: LogModel): Promise<void> {
-		await this.client.insert(
-			{
-				table: "log_events",
-				values: [{
+		await this.client.insert({
+			table: "log_events",
+			values: [
+				{
 					event_id: uuidV4(),
 					info: data.info,
 					deployment_id: data.deploymentId,
 					project_id: data.projectId,
 					log: data.log,
-					report_time: data.reportTime.toISOString()
-				}],
-				format: "JSONEachRow"
-			}
-		)
+					report_time: data.reportTime.toISOString().replace('T', ' ').replace('Z', '').split('.')[0],
+				},
+			],
+			format: "JSONEachRow",
+		});
 	}
 }
-export default LogRepository
+export default LogRepository;

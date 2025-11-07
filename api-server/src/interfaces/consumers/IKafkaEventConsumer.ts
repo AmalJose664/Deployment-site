@@ -1,4 +1,4 @@
 export interface IKafkaEventConsumer {
-	start(): Promise<void>
-	stop(): Promise<void>
+    start(): Promise<void>;
+    stop(): Promise<void>;
 }

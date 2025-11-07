@@ -9,13 +9,13 @@ const startServer = async () => {
 startServer().catch((e) => console.log(e));
 process.on("SIGINT", async () => {
 	console.log("Exiting.........");
-	await stopKafkaConsumer()
+	await stopKafkaConsumer();
 	process.exit(0);
 });
 
 process.on("SIGTERM", async () => {
 	console.log("Exiting.....");
-	await stopKafkaConsumer()
+	await stopKafkaConsumer();
 	process.exit(0);
 });
 

@@ -68,7 +68,7 @@ export default function LoginPage() {
 							Sign in with Github</span>
 					</button>
 				</div>
-				<div className="mt-12 flex items-center justify-between flex-col">
+				<div className="mt-12 flex items-center justify-between flex-col text-some-less">
 					No account yet?
 					<Link href={"/signup"} className='m-auto mt-2 text-blue-400 hover:underline'>
 						Sign up
