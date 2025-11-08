@@ -69,6 +69,8 @@ const TechStack = ({ stack }: { stack: string }) => {
 		</div></>),
 	}
 
-	return stacks[stack] || null
+	return stacks[stack] || <div className='flex flex-col items-center justify-center w-2/5 bg-gradient-to-br from-[#1a1d29] to-[#2a2f3f] rounded-xl border border-[#2c4f7c]/50 shadow-lg p-8'>
+
+	</div>
 }
 export default TechStack

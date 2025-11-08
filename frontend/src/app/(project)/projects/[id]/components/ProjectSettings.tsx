@@ -9,7 +9,6 @@ import { DeleteProjectDialog } from "@/components/DeleteProject";
 import { toast } from "sonner"
 
 const ProjectSettings = ({ project }: { project: Project }) => {
-
 	return (
 		<div>
 			<div className="px-2 py-3">

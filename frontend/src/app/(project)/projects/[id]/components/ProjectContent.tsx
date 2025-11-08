@@ -15,7 +15,7 @@ import { Logs } from "@/components/LogsComponent"
 
 import { Project } from "@/types/Project"
 import { Deployment } from "@/types/Deployment"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import AllDeployments from "./AllDeployments"
 import { useState } from "react"
 import ProjectSettings from "./ProjectSettings"
@@ -42,6 +42,7 @@ export function ProjectContent({
 	onCreateDeployment
 }: ProjectContentProps) {
 	const [tab, setTabs] = useState(tabFromUrl || "project")
+	console.log(project)
 	return (
 		<div className="min-h-screen">
 
