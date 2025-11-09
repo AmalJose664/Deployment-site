@@ -8,6 +8,7 @@ import pg from "pg"; // COnsider  ----------------------------------------------
 import { User } from "./src/models/User";
 
 import { client } from "./src/config/clickhouse";
+import { EVENT_REGISTRY } from "./src/events/regitry"
 
 async function mongodbData() {
 	try {
@@ -80,4 +81,4 @@ async function getClickhouseData() {
 
 	console.log(datas)
 }
-getClickhouseData()
+// getClickhouseData()

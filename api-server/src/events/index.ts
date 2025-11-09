@@ -1,15 +1,15 @@
 import { kafka } from "../config/kafka.js";
-import KafkaEventConsumer from "./consumer.js";
+import KafkaEventConsumer from "./consumers.js";
 
-let consumerInstance: KafkaEventConsumer | null = null;
+let consumersInstance: KafkaEventConsumer | null = null;
 
 export async function startKafkaConsumer(): Promise<void> {
-    consumerInstance = new KafkaEventConsumer(kafka);
-    await consumerInstance.start();
+	consumersInstance = new KafkaEventConsumer(kafka);
+	await consumersInstance.start();
 }
 
 export async function stopKafkaConsumer(): Promise<void> {
-    if (consumerInstance) {
-        await consumerInstance.stop();
-    }
+	if (consumersInstance) {
+		await consumersInstance.stop();
+	}
 }

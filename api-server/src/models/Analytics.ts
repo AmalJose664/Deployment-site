@@ -13,5 +13,4 @@ export interface IAnalytics {
 	isBot?: boolean;
 	referer?: string;
 	timestamp: string;
-	error?: string;
 }

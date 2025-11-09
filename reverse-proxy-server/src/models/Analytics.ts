@@ -7,9 +7,10 @@ export interface IAnalytics {
 	requestSize: number;
 	responseSize: number;
 	ip: string;
-	ua?: string;
+	uaBrowser?: string
+	uaOs?: string;
+	isMobile?: boolean;
 	isBot?: boolean;
 	referer?: string;
 	timestamp: string;
-	error?: string;
 }

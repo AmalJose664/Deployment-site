@@ -8,7 +8,7 @@ class AnalyticsService implements IAnalyticsService {
 	private kafkaTopic: string
 	private analyticsBuffer: IAnalytics[] = []
 	MAX_QUEUE_SIZE = 1000;
-	BATCH_SIZE = 5;
+	BATCH_SIZE = 50;
 	FLUSH_INTERVAL = 5000;
 	isSending = false;
 	FLUSH_INTERVAL_REF: ReturnType<typeof setInterval>;
@@ -17,13 +17,14 @@ class AnalyticsService implements IAnalyticsService {
 		this.kafkaProducer = producer
 		this.kafkaTopic = topic
 		this.FLUSH_INTERVAL_REF = setInterval(this.sendAnalyticsBatch.bind(this), this.FLUSH_INTERVAL);
+		this.kafkaProducer.connect()
 	}
 
 	async sendAnalyticsBatch(): Promise<void> {
 		console.log("call to send ....", this.analyticsBuffer.length)
 		if (this.isSending || this.analyticsBuffer.length === 0) return
-		this.analyticsBuffer.splice(0, this.BATCH_SIZE);
-		return
+		// this.analyticsBuffer.splice(0, this.BATCH_SIZE);
+		// return
 		this.isSending = true;
 
 		const batch = this.analyticsBuffer.splice(0, this.BATCH_SIZE);
@@ -60,7 +61,6 @@ class AnalyticsService implements IAnalyticsService {
 	}
 
 	sendAnalytics(data: IAnalytics): void {
-
 		this.queueAnalytics(data)
 	}
 
@@ -71,7 +71,8 @@ class AnalyticsService implements IAnalyticsService {
 
 		console.log("Analytics cleared\nExiting....")
 		clearInterval(this.FLUSH_INTERVAL_REF)
-		this.kafkaProducer.disconnect()
+		await this.kafkaProducer.disconnect()
+		console.log("Kafka disconnected..")
 
 	}
 

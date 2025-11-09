@@ -5,6 +5,7 @@ import { IProject } from "../models/Project.js";
 import { projectRepo } from "../repository/project.repo.js";
 import AppError from "../utils/AppError.js";
 
+// ←
 class ProjectService implements IProjectService {
 	private projectRepository: IProjectRepo;
 	private projectCache: NodeCache
@@ -15,9 +16,9 @@ class ProjectService implements IProjectService {
 
 	async findProjectBySlug(slug: string): Promise<IProject | null> {
 		const dataFromCache = this.projectCache.get(slug) || null
-		console.log(dataFromCache, "<<<<< ----")
+
 		if (dataFromCache) {
-			console.log("from cache")
+			console.log("from cache ←←←")
 			return dataFromCache as IProject
 		}
 

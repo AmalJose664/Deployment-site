@@ -1,10 +1,15 @@
+import { analyticsService } from "../../instances.js"
+import { AnalyticsEvent } from "../schemas/analytics.schema.js"
 
 class ProjectAnalyticsHandler {
-	private buffer: any
-	private batchSize = 100;
 
-	static async handleData(data: any) {
-		console.log(data)
+	static async handleDataBatch(data: AnalyticsEvent[]) {
+
+		analyticsService.addEventBatch(data)
+	}
+	static async handleDataSinlge(data: AnalyticsEvent) {
+
+		analyticsService.addEvent(data)
 	}
 
 }

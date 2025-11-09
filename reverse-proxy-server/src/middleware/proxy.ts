@@ -4,6 +4,7 @@ import { createProxyMiddleware, } from "http-proxy-middleware"
 import { isbot } from 'isbot';
 import { IAnalytics } from "../models/Analytics.js";
 import { analyticsService } from "../service/analytics.service.js";
+import parseUA from "../utils/uaParser.js";
 
 const BUCKET_NAME = "new-vercel-664" //                             FILL HERE
 const BASE_PATH = `https://${BUCKET_NAME}.s3.us-east-1.amazonaws.com/__outputs`
@@ -40,6 +41,7 @@ export const proxy = createProxyMiddleware({
 			const endTime = performance.now();
 			const startTime = (req as any).startTime || endTime;
 			const responseTime = (endTime - startTime).toFixed(2);
+			const ua = parseUA(req.headers['user-agent'] || "")
 
 			const data: IAnalytics = {
 				projectId: req.project?.id || "",
@@ -51,7 +53,9 @@ export const proxy = createProxyMiddleware({
 				responseTime: parseFloat(responseTime),
 				ip: req.socket.remoteAddress || "",
 				statusCode: res.statusCode || proxyRes.statusCode || 0,
-				ua: req.headers['user-agent'] || "",
+				uaBrowser: ua.browser,
+				uaOs: ua.os,
+				isMobile: ua.isMobile,
 				isBot: (req as any).isBot,
 				referer: req.headers['referer'] || ""
 			}

@@ -1,51 +1,61 @@
 import { ZodError } from "zod";
 import DeploymentEventHandler from "./handlers/deployment.handler.js";
 import { DeploymentLogEventSchema, DeploymentUpdatesEventSchema } from "./schemas/deployment.schema.js";
-import { ZodObject } from "zod";
 import ProjectAnalyticsHandler from "./handlers/analytics.handler.js";
+import { analyticsEventSchema } from "./schemas/analytics.schema.js";
+import { EventConfig, EventRegistryType } from "./types/event.js";
 
-type EventHandler<T = any> = (event: T) => Promise<void>;
-interface EventConfig {
-	topic: string;
-	schema: ZodObject;
-	handler: EventHandler;
 
-	description?: string;
-}
 
-export const EVENT_REGISTRY: Record<string, EventConfig> = {
-	"deployment.logs": {
-		topic: "deployment.logs",
-		handler: DeploymentEventHandler.handleLogs,
-		schema: DeploymentLogEventSchema,
-		description: "Real-time deployment build logs",
+export const EVENT_REGISTRY: EventRegistryType = {
+	logs: {
+		"deployment.logs": {
+			topic: "deployment.logs",     // <------- Actual kafka topic name
+			handler: DeploymentEventHandler.handleLogs,
+			schema: DeploymentLogEventSchema,
+			processFn: processLogEvent,
+			description: "Real-time deployment build logs",
+		},
+		"deployment.updates": {
+			topic: "deployment.updates",     // <------- Actual kafka topic name
+			handler: DeploymentEventHandler.handleUpdates,
+			processFn: processLogEvent,
+			schema: DeploymentUpdatesEventSchema,
+			description: "Deployment, Project status transitions, data updations",
+		},
 	},
-	"deployment.updates": {
-		topic: "deployment.updates",
-		handler: DeploymentEventHandler.handleUpdates,
-		schema: DeploymentUpdatesEventSchema,
-		description: "Deployment status transitions",
-	},
-	"project.analytics": {
-		topic: "project.analytics",
-		handler: ProjectAnalyticsHandler.handleData,
-		schema: DeploymentUpdatesEventSchema,
-		description: "Project analytics"
+	analytics: {
+		"project.analytics": {
+			topic: "project.analytics",     // <------- Actual kafka topic name
+			handler: ProjectAnalyticsHandler.handleDataBatch,
+			processFn: processAnalyticsEvent,
+			schema: analyticsEventSchema,
+			description: "Project analytics"
+		}
 	}
 };
 
 const KAFKA_MESSAGE_SAVE_RETRIES = 3;
 const KAFKA_MESSAGE_RETRY_INITIAL_DELAY = 750;
 
-export function getALlTopics() {
-	return Object.values(EVENT_REGISTRY).map((c) => c.topic);
+
+export function getAllTopics() {
+	return Object.values(EVENT_REGISTRY).map((types) => Object.values(types).map(field => field.topic));
 }
-export function getEventConfig(topic: string): EventConfig | undefined {
-	return EVENT_REGISTRY[topic];
+export function getEventConfig(topic: string, type: "logs" | "analytics"): EventConfig | undefined {
+	return EVENT_REGISTRY[type][topic];
+}
+export function getEventProcessFn(topic: string, type: "logs" | "analytics"): EventConfig['processFn'] {
+	return EVENT_REGISTRY[type][topic].processFn;
+}
+export function getEventSchema(topic: string, type: "logs" | "analytics"): EventConfig['schema'] {
+	return EVENT_REGISTRY[type][topic].schema;
 }
 
-export async function processEvent(data: unknown, topic: string) {
-	const config = getEventConfig(topic);
+
+
+export async function processLogEvent(data: unknown, topic: string, type: "logs" | "analytics") {
+	const config = getEventConfig(topic, type);
 
 	if (!config) {
 		throw new Error(`No handler registered for topic: ${topic}`);
@@ -63,6 +73,10 @@ export async function processEvent(data: unknown, topic: string) {
 				console.log("Error on parsing data ", error, data, "\nReturning...");
 				return;
 			}
+			if (topic.endsWith("analytics")) {
+				console.log("Retrying skiped .....")
+				return
+			}
 			attempt++;
 			console.error(`Error processing message (attempt ${attempt}):`, {
 				value: data,
@@ -78,4 +92,15 @@ export async function processEvent(data: unknown, topic: string) {
 			}
 		}
 	}
+}
+
+
+export async function processAnalyticsEvent(data: unknown | unknown[], topic: string, type: "logs" | "analytics") {
+	const config = getEventConfig(topic, type);
+
+	if (!config) {
+		throw new Error(`No handler registered for topic: ${topic}`);
+	}
+
+	await config.handler(data);
 }

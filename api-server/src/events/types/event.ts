@@ -1,20 +1,24 @@
 import { ZodObject } from "zod";
 
 export type EventHandler<T = any> = (event: T) => Promise<void>;
-export interface EventConfig {
-    topic: string;
-    handler: EventHandler;
-    schema: ZodObject;
-    description?: string;
-    type: EventTypes;
-}
+
 export enum EventTypes {
-    DEPLOYMENT_LOG = "DEPLOYMENT_LOG",
-    DEPLOYMENT_UPDATES = "DEPLOYMENT_UPDATES",
+	DEPLOYMENT_LOG = "DEPLOYMENT_LOG",
+	DEPLOYMENT_UPDATES = "DEPLOYMENT_UPDATES",
 }
 export enum UpdateTypes {
-    START = "START",
-    ERROR = "ERROR",
-    CUSTOM = "CUSTOM",
-    END = "END",
+	START = "START",
+	ERROR = "ERROR",
+	CUSTOM = "CUSTOM",
+	END = "END",
 }
+
+export interface EventConfig {
+	topic: string;
+	schema: ZodObject;
+	handler: EventHandler;
+	processFn: (data: unknown, topic: string, type: "logs" | "analytics") => Promise<void>
+	description?: string;
+}
+
+export type EventRegistryType = Record<string, Record<string, EventConfig>>
