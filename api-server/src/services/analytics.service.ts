@@ -1,14 +1,15 @@
-import { IAnalyticsRepository } from "../interfaces/repository/IAnalyticsRepository.js";
+import { IAnalyticsRepository, queryOptions } from "../interfaces/repository/IAnalyticsRepository.js";
 import { IAnalyticsService } from "../interfaces/service/IAnalyticsService.js";
 import { BufferAnalytics } from "../models/Analytics.js";
+import { getInterval, getUnit, getRange } from "../utils/analyticsUnits.js";
 
 
 class AnalyticsService implements IAnalyticsService {
 	private analyticsRepo: IAnalyticsRepository
 
-	private analyticsBuffer: BufferAnalytics[] = [];
+	private analyticsBuffer: BufferAnalytics[] = []
 	private readonly BATCH_SIZE = 170;
-	private readonly FLUSH_INTERVAL = 7000; // 7s
+	private readonly FLUSH_INTERVAL = 7000 * 10; // 7s
 	private readonly MAX_BUFFER_SIZE = 10000;
 	private flushTimer?: NodeJS.Timeout;
 	private isFlushing = false;
@@ -22,6 +23,7 @@ class AnalyticsService implements IAnalyticsService {
 
 	private startFlushTimer(): void {
 		this.flushTimer = setInterval(() => {
+			console.log("---")
 			if (this.analyticsBuffer.length > 0) {
 				this.saveBatch().catch(console.error);
 			}
@@ -78,6 +80,40 @@ class AnalyticsService implements IAnalyticsService {
 			await this.saveBatch()
 		}
 	}
+
+
+	async getBandwidthData(projectId: string, range: string, interval: string): Promise<[unknown[], queryOptions]> {
+		const queryOptions = {
+			range: getRange(range),
+			rangeUnit: getUnit(range),
+			interval: getInterval(interval),
+			intervalUnit: getUnit(interval)
+		}
+		const data = await this.analyticsRepo.getBandwidth(projectId, queryOptions)
+		return [data, queryOptions]
+	}
+	async getOverView(projectId: string, range: string, interval: string): Promise<[unknown[], queryOptions]> {
+		const queryOptions = {
+			range: getRange(range),
+			rangeUnit: getUnit(range),
+			interval: getInterval(interval),
+			intervalUnit: getUnit(interval)
+		}
+		const data = await this.analyticsRepo.getOverview(projectId, queryOptions)
+		return [data, queryOptions]
+	}
+	async getRealtime(projectId: string, range: string, interval: string): Promise<[unknown[], queryOptions]> {
+		const queryOptions = {
+			range: getRange(range),
+			rangeUnit: getUnit(range),
+			interval: getInterval(interval),
+			intervalUnit: getUnit(interval)
+		}
+		const data = await this.analyticsRepo.getRealtime(projectId, queryOptions)
+		return [data, queryOptions]
+	}
+
+
 
 
 }

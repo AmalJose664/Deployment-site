@@ -1,6 +1,17 @@
 import { BufferAnalytics, IAnalytics } from "../../models/Analytics.js";
 
+export interface queryOptions {
+	range?: number,
+	rangeUnit?: string,
+	interval?: number,
+	intervalUnit?: string
+}
 export interface IAnalyticsRepository {
 	insertBatch(data: BufferAnalytics[]): Promise<void>
 	insertSingle(data: BufferAnalytics): Promise<void>
+
+
+	getBandwidth(projectId: string, queryOptions: queryOptions): Promise<unknown[]>
+	getOverview(projectId: string, queryOptions: queryOptions): Promise<unknown[]>
+	getRealtime(projectId: string, queryOptions: queryOptions): Promise<unknown[]>
 }

@@ -19,6 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import AllDeployments from "./AllDeployments"
 import { useState } from "react"
 import ProjectSettings from "./ProjectSettings"
+import ProjectAnalytics from "./ProjectAnalytics"
 
 interface ProjectContentProps {
 	project: Project
@@ -136,7 +137,7 @@ export function ProjectContent({
 						<ProjectSettings project={project} />
 					</TabsContent>
 					<TabsContent value="analytics">
-						hey
+						<ProjectAnalytics />
 					</TabsContent>
 				</Tabs>
 
