@@ -1,9 +1,9 @@
-import { IAnalytics } from "../../models/Analytics.js"
+import { BufferAnalytics, IAnalytics } from "../../models/Analytics.js"
 
 export interface IAnalyticsService {
 
 	saveBatch(): Promise<void>
-	addEvent(event: IAnalytics): Promise<void>
-	addEventBatch(event: IAnalytics[]): Promise<void>
+	addEvent(event: BufferAnalytics): Promise<void>
+	addEventBatch(event: BufferAnalytics[]): Promise<void>
 	exitService(): Promise<void>
 }

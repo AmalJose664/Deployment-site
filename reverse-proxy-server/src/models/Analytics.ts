@@ -12,5 +12,5 @@ export interface IAnalytics {
 	isMobile?: boolean;
 	isBot?: boolean;
 	referer?: string;
-	timestamp: string;
+	timestamp: number;
 }

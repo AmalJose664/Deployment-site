@@ -14,7 +14,7 @@ export const analyticsEventSchema = z.object({
 	isMobile: z.boolean().optional(),
 	isBot: z.boolean().optional(),
 	referer: z.string().optional(),
-	timestamp: z.string()
+	timestamp: z.number()
 }).strict();
 
 export type AnalyticsEvent = z.infer<typeof analyticsEventSchema>

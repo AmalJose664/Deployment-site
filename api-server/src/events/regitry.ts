@@ -2,8 +2,10 @@ import { ZodError } from "zod";
 import DeploymentEventHandler from "./handlers/deployment.handler.js";
 import { DeploymentLogEventSchema, DeploymentUpdatesEventSchema } from "./schemas/deployment.schema.js";
 import ProjectAnalyticsHandler from "./handlers/analytics.handler.js";
-import { analyticsEventSchema } from "./schemas/analytics.schema.js";
+import { AnalyticsEvent, analyticsEventSchema } from "./schemas/analytics.schema.js";
 import { EventConfig, EventRegistryType } from "./types/event.js";
+import { EachBatchPayload, Offsets } from "kafkajs";
+import { BufferAnalytics } from "../models/Analytics.js";
 
 
 
@@ -53,7 +55,6 @@ export function getEventSchema(topic: string, type: "logs" | "analytics"): Event
 }
 
 
-
 export async function processLogEvent(data: unknown, topic: string, type: "logs" | "analytics") {
 	const config = getEventConfig(topic, type);
 
@@ -65,17 +66,15 @@ export async function processLogEvent(data: unknown, topic: string, type: "logs"
 
 	while (!processed && attempt < KAFKA_MESSAGE_SAVE_RETRIES) {
 		try {
+
 			const parsedData = config.schema.parse(data);
 			await config.handler(parsedData);
 			processed = true;
+
 		} catch (error: any) {
 			if (error instanceof ZodError) {
 				console.log("Error on parsing data ", error, data, "\nReturning...");
 				return;
-			}
-			if (topic.endsWith("analytics")) {
-				console.log("Retrying skiped .....")
-				return
 			}
 			attempt++;
 			console.error(`Error processing message (attempt ${attempt}):`, {
@@ -104,3 +103,76 @@ export async function processAnalyticsEvent(data: unknown | unknown[], topic: st
 
 	await config.handler(data);
 }
+
+
+
+
+
+
+
+export async function processConumerLogs({ batch, heartbeat, commitOffsetsIfNecessary, resolveOffset }: EachBatchPayload) {
+	const processFn = getEventProcessFn(batch.topic, "logs")
+	await Promise.all(
+		batch.messages.map(async (msg) => {
+			try {
+
+				const data = JSON.parse(msg.value?.toString() as any)
+				processFn(data, batch.topic, "logs")
+
+				resolveOffset(msg.offset);
+			} catch (error: any) {
+				console.error("Failed to process message:", error); // send to dlq task-------
+				resolveOffset(msg.offset);
+			}
+
+			commitOffsetsIfNecessary(msg.offset as unknown as Offsets);
+			await heartbeat();
+		}),
+	);
+}
+
+
+
+
+export async function processConumerAnalytics({ batch }: EachBatchPayload) {
+	const schema = getEventSchema(batch.topic, "analytics")
+	const processFn = getEventProcessFn(batch.topic, "analytics")
+
+	const events = batch.messages
+		.map((msg) => {
+			try {
+				const data = JSON.parse(msg.value?.toString() || "{}");
+
+				const safeData = schema.parse(data) as AnalyticsEvent
+
+				return {
+					project_id: safeData.projectId,
+					subdomain: safeData.subdomain,
+					path: safeData.path,
+					status_code: safeData.statusCode,
+					response_time: safeData.responseTime,
+					request_size: safeData.requestSize,
+					response_size: safeData.responseSize,
+					ip: safeData.ip,
+					ua_browser: safeData.uaBrowser || null,
+					ua_os: safeData.uaOs || null,
+					is_mobile: safeData.isMobile ? 1 : 0,
+					is_bot: safeData.isBot ? 1 : 0,
+					referer: safeData.referer || null,
+					timestamp: safeData.timestamp
+				} as BufferAnalytics
+
+			} catch (error: any) {
+				console.error("Analytics parse fail, => ", error.message);
+				return null;
+			}
+		}).filter(Boolean)
+
+	try {
+		await processFn(events, batch.topic, "analytics")
+	} catch (error) {
+		console.error("Failed to process analytics batch:", error);
+
+	}
+}
+

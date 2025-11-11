@@ -1,6 +1,6 @@
-import { IAnalytics } from "../../models/Analytics.js";
+import { BufferAnalytics, IAnalytics } from "../../models/Analytics.js";
 
 export interface IAnalyticsRepository {
-	insertBatch(data: IAnalytics[]): Promise<void>
-	insertSingle(data: IAnalytics): Promise<void>
+	insertBatch(data: BufferAnalytics[]): Promise<void>
+	insertSingle(data: BufferAnalytics): Promise<void>
 }

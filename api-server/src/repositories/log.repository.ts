@@ -11,7 +11,7 @@ class LogRepository implements ILogRepository {
 	async getProjectLogs(projectId: string, page: number = 1, limit: number = 100): Promise<ResponseJSON<unknown>> {
 		const offset = (page - 1) * limit;
 		const result = await this.client.query({
-			query: `SELECT *, count() OVER () AS total FROM log_events WHERE project_id={project_id:String} ORDER BY "report_time" ASC LIMIT {limit:UInt32} OFFSET {offset:UInt32}`,
+			query: `SELECT *, toTimeZone(report_time, 'Asia/Kolkata') as report_time, count() OVER () AS total FROM log_events WHERE project_id={project_id:String} ORDER BY "report_time" ASC LIMIT {limit:UInt32} OFFSET {offset:UInt32}`,
 			query_params: {
 				project_id: projectId,
 				limit: limit > 1000 ? 1000 : limit,
@@ -26,7 +26,7 @@ class LogRepository implements ILogRepository {
 	async getLogs(deploymentId: string, page: number = 1, limit: number = 100): Promise<ResponseJSON<unknown>> {
 		const offset = (page - 1) * limit;
 		const result = await this.client.query({
-			query: `SELECT * FROM log_events WHERE deployment_id={deployment_id:String} ORDER BY "report_time" ASC`,
+			query: `SELECT *, toTimeZone(report_time, 'Asia/Kolkata') as report_time FROM log_events WHERE deployment_id={deployment_id:String} ORDER BY "report_time" ASC`,
 			query_params: {
 				deployment_id: deploymentId,
 				limit,
@@ -47,7 +47,7 @@ class LogRepository implements ILogRepository {
 					deployment_id: data.deploymentId,
 					project_id: data.projectId,
 					log: data.log,
-					report_time: data.reportTime.toISOString().replace('T', ' ').replace('Z', '').split('.')[0],
+					report_time: data.reportTime.getTime()
 				},
 			],
 			format: "JSONEachRow",

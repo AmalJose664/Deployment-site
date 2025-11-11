@@ -1,17 +1,18 @@
 import { IAnalyticsRepository } from "../interfaces/repository/IAnalyticsRepository.js";
 import { IAnalyticsService } from "../interfaces/service/IAnalyticsService.js";
-import { IAnalytics } from "../models/Analytics.js";
+import { BufferAnalytics } from "../models/Analytics.js";
 
 
 class AnalyticsService implements IAnalyticsService {
 	private analyticsRepo: IAnalyticsRepository
 
-	private analyticsBuffer: IAnalytics[] = [];
-	private readonly BATCH_SIZE = 70;
+	private analyticsBuffer: BufferAnalytics[] = [];
+	private readonly BATCH_SIZE = 170;
 	private readonly FLUSH_INTERVAL = 7000; // 7s
 	private readonly MAX_BUFFER_SIZE = 10000;
 	private flushTimer?: NodeJS.Timeout;
 	private isFlushing = false;
+
 
 	constructor(analyticsRepo: IAnalyticsRepository) {
 		this.analyticsRepo = analyticsRepo
@@ -21,7 +22,7 @@ class AnalyticsService implements IAnalyticsService {
 
 	private startFlushTimer(): void {
 		this.flushTimer = setInterval(() => {
-			if (this.analyticsBuffer.length > 0 || true) {
+			if (this.analyticsBuffer.length > 0) {
 				this.saveBatch().catch(console.error);
 			}
 		}, this.FLUSH_INTERVAL);
@@ -47,7 +48,7 @@ class AnalyticsService implements IAnalyticsService {
 		}
 	}
 
-	async addEvent(event: IAnalytics): Promise<void> {
+	async addEvent(event: BufferAnalytics): Promise<void> {
 		if (this.analyticsBuffer.length >= this.MAX_BUFFER_SIZE) {
 			console.warn('Analytics buffer full, dropping oldest events');
 			this.analyticsBuffer.splice(0, 1000);
@@ -55,10 +56,10 @@ class AnalyticsService implements IAnalyticsService {
 		this.analyticsBuffer.push(event);
 
 		if (this.analyticsBuffer.length >= this.BATCH_SIZE) {
-			await this.saveBatch();
+			this.saveBatch();
 		}
 	}
-	async addEventBatch(event: IAnalytics[]): Promise<void> {
+	async addEventBatch(event: BufferAnalytics[]): Promise<void> {
 		if (this.analyticsBuffer.length >= this.MAX_BUFFER_SIZE) {
 			console.warn('Analytics buffer full, dropping oldest events');
 			this.analyticsBuffer.splice(0, 1000);
@@ -66,7 +67,7 @@ class AnalyticsService implements IAnalyticsService {
 		this.analyticsBuffer.push(...event);
 
 		if (this.analyticsBuffer.length >= this.BATCH_SIZE) {
-			await this.saveBatch();
+			this.saveBatch();
 		}
 	}
 

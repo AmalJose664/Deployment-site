@@ -14,6 +14,7 @@ import projectRouter from "./routes/projectRoutes.js";
 import deploymentRouter from "./routes/deploymentRoutes.js";
 import internalRoutes from "./routes/containerRoutes.js";
 import logsRouter from "./routes/logsRoutes.js";
+import analyticsRouter from "./routes/analyticsRoutes.js";
 
 
 
@@ -49,6 +50,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 	next();
 });
 
+app.use("/api/analytics", analyticsRouter);
 app.use("/api/logs", logsRouter);
 app.use("/api/deployments", deploymentRouter);
 app.use("/api/projects", projectRouter);

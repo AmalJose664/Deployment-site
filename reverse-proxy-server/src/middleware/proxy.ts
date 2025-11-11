@@ -46,7 +46,7 @@ export const proxy = createProxyMiddleware({
 			const data: IAnalytics = {
 				projectId: req.project?.id || "",
 				subdomain: req.project?.subdomain || "",
-				timestamp: new Date().toISOString(),
+				timestamp: new Date().getTime(),
 				path: req.url,
 				requestSize,
 				responseSize,

@@ -17,11 +17,11 @@ export interface ILogs {
  *  CREATE TABLE  log_events
 (
 	event_id UUID DEFAULT generateUUIDv4(),
-	deployment_id Nullable(String),
-	project_id Nullable(String),
+	deployment_id String,
+	project_id String,
 	log String,
 	info String,
-	report_time DateTime('UTC'),
+	report_time DateTime64(3, 'UTC'),
 	metadata Nullable(String)
 )
 ENGINE = MergeTree

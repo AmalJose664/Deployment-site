@@ -1,13 +1,13 @@
 import { analyticsService } from "../../instances.js"
-import { AnalyticsEvent } from "../schemas/analytics.schema.js"
+import { BufferAnalytics } from "../../models/Analytics.js"
 
 class ProjectAnalyticsHandler {
 
-	static async handleDataBatch(data: AnalyticsEvent[]) {
+	static async handleDataBatch(data: BufferAnalytics[]) {
 
 		analyticsService.addEventBatch(data)
 	}
-	static async handleDataSinlge(data: AnalyticsEvent) {
+	static async handleDataSinlge(data: BufferAnalytics) {
 
 		analyticsService.addEvent(data)
 	}

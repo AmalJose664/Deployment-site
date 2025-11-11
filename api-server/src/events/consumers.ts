@@ -1,5 +1,5 @@
-import { Consumer, EachBatchPayload, Kafka, Offsets } from "kafkajs";
-import { getAllTopics, getEventConfig, getEventProcessFn, getEventSchema, } from "./regitry.js";
+import { Consumer, Kafka } from "kafkajs";
+import { getAllTopics, processConumerAnalytics, processConumerLogs, } from "./regitry.js";
 import { IKafkaEventConsumer } from "../interfaces/consumers/IKafkaEventConsumer.js";
 
 
@@ -31,11 +31,11 @@ class KafkaEventConsumer implements IKafkaEventConsumer {
 
 			await this.logsConsumer.run({
 				autoCommit: false,
-				eachBatch: this.processLogsEvent.bind(this),
+				eachBatch: processConumerLogs,
 			});
 			await this.analyticsConsumer.run({
 				autoCommit: true,
-				eachBatch: this.processAnalyticsEvent.bind(this),
+				eachBatch: processConumerAnalytics
 			});
 
 			this.isRunning = true;
@@ -61,48 +61,6 @@ class KafkaEventConsumer implements IKafkaEventConsumer {
 		}
 	}
 
-	private async processLogsEvent({ batch, heartbeat, commitOffsetsIfNecessary, resolveOffset }: EachBatchPayload): Promise<void> {
-		const processFn = getEventProcessFn(batch.topic, "logs")
-		await Promise.all(
-			batch.messages.map(async (msg) => {
-				try {
-					const data = JSON.parse(msg.value?.toString() || "{}") as {};
-
-					await processFn(data, batch.topic, "logs");
-					resolveOffset(msg.offset);
-
-				} catch (error: any) {
-					console.error("Failed to process message:", error); // send to dlq task!!!!!
-					resolveOffset(msg.offset);
-				}
-
-				commitOffsetsIfNecessary(msg.offset as unknown as Offsets);
-				await heartbeat();
-			}),
-		);
-	}
-
-	private async processAnalyticsEvent({ batch }: EachBatchPayload): Promise<void> {
-		const schema = getEventSchema(batch.topic, "analytics")
-		const processFn = getEventProcessFn(batch.topic, "analytics")
-		const events = batch.messages
-			.map(msg => {
-				try {
-					const data = JSON.parse(msg.value?.toString() || "{}");
-					return schema.parse(data)
-				} catch (error) {
-					console.error("Failed to parse analytics message:", error);
-					return null;
-				}
-			}).filter(Boolean)
-
-		try {
-			await processFn(events, batch.topic, "analytics")
-		} catch (error) {
-			console.error("Failed to process analytics batch:", error);
-
-		}
-	}
 }
 
 export default KafkaEventConsumer;
