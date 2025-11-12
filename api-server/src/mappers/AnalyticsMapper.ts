@@ -6,12 +6,33 @@ interface bandWidthType {
 	responseMB: number;
 	totalMB: number;
 }
-interface trafficOverview {
+interface overviewType {
 	date: string
 	requests: number,
 	uniqueVisitors: number,
 	avgResponseTime: number,
 	totalBandwidthMb: number
+}
+interface realtimeType {
+	errors: number
+	successful: number,
+	totalRequests: number,
+	avgResponseTime: number,
+	p95ResponseTime: number
+	totalBandwidthMb: number
+	activeUsers: number
+}
+interface topPagesType {
+	path: string,
+	requests: number,
+	avgResponseTime: number
+	errors: number
+	totalSize: number,
+}
+interface osDistTypes {
+	uaOs: string,
+	users: number,
+	percentage: number
 }
 
 export class AnalyticsMapper {
@@ -32,10 +53,9 @@ export class AnalyticsMapper {
 	}
 
 	static overviewResponse(data: unknown[], projectId: string, meta: queryOptions): {
-		projectId: string, data: trafficOverview[]
+		projectId: string, data: overviewType[]
 		meta: meta
 	} {
-
 		return {
 			projectId,
 			data: data.map((d: any) => ({
@@ -45,6 +65,59 @@ export class AnalyticsMapper {
 				requests: Number(d.requests),
 				totalBandwidthMb: parseFloat(d.total_bandwidth_mb.toFixed(2)),
 			})),
+			meta: { ...meta, total: data.length } as unknown as meta
+		}
+	}
+	static realtimeResponse(data: any[], projectId: string, meta: queryOptions): {
+		projectId: string, data: realtimeType
+		meta: meta
+	} {
+		return {
+			projectId,
+			data: {
+				totalRequests: Number(data[0].total_requests),
+				errors: Number(data[0].errors),
+				successful: Number(data[0].successful),
+				avgResponseTime: parseFloat(data[0].avg_response_time.toFixed(2)),
+				p95ResponseTime: parseFloat(data[0].p95_response_time.toFixed(2)),
+				totalBandwidthMb: parseFloat(data[0].total_bandwidth.toFixed(2)),
+				activeUsers: Number(data[0].active_users),
+			},
+
+			meta: { ...meta, total: data.length } as unknown as meta
+		}
+	}
+	static topPagesResponse(data: any[], projectId: string, meta: queryOptions): {
+		projectId: string, data: topPagesType[]
+		meta: meta
+	} {
+		return {
+			projectId,
+			data: data.map((d: any) => ({
+				path: d.path,
+				requests: Number(d.requests),
+				errors: Number(d.errors),
+				totalSize: parseFloat(d.total_size.toFixed(2)),
+				avgResponseTime: parseFloat(d.avg_response_time.toFixed(2)),
+
+			})),
+
+			meta: { ...meta, total: data.length } as unknown as meta
+		}
+	}
+	static osStatsResponse(data: any[], projectId: string, meta: queryOptions): {
+		projectId: string, data: osDistTypes[]
+		meta: meta
+	} {
+		return {
+			projectId,
+			data: data.map((d: any) => ({
+				uaOs: d.ua_os,
+				users: Number(d.users),
+				percentage: Number(d.percentage),
+
+			})),
+
 			meta: { ...meta, total: data.length } as unknown as meta
 		}
 	}

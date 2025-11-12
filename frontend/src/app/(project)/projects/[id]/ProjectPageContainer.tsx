@@ -8,7 +8,7 @@ import { useCreateDeploymentMutation, useGetDeploymentByIdQuery } from "@/store/
 
 import ProjectLoading from "./components/ProjectLoading"
 import ProjectError from "./components/ProjectError"
-import { ProjectContent } from "./components/ProjectContent"
+import { ProjectContent } from "./components/Content"
 import { useDeploymentSSE } from "@/hooks/useUpdatesSse"
 import { useGetDeploymentLogsQuery } from "@/store/services/logsApi"
 import { useDispatch } from "react-redux"

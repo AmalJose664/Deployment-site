@@ -91,3 +91,12 @@ export const formatLogTime = (time: string | Date) => {
 
 	return `${date.getMonth() + 1}/${date.getDate()} - ${hours}:${minutes}:${seconds} ${ampm}`
 }
+
+
+export const getRandomBlue = () => {
+	const min = 1;
+	const max = 9;
+	return `var(--color-blue-${Math.floor(Math.random() * (max - min + 1)) + min}00)`;
+
+
+}

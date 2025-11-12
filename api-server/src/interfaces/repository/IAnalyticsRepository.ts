@@ -5,6 +5,7 @@ export interface queryOptions {
 	rangeUnit?: string,
 	interval?: number,
 	intervalUnit?: string
+	limit?: number
 }
 export interface IAnalyticsRepository {
 	insertBatch(data: BufferAnalytics[]): Promise<void>
@@ -14,4 +15,6 @@ export interface IAnalyticsRepository {
 	getBandwidth(projectId: string, queryOptions: queryOptions): Promise<unknown[]>
 	getOverview(projectId: string, queryOptions: queryOptions): Promise<unknown[]>
 	getRealtime(projectId: string, queryOptions: queryOptions): Promise<unknown[]>
+	getTopPages(projectId: string, queryOptions: queryOptions): Promise<unknown[]>
+	getOsStats(projectId: string, queryOptions: queryOptions): Promise<unknown[]>
 }

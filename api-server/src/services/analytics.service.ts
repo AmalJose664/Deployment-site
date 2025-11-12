@@ -102,14 +102,29 @@ class AnalyticsService implements IAnalyticsService {
 		const data = await this.analyticsRepo.getOverview(projectId, queryOptions)
 		return [data, queryOptions]
 	}
-	async getRealtime(projectId: string, range: string, interval: string): Promise<[unknown[], queryOptions]> {
+	async getRealtime(projectId: string, interval: string): Promise<[unknown[], queryOptions]> {
 		const queryOptions = {
-			range: getRange(range),
-			rangeUnit: getUnit(range),
 			interval: getInterval(interval),
 			intervalUnit: getUnit(interval)
 		}
 		const data = await this.analyticsRepo.getRealtime(projectId, queryOptions)
+		return [data, queryOptions]
+	}
+	async getTopPages(projectId: string, interval: string, limit: number): Promise<[unknown[], queryOptions]> {
+		const queryOptions = {
+			interval: getInterval(interval),
+			intervalUnit: getUnit(interval),
+			limit
+		}
+		const data = await this.analyticsRepo.getTopPages(projectId, queryOptions)
+		return [data, queryOptions]
+	}
+	async getOsStats(projectId: string, interval: string): Promise<[unknown[], queryOptions]> {
+		const queryOptions = {
+			interval: getInterval(interval),
+			intervalUnit: getUnit(interval)
+		}
+		const data = await this.analyticsRepo.getOsStats(projectId, queryOptions)
 		return [data, queryOptions]
 	}
 

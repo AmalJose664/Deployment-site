@@ -97,7 +97,7 @@ class AnalyticsRepository implements IAnalyticsRepository {
     		countIf(status_code < 400) as successful,
     		avg(response_time) as avg_response_time,
     		quantile(0.95)(response_time) as p95_response_time,
-    		sum(response_size) as total_bandwidth,
+    		(SUM(request_size) + SUM(response_size)) / 1024 / 1024 as total_bandwidth,
     		uniq(ip) as active_users
 			FROM analytics
 			WHERE project_id = {projectId:String}
@@ -106,6 +106,60 @@ class AnalyticsRepository implements IAnalyticsRepository {
 			query_params: {
 				projectId,
 				interval: queryOptions.interval,
+			},
+			format: 'JSONEachRow'
+		})
+
+		return await result.json()
+
+	}
+	async getTopPages(projectId: string, queryOptions: queryOptions): Promise<unknown[]> {
+		console.log(queryOptions)
+		const result = await this.client.query({
+			query: `SELECT 
+    		path,
+    		count() as requests,
+    		avg(response_time) as avg_response_time,
+    		(SUM(request_size) + SUM(response_size)) / 1024 / 1024 as total_size,
+    		countIf(status_code >= 400) as errors
+			FROM analytics
+			WHERE project_id = {projectId:String}
+  			AND timestamp >= now() - INTERVAL {interval:UInt32} ${queryOptions.intervalUnit}
+			GROUP BY path
+			ORDER BY requests DESC
+			LIMIT {limit:UInt32}
+			`,
+
+			query_params: {
+				projectId,
+				interval: queryOptions.interval,
+				limit: queryOptions.limit
+			},
+			format: 'JSONEachRow'
+		})
+
+		return await result.json()
+
+	}
+	async getOsStats(projectId: string, queryOptions: queryOptions): Promise<unknown[]> {
+		console.log(queryOptions)
+		const result = await this.client.query({
+			query: `SELECT 
+    		ua_os,
+    		count() as users,
+    		(count() * 100.0 / sum(count()) OVER ()) as percentage
+			FROM analytics
+			WHERE project_id = {projectId:String}
+  			AND timestamp >= now() - INTERVAL {interval:UInt32} ${queryOptions.intervalUnit}
+  			AND ua_os IS NOT NULL
+			GROUP BY ua_os
+			ORDER BY users DESC
+			`,
+
+			query_params: {
+				projectId,
+				interval: queryOptions.interval,
+
 			},
 			format: 'JSONEachRow'
 		})

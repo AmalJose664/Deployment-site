@@ -11,4 +11,7 @@ export interface IAnalyticsService {
 
 	getBandwidthData(projectId: string, range: string, interval: string): Promise<[unknown[], queryOptions]>
 	getOverView(projectId: string, range: string, interval: string): Promise<[unknown[], queryOptions]>
+	getRealtime(projectId: string, interval: string): Promise<[unknown[], queryOptions]>
+	getTopPages(projectId: string, interval: string, limit: number): Promise<[unknown[], queryOptions]>
+	getOsStats(projectId: string, interval: string): Promise<[unknown[], queryOptions]>
 }

@@ -1,0 +1,55 @@
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { axiosBaseQuery } from "../axiosBaseQuery";
+import { AnalyticsParamsTypes, bandWidthType, osDistTypes, overviewType, topPagesType } from "@/types/Analytics";
+
+export const analyticsApi = createApi({
+	reducerPath: "analyticsApi",
+	baseQuery: axiosBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_SERVER_ENDPOINT as string }),
+	keepUnusedDataFor: 20 * 60,
+
+	tagTypes: ['Analytics'],
+	endpoints: (builder) => ({
+		getBandWidth: builder.query<bandWidthType[], AnalyticsParamsTypes>({
+			query: ({ projectId, range, interval }) => ({ url: `/analytics/${projectId}/bandwidth?range=${range}&interval=${interval}`, method: 'get' }),
+			transformResponse: (data: any) => {
+				return data.data
+			},
+			providesTags: (result, error, { projectId }) => [
+				{ type: 'Analytics', id: "bandwidth_" + projectId },
+			],
+
+		}),
+		getOverview: builder.query<overviewType[], AnalyticsParamsTypes>({
+			query: ({ projectId, range, interval }) => ({ url: `/analytics/${projectId}/overview?range=${range}&interval=${interval}`, method: 'get' }),
+			transformResponse: (data: any) => {
+				return data.data
+			},
+			providesTags: (result, error, { projectId }) => [
+				{ type: 'Analytics', id: "overview_" + projectId },
+			],
+
+		}),
+		getTopPages: builder.query<topPagesType[], AnalyticsParamsTypes>({
+			query: ({ projectId, interval, limit }) => ({ url: `/analytics/${projectId}/top-pages?interval=${interval}&limit=${limit}`, method: 'get' }),
+			transformResponse: (data: any) => {
+				return data.data
+			},
+			providesTags: (result, error, { projectId }) => [
+				{ type: 'Analytics', id: "pages_" + projectId },
+			],
+
+		}),
+		getOsStats: builder.query<osDistTypes[], AnalyticsParamsTypes>({
+			query: ({ projectId, interval, limit }) => ({ url: `/analytics/${projectId}/os-stats?interval=${interval}&limit=${limit}`, method: 'get' }),
+			transformResponse: (data: any) => {
+				return data.data
+			},
+			providesTags: (result, error, { projectId }) => [
+				{ type: 'Analytics', id: "osstats_" + projectId },
+			],
+
+		}),
+	})
+})
+
+export const { useGetBandWidthQuery, useGetOverviewQuery, useGetTopPagesQuery, useGetOsStatsQuery } = analyticsApi

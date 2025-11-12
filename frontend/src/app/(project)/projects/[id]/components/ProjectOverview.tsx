@@ -1,9 +1,12 @@
 
 import { IoMdGlobe, IoMdGitBranch } from "react-icons/io";
-import { GiCheckMark } from "react-icons/gi";
-import { FiGithub, FiGitCommit, FiMoreHorizontal } from "react-icons/fi";
+
+import { FiGithub, FiGitCommit, } from "react-icons/fi";
 import { CiCalendarDate } from "react-icons/ci";
+import { GrRotateRight } from "react-icons/gr";
+import { IoSettingsOutline } from "react-icons/io5";
 import { MdAccessTime } from "react-icons/md";
+import { MdOutlineLineStyle } from "react-icons/md";
 
 import { User } from "@/types/User";
 import { Project, ProjectStatus } from "@/types/Project";
@@ -11,18 +14,28 @@ import Link from "next/link";
 import TechStack from "@/components/TechStack";
 import { getGithubBranchUrl, getGithubCommitUrl, getStatusColor, timeToSeconds } from "@/lib/utils";
 import StatusIcon from "@/components/ui/StatusIcon";
-
+import { toast } from "sonner"
+import { Deployment } from "@/types/Deployment";
+import { Button } from "@/components/ui/button";
 
 interface ProjectOverviewProps {
 	project: Project,
-	deploymentCommitHash?: string
-	deploymentDuration: number | undefined
-	errorMessage?: string
+	deployment?: Deployment
+	reDeploy: () => void
+	setShowBuild: (state: boolean) => void;
+	goToSettings: () => void
 }
 
-const ProjectOverview = ({ project, deploymentCommitHash, deploymentDuration, errorMessage }: ProjectOverviewProps) => {
+const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, goToSettings }: ProjectOverviewProps) => {
 	const repoValues = project.repoURL.split("/")
 	const repoWithUser = repoValues[3] + "/" + repoValues[4]
+
+	const triggerReDeploy = () => {
+		toast.info("New Deployment started")
+		return
+		reDeploy()
+		// post deploy events sse
+	}
 
 	return (
 		<>
@@ -78,7 +91,7 @@ const ProjectOverview = ({ project, deploymentCommitHash, deploymentDuration, er
 									<FiGitCommit className='size-4 text-less' />
 								</div>
 								<div>
-									<Link target="_blank" href={getGithubCommitUrl(project.repoURL, deploymentCommitHash || "")} className='text-sm font-medium hover:underline'>{deploymentCommitHash || ""}</Link>
+									<Link target="_blank" href={getGithubCommitUrl(project.repoURL, deployment?.commitHash || "")} className='text-sm font-medium hover:underline'>{deployment?.commitHash || ""}</Link>
 								</div>
 							</div>
 						</div>
@@ -98,7 +111,7 @@ const ProjectOverview = ({ project, deploymentCommitHash, deploymentDuration, er
 								</div>
 								<div className='flex gap-2 items-center'>
 									<p className='text-xs text-less font-medium'>Reason</p>
-									<p className={`text-sm font-bold rounded-xs px-1 ${getStatusColor(project.status)}`}>{errorMessage}</p>
+									<p className={`text-sm font-bold rounded-xs px-1 ${getStatusColor(project.status)}`}>{deployment?.errorMessage}</p>
 								</div>
 							</div>
 						)}
@@ -110,19 +123,27 @@ const ProjectOverview = ({ project, deploymentCommitHash, deploymentDuration, er
 								<p className='text-sm font-medium '>
 									<span className="text-less">
 										Duration{" "}</span>
-									{timeToSeconds(deploymentDuration) || "- - - -"}
+									{timeToSeconds(deployment?.performance.totalDuration) || "- - - -"}
 								</p>
 							</div>
 						</div>
 					</div>
 
 					<div className='flex gap-2 mt-2 pt-4 border-t '>
-						<button className='px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors'>
-							View Logs
-						</button>
-						<button className='px-4 py-2 bg-gray-100 text-gray-900 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors'>
-							Settings
-						</button>
+						<Button variant={"secondary"} onClick={() => setShowBuild(true)} className='border px-4 py-2 rounded-lg text-sm font-medium  transition-colors'>
+							View Logs <MdOutlineLineStyle />
+						</Button>
+						{(project.status === ProjectStatus.CANCELED || project.status === ProjectStatus.FAILED)
+							&&
+							(deployment && (deployment?.status === ProjectStatus.CANCELED || deployment?.status === ProjectStatus.FAILED)) &&
+							<Button variant={"secondary"} onClick={triggerReDeploy} className='border  group px-4 py-2 rounded-lg text-sm font-medium  transition-colors'>
+								Re Deploy < GrRotateRight className="text-green-400 group-hover:rotate-z-90 transition-all" />
+							</Button>
+						}
+						<Button variant={"secondary"} onClick={goToSettings} className='border group px-4 py-2  rounded-lg text-sm font-medium  transition-colors'>
+							Settings <IoSettingsOutline className="group-hover:translate-x-1.5 group-hover:rotate-z-45 transition-all" />
+						</Button>
+
 					</div>
 				</div>
 				<TechStack stack={project.techStack.toLowerCase()} />

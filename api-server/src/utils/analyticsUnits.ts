@@ -1,4 +1,4 @@
-type timesFieldTypes = '5m' | '15m' | '1h' | '1d'
+type timesFieldTypes = '5m' | '15m' | '1h' | '1d' | "7d" | "30d"
 type rangeFieldsTypes = '1h' | '24h' | '7d' | '30d'
 
 /**
@@ -9,7 +9,7 @@ type rangeFieldsTypes = '1h' | '24h' | '7d' | '30d'
  */
 
 const intervalMap: Record<timesFieldTypes, number> = {
-	'5m': 5, '15m': 15, '1h': 1, '1d': 1
+	'5m': 5, '15m': 15, '1h': 1, '1d': 1, "7d": 7, "30d": 30
 }
 
 const rangeMap: Record<rangeFieldsTypes, number> = {

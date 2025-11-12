@@ -37,6 +37,48 @@ class AnalyticsController implements IAnalyticsController {
 			next(error);
 		}
 	}
+	async realtime(req: Request, res: Response, next: NextFunction): Promise<void> {
+		const { projectId } = req.params
+		const { interval, } = req.query
+
+		try {
+			const [data, queryOptions] = await this.analyticsService.getRealtime(projectId, interval as string,)
+			const response = AnalyticsMapper.realtimeResponse(data, projectId, queryOptions)
+
+			res.json(response)
+			return;
+		} catch (error) {
+			next(error);
+		}
+	}
+	async topPages(req: Request, res: Response, next: NextFunction): Promise<void> {
+		const { projectId } = req.params
+		const { interval, limit } = req.query
+
+		try {
+			const [data, queryOptions] = await this.analyticsService.getTopPages(projectId, interval as string, Number(limit || 30))
+			const response = AnalyticsMapper.topPagesResponse(data, projectId, queryOptions)
+
+			res.json(response)
+			return;
+		} catch (error) {
+			next(error);
+		}
+	}
+	async osStats(req: Request, res: Response, next: NextFunction): Promise<void> {
+		const { projectId } = req.params
+		const { interval } = req.query
+
+		try {
+			const [data, queryOptions] = await this.analyticsService.getOsStats(projectId, interval as string)
+			const response = AnalyticsMapper.osStatsResponse(data, projectId, queryOptions)
+
+			res.json(response)
+			return;
+		} catch (error) {
+			next(error);
+		}
+	}
 }
 
 
