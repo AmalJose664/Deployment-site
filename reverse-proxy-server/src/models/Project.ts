@@ -24,6 +24,7 @@ export interface IProject extends Document {
 	branch: string;
 	rootDir: string;
 	outputDirectory: string;
+	currentDeployment: string | null;
 	env: IEnvVar[];
 	lastDeployedAt?: Date;
 	status: ProjectStatus;
@@ -46,6 +47,7 @@ const projectSchema = new Schema<IProject>(
 		installCommand: { type: String, required: true, default: "npm install" },
 		techStack: { type: String },
 		outputDirectory: { type: String, required: true, default: "dist" },
+		currentDeployment: { type: String, },
 		env: [{ name: String, value: String }],
 		lastDeployedAt: { type: Date, default: Date.now() },
 		isDeleted: { type: Boolean, default: false },

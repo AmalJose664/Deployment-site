@@ -12,6 +12,7 @@ import { useState } from "react"
 import ProjectSettings from "./TabProjectSettings"
 import ProjectAnalytics from "./TabProjectAnalytics"
 import TabProject from "./TabProject"
+import TabFiles from "./TabFiles"
 
 interface ProjectContentProps {
 	project: Project
@@ -21,6 +22,7 @@ interface ProjectContentProps {
 	showBuild: boolean
 	setShowBuild: (state: boolean) => void;
 	tabFromUrl?: string
+	reDeploy: () => void;
 	onCreateDeployment: () => void
 }
 
@@ -32,19 +34,20 @@ export function ProjectContent({
 	tabFromUrl,
 	showBuild,
 	setShowBuild,
+	reDeploy,
 	onCreateDeployment
 }: ProjectContentProps) {
 	const [tab, setTabs] = useState(tabFromUrl || "project")
-	console.log(project)
+	console.log("--------------------project--------------------", project.name)
 	return (
 		<div className="min-h-screen">
 			<Tabs defaultValue="project" value={tab} onValueChange={setTabs} className="w-full ">
 
-				<header className="border-b border-gray-800">
+				<header className="border-b dark:border-neutral-800 border-neutral-200 ">
 					<div className="max-w-[1420px] mx-auto px-6 py-4">
 
 						<div className="flex items-center justify-between">
-							<div className="flex items-center gap-4">
+							<div className="flex items-center gap-6">
 								<button
 									onClick={onBack}
 									className="p-2 dark:hover:bg-zinc-800 hover:bg-zinc-200 rounded-lg transition-colors"
@@ -72,6 +75,7 @@ export function ProjectContent({
 							deployment={deployment}
 							onCreateDeployment={onCreateDeployment}
 							setShowBuild={setShowBuild}
+							reDeploy={reDeploy}
 							showBuild={showBuild}
 							setTabs={setTabs}
 						/>
@@ -84,6 +88,9 @@ export function ProjectContent({
 					</TabsContent>
 					<TabsContent value="analytics">
 						<ProjectAnalytics projectId={project._id} />
+					</TabsContent>
+					<TabsContent value="files">
+						<TabFiles projectId={project._id} deploymentId={deployment?._id} />
 					</TabsContent>
 
 

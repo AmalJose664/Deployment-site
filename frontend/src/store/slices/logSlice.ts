@@ -8,6 +8,7 @@ const logSlice = createSlice({
 	name: "logs",
 	initialState,
 	reducers: {
+
 		addLog(state, action: PayloadAction<Log>) {
 			if (action.payload && action.payload.message) {
 				state.push(action.payload);

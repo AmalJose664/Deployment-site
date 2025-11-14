@@ -15,13 +15,15 @@ interface TabProjectProps {
 	setShowBuild: (state: boolean) => void;
 	showBuild: boolean
 	setTabs: (state: string) => void;
+	reDeploy: () => void;
 }
 
 
-const TabProject = ({ project, deployment, onCreateDeployment, setShowBuild, showBuild, setTabs }: TabProjectProps) => {
+const TabProject = ({ project, deployment, onCreateDeployment, setShowBuild, showBuild, setTabs, reDeploy }: TabProjectProps) => {
+
 	return (
 		<>
-			<div className="dark:bg-neutral-900 border bg-white w-full rounded-md mb-6 px-4 py-6">
+			<div className="dark:bg-neutral-900 border bg-white w-full rounded-md mb-6 mt-4 px-4 py-4">
 
 				{(!project.deployments || project.deployments.length === 0) && (
 					<NoDeployment onCreateDeployment={onCreateDeployment} />
@@ -30,7 +32,7 @@ const TabProject = ({ project, deployment, onCreateDeployment, setShowBuild, sho
 				<ProjectOverview
 					project={project}
 					deployment={deployment}
-					reDeploy={onCreateDeployment}
+					reDeploy={reDeploy}
 					setShowBuild={setShowBuild}
 					goToSettings={() => setTabs("settings")}
 				/>

@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { axiosBaseQuery } from "../axiosBaseQuery";
-import { Deployment } from "@/types/Deployment";
+import { Deployment, DeploymentFilesType } from "@/types/Deployment";
 
 export const deployemntApis = createApi({
 	reducerPath: "deployemntsApi",
@@ -46,6 +46,14 @@ export const deployemntApis = createApi({
 			},
 			providesTags: (result, error, { id }) => [{ type: 'Deployments', id }]
 		}),
+		getDeploymentFiles: builder.query<DeploymentFilesType, { id: string, params: {} }>({
+			query: ({ id, params }) => ({ url: '/deployments/' + id + "/files", method: 'get', params }),
+			keepUnusedDataFor: 20 * 60,
+			transformResponse: (data: any) => {
+				return data.deployment
+			},
+			providesTags: (result, error, { id }) => [{ type: 'Deployments', id: "files__" + id, }]
+		}),
 		createDeployment: builder.mutation<Deployment, string>({
 			query: (projectId) => ({ url: `/projects/${projectId}/deployments`, method: "POST", data: { projectId } }),
 			invalidatesTags: (result, error, projectId) => [{ type: 'Deployments', id: 'LIST' }],
@@ -55,6 +63,6 @@ export const deployemntApis = createApi({
 })
 
 export const {
-	useCreateDeploymentMutation,
+	useCreateDeploymentMutation, useGetDeploymentFilesQuery,
 	useGetDeploymentByIdQuery, useGetProjectDeploymentsQuery,
 	useGetDeploymentsQuery } = deployemntApis

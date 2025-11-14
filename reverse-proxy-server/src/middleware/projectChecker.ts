@@ -29,6 +29,13 @@ export async function checkProject(req: Request, res: Response, next: NextFuncti
 			});
 			return
 		}
+		if (!project.currentDeployment) {
+			res.status(404).json({
+				error: 'Project Deployment not found',
+				slug
+			});
+			return
+		}
 
 		req.project = project;
 		next();

@@ -68,7 +68,8 @@ export function useDeploymentSSE(projectId?: string,
 							(draft) => {
 								const newData = {
 									status: update.status,
-									...(update.techStack && { techStack: update.techStack })
+									...(update.techStack && { techStack: update.techStack }),
+									...(update.status === ProjectStatus.READY && { currentDeployment: update.deploymentId })
 								}
 								Object.assign(draft, newData)
 							}

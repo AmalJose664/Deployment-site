@@ -19,7 +19,16 @@ export interface Deployment {
 	createdAt: Date;
 	updatedAt: Date;
 }
-
+export interface DeploymentFilesType {
+	_id: string;
+	fileStructure?: {
+		totalSize: number;
+		files: {
+			name: string;
+			size: number;
+		}[]
+	}
+}
 export interface DeploymentUpdates {
 	deploymentId: string;
 	projectId: string;

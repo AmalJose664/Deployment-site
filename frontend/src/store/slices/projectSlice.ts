@@ -28,7 +28,9 @@ export const fetchProjects = createAsyncThunk(
 const projectSlice = createSlice({
 	name: "projects",
 	initialState,
-	reducers: {},
+	reducers: {
+
+	},
 	extraReducers: (builder) => {
 		builder.addCase(fetchProjects.pending, (state) => {
 			state.loading = true;

@@ -20,6 +20,12 @@ deploymentRouter.get(
 	validateObjectId("deploymentId"),
 	deploymentController.getDeployment.bind(deploymentController),
 );
+deploymentRouter.get(
+	"/:deploymentId/files",
+	authenticateToken,
+	validateObjectId("deploymentId"),
+	deploymentController.getAllDeploymentFilesData.bind(deploymentController),
+);
 
 deploymentRouter.get(
 	"/:deploymentId/logs",

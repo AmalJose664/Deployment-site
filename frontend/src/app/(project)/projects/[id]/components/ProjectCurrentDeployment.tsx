@@ -44,7 +44,7 @@ const ProjectCurrentDeployment = ({ deployment, projectBranch, repoURL, showLogs
 									<span className="text-xs  font-mono">
 										{deployment.commitHash}
 									</span>
-									<span className="text-xs text-gray-500">{getElapsedTime(deployment.completedAt)} ago</span>
+									<span className="text-xs text-gray-500">{deployment.completedAt ? getElapsedTime(deployment.completedAt) : "- - - -"}{"  "}ago</span>
 								</div>
 								<Link href={getGithubCommitUrl(repoURL, deployment.commitHash)} target="_blank" className="hover:underline text-sm text-primary mb-1">{deployment.commitHash}</Link>
 								<div className="flex items-center gap-4 text-xs text-gray-400">

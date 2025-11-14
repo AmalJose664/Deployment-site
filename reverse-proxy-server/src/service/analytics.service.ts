@@ -8,8 +8,8 @@ class AnalyticsService implements IAnalyticsService {
 	private kafkaTopic: string
 	private analyticsBuffer: IAnalytics[] = []
 	MAX_QUEUE_SIZE = 1000;
-	BATCH_SIZE = 50;
-	FLUSH_INTERVAL = 5000;
+	BATCH_SIZE = 100;
+	FLUSH_INTERVAL = 7000;    //    7s 
 	isSending = false;
 	FLUSH_INTERVAL_REF: ReturnType<typeof setInterval>;
 
@@ -23,8 +23,7 @@ class AnalyticsService implements IAnalyticsService {
 	async sendAnalyticsBatch(): Promise<void> {
 		console.log("call to send ....", this.analyticsBuffer.length)
 		if (this.isSending || this.analyticsBuffer.length === 0) return
-		// this.analyticsBuffer.splice(0, this.BATCH_SIZE);
-		// return
+
 		this.isSending = true;
 
 		const batch = this.analyticsBuffer.splice(0, this.BATCH_SIZE);
@@ -38,8 +37,7 @@ class AnalyticsService implements IAnalyticsService {
 					timestamp: new Date(event.timestamp).getTime().toString()
 				}))
 			});
-
-			console.log(`Sent ${batch.length} analytics events to Kafka`);
+			console.log(`Senting ${batch.length} analytics events...`);
 		} catch (error) {
 			console.error('Kafka send failed:', error);
 		} finally {

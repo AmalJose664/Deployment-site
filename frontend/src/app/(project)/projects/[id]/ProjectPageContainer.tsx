@@ -3,16 +3,17 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 
-import { useGetProjectByIdQuery } from "@/store/services/projectsApi"
-import { useCreateDeploymentMutation, useGetDeploymentByIdQuery } from "@/store/services/deploymentApi"
+import { projectApis, useGetProjectByIdQuery } from "@/store/services/projectsApi"
+import { deployemntApis, useCreateDeploymentMutation, useGetDeploymentByIdQuery } from "@/store/services/deploymentApi"
 
 import ProjectLoading from "./components/ProjectLoading"
 import ProjectError from "./components/ProjectError"
 import { ProjectContent } from "./components/Content"
 import { useDeploymentSSE } from "@/hooks/useUpdatesSse"
 import { useGetDeploymentLogsQuery } from "@/store/services/logsApi"
-import { useDispatch } from "react-redux"
 import { addLogs, clearLogs } from "@/store/slices/logSlice"
+import { ProjectStatus } from "@/types/Project"
+import { useAppDispatch } from "@/store/store"
 
 interface ProjectPageContainerProps {
 	projectId: string
@@ -21,7 +22,7 @@ interface ProjectPageContainerProps {
 
 export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerProps) {
 	const router = useRouter()
-	const dispatch = useDispatch()
+	const dispatch = useAppDispatch();
 
 	const {
 		data: project,
@@ -40,12 +41,12 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 	}
 	const { data: deployment } = useGetDeploymentByIdQuery(
 		{
-			id: project?.deployments
-				? project.deployments[project.deployments.length - 1]
+			id: project?.deployments?.length !== 0 && project?.currentDeployment
+				? project?.currentDeployment
 				: "",
 			params: {},
 		},
-		{ skip: !project?.deployments?.length }
+		{ skip: (project?.deployments?.length === 0 && !!project.currentDeployment) }
 	)
 	const { data: initialLogs } = useGetDeploymentLogsQuery(
 		{ deploymentId: deployment?._id ?? "" },
@@ -60,7 +61,35 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 	}, [initialLogs, dispatch])
 	useDeploymentSSE(project?._id, deployment?.status, deployment?._id,)
 
+	const reDeploy = async () => {
+		if (!project || !deployment) return
+		dispatch(
+			projectApis.util.updateQueryData(
+				"getProjectById",
+				{ id: project._id, params: { user: "true" } },
+				(draft) => {
+					const newData = {
+						status: ProjectStatus.QUEUED,
+					}
+					Object.assign(draft, newData)
+				}
+			)
+		)
+		dispatch(
+			deployemntApis.util.updateQueryData(
+				"getDeploymentById",
+				{ id: deployment._id, params: {} },
+				(draft) => {
+					const newData = {
+						status: ProjectStatus.QUEUED,
+					}
+					Object.assign(draft, newData)
+				}
+			)
+		)
+		await handleCreateDeployment()
 
+	}
 
 
 	if (!project && !isLoading) {
@@ -81,6 +110,7 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 			deployment={deployment}
 			tabFromUrl={tab}
 			refetch={refetch}
+			reDeploy={reDeploy}
 			onBack={() => router.push('/projects')}
 			showBuild={showBuild}
 			setShowBuild={setShowBuild}

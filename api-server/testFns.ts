@@ -2,25 +2,81 @@ import "dotenv/config"
 import { Kafka } from "kafkajs";
 import { Deployment } from "./src/models/Deployment";
 import { Project } from "./src/models/Projects";
-import repo from "./src/repositories/project.repository";
+import P_repo from "./src/repositories/project.repository";
+import D_repo from "./src/repositories/deployment.repository";
 import AnalyticsRepo from "./src/repositories/analytics.repository";
-
 import mongoose, { Types } from "mongoose";
 import connectDb from "./src/config/db";
-
 import { User } from "./src/models/User";
-
 import { client } from "./src/config/clickhouse";
-import { EVENT_REGISTRY } from "./src/events/regitry"
+import { exec } from "child_process";
+import path from "path"
+import { existsSync, lstatSync, readdirSync } from "fs";
+
+
+
+
+
+function formatTimeWithSeconds(input: Date | string | number): string {
+	const date = input instanceof Date ? input : new Date(input);
+
+	if (isNaN(date.getTime())) {
+		throw new Error("Invalid date input");
+	}
+
+	let hours = date.getHours();
+	const minutes = date.getMinutes();
+	const seconds = date.getSeconds();
+	const ampm = hours >= 12 ? "PM" : "AM";
+
+	hours = hours % 12 || 12; // Convert 0–23 → 1–12 range
+
+	// Pad with leading zeros
+	const hh = String(hours).padStart(2, "0");
+	const mm = String(minutes).padStart(2, "0");
+	const ss = String(seconds).padStart(2, "0");
+
+	return `${hh}:${mm}:${ss} ${ampm}`;
+}
+
+
 console.log('--------------------------------------------------------------------------------------------------------------')
 async function mongodbData() {
 	try {
 		await connectDb();
-		// await Project.updateOne({ _id: "68fb1ccb10b93de245fa9f55" }, { deployments: [] })
-		console.log(await Project.deleteOne({ name: "new-ui-projectsqq" }));
-		// const r = await new repo().pullDeployments("68fa78e47e6c4401f35402d8", "68e4a04f1e57fa3fe5b1a81e", "68fa79c47e6c4401f35402f2")
+		const p = new P_repo()
+		const de = new D_repo()
+		// console.log(await Project.updateMany({}, { deployments: [] }), await Deployment.deleteMany({}));
+		const project = await Project.findById("6915d856e9c778440b64bf8d").populate("deployments", "commit_hash")
+		const userId = "68e4a04f1e57fa3fe5b1a81e"
+		const user = await User.findById(userId)
+		// await p.createProject({ name: "TEST_PROJECT_1", repoURL: "TEST_PROJECT_1_REPO", user: user._id, subdomain: "testable-subdomain", })
 
-		// await mongoose.disconnect()
+
+		const obj = {
+			project: project?._id,
+			status: 'READY',
+			s3Path: project?._id.toString(),
+			userId: user?._id,
+			commit_hash: 'project__6',
+			install_ms: 6784.54,
+			build_ms: 4669.79,
+			overWrite: false,
+			duration_ms: 13531.03,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			complete_at: new Date()
+		}
+		console.log("found>> ", project)
+		// await p.pullDeployments(project._id, user._id, project?.deployments[0]._id, null)
+
+
+		const deplos = await Deployment.find({ project: project?._id }, { createdAt: 1, commit_hash: 1 }).sort("createdAt")
+		// await p.pushToDeployments(project._id, user._id, deplos[deplos.length - 1]._id)
+		console.log(deplos.map((dep) => ({ commit_hash: dep.commit_hash, time: formatTimeWithSeconds(new Date(dep.createdAt)) })))
+
+
+		await mongoose.disconnect()
 	} catch (error) {
 		console.log(error);
 	} finally {
@@ -98,7 +154,6 @@ async function getClickhouseData() {
 
 	const data = await client.query({
 		query: `SELECT *, toTimeZone(timestamp, 'Asia/Kolkata') as timestamp FROM analytics `,
-
 		format: "JSON",
 	})
 	const datas = await data.json()
@@ -107,18 +162,38 @@ async function getClickhouseData() {
 	// })
 
 	console.log(datas)
-	console.log(formatLogTime(new Date((datas as any).data[0].timestamp)))
 	console.log(typeof (datas as any).data[0].timestamp)
 }
-export const formatLogTime = (time: string | Date) => {
-	const date = new Date(time)
-	let hours = date.getHours()
-	const minutes = date.getMinutes().toString().padStart(2, "0")
-	const seconds = date.getSeconds().toString().padStart(2, "0")
+// getClickhouseData().then(() => process.exit(0))
 
-	const ampm = hours >= 12 ? "PM" : "AM"
-	hours = hours % 12 || 12
-
-	return `${date.getDate()}/${date.getMonth() + 1}} - ${hours}:${minutes}:${seconds} ${ampm} -- ${date.getFullYear()}`
+const buildFileTree = (files: { name: string; size: number }[]) => {
+	const root: any = { name: 'root', children: {}, files: [] };
+	files.forEach(file => {
+		const parts = file.name.split('/');
+		let current = root;
+		parts.forEach((part, index) => {
+			if (index === parts.length - 1) {
+				// It's a file
+				current.files.push({ name: part, size: file.size, fullPath: file.name });
+			} else {
+				// It's a directory
+				if (!current.children[part]) {
+					current.children[part] = { name: part, children: {}, files: [] };
+				}
+				current = current.children[part];
+			}
+		});
+	});
+	console.log(JSON.stringify(root, null, 2))
 }
-getClickhouseData().then(() => process.exit(0))
+buildFileTree([
+	{ name: "index.html", size: 4523 },
+	{ name: "assets/main-abc123.js", size: 245678 },
+	{ name: "assets/vendor-def456.js", size: 1234567 },
+	{ name: "assets/styles-ghi789.css", size: 45678 },
+	{ name: "_next/static/chunks/main.js", size: 123456 },
+	{ name: "_next/static/chunks/webpack.js", size: 67890 },
+	{ name: "images/logo.png", size: 12345 },
+	{ name: "images/hero.jpg", size: 234567 },
+	{ name: "favicon.ico", size: 1234 }
+])

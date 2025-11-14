@@ -7,13 +7,13 @@ import { GrRotateRight } from "react-icons/gr";
 import { IoSettingsOutline } from "react-icons/io5";
 import { MdAccessTime } from "react-icons/md";
 import { MdOutlineLineStyle } from "react-icons/md";
-
+import { RxExternalLink } from "react-icons/rx";
 import { User } from "@/types/User";
 import { Project, ProjectStatus } from "@/types/Project";
 import Link from "next/link";
 import TechStack from "@/components/TechStack";
 import { getGithubBranchUrl, getGithubCommitUrl, getStatusColor, timeToSeconds } from "@/lib/utils";
-import StatusIcon from "@/components/ui/StatusIcon";
+import StatusIcon, { AnimationBuild } from "@/components/ui/StatusIcon";
 import { toast } from "sonner"
 import { Deployment } from "@/types/Deployment";
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,6 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, goToSett
 
 	const triggerReDeploy = () => {
 		toast.info("New Deployment started")
-		return
 		reDeploy()
 		// post deploy events sse
 	}
@@ -55,9 +54,9 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, goToSett
 								<CiCalendarDate /><span>{new Date(project.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
 							</span>
 							<Link href={project.repoURL} target="_blank">
-								<button className='p-2 border flex gap-1 text-xs items-center dark:bg-gray-950 bg-gray-100  rounded-lg transition-colors'>
-									<FiGithub className='size-3 text-primary' /> {repoWithUser}
-								</button>
+								<Button variant={"outline"} className='p-2 border flex gap-1 text-xs items-center rounded-lg group'>
+									<FiGithub className='size-3 text-primary group-hover:rotate-y-180 transition-all duration-300' /> {repoWithUser}
+								</Button>
 							</Link>
 						</div>
 					</div>
@@ -69,8 +68,9 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, goToSett
 									<IoMdGlobe className='size-4 text-less' />
 								</div>
 								<div>
-									<Link href={'http://' + project.subdomain + '.localhost'} className='text-sm font-medium '>
-										{project.subdomain}
+									<Link href={'http://' + project.subdomain + '.localhost'} className='flex gap-2 items-center text-sm font-medium '>
+										{"http://" + project.subdomain}
+										<RxExternalLink />
 									</Link>
 								</div>
 							</div>
@@ -101,7 +101,11 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, goToSett
 							</div>
 							<div className='flex gap-2 items-center'>
 								<p className='text-xs text-less font-medium'>Status</p>
+
 								<p className={`text-sm font-bold rounded-xs px-1 ${getStatusColor(project.status)}`}>{project.status}</p>
+								{(project.status === ProjectStatus.BUILDING || project.status === ProjectStatus.QUEUED) &&
+									<AnimationBuild />
+								}
 							</div>
 						</div>
 						{project.status === ProjectStatus.CANCELED && (
@@ -137,11 +141,11 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, goToSett
 							&&
 							(deployment && (deployment?.status === ProjectStatus.CANCELED || deployment?.status === ProjectStatus.FAILED)) &&
 							<Button variant={"secondary"} onClick={triggerReDeploy} className='border  group px-4 py-2 rounded-lg text-sm font-medium  transition-colors'>
-								Re Deploy < GrRotateRight className="text-green-400 group-hover:rotate-z-90 transition-all" />
+								Re Deploy < GrRotateRight className="text-green-400 group-hover:rotate-z-90 transition-all duration-300" />
 							</Button>
 						}
-						<Button variant={"secondary"} onClick={goToSettings} className='border group px-4 py-2  rounded-lg text-sm font-medium  transition-colors'>
-							Settings <IoSettingsOutline className="group-hover:translate-x-1.5 group-hover:rotate-z-45 transition-all" />
+						<Button variant={"secondary"} onClick={triggerReDeploy} className='border group px-4 py-2  rounded-lg text-sm font-medium  transition-colors'>
+							Settings <IoSettingsOutline className="group-hover:translate-x-1.5 group-hover:rotate-z-45 transition-all duration-300" />
 						</Button>
 
 					</div>

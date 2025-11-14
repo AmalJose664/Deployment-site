@@ -97,6 +97,13 @@ export const getRandomBlue = () => {
 	const min = 1;
 	const max = 9;
 	return `var(--color-blue-${Math.floor(Math.random() * (max - min + 1)) + min}00)`;
+}
 
 
+export const formatBytes = (size: number): string => {
+	if (size === 0) return "0 B"
+	const k = 1024;
+	const sizes = ["B", "KB", "MB", "GB"]
+	const i = Math.floor(Math.log(size) / Math.log(k))
+	return `${(size / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
 }

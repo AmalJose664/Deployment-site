@@ -15,14 +15,14 @@ class ProjectRepository extends BaseRepository<IProject> implements IProjectRepo
 		const savedProject = await project.save();
 		return savedProject;
 	}
-	async findProject(projectId: string, userId: string, userFill?: boolean): Promise<IProject | null> { // FIX ISDELETE FLAG
+	async findProject(projectId: string, userId: string, userFill?: boolean): Promise<IProject | null> {
 		if (userFill) {
-			return await Project.findOne({ _id: projectId, user: userId, }).populate("user", "name email profileImage");
+			return await Project.findOne({ _id: projectId, user: userId, isDeleted: false }).populate("user", "name email profileImage");
 		}
-		return await Project.findOne({ _id: projectId, user: userId, isDeleted: false });
+		return await Project.findOne({ _id: projectId, user: userId, isDeleted: false }); // 
 	}
 	async getAllProjects(userId: string, query: QueryProjectDTO): Promise<{ projects: IProject[]; total: number }> {
-		const dbQuery: FilterQuery<IProject> = { user: userId, }; //FIX ISDELETE FLAG
+		const dbQuery: FilterQuery<IProject> = { user: userId, isDeleted: false };
 		if (query.search) {
 			dbQuery.$or = [{ name: { $regex: query.search, $options: "i" } }, { subdomain: { $regex: query.search, $options: "i" } }];
 		}
@@ -48,14 +48,20 @@ class ProjectRepository extends BaseRepository<IProject> implements IProjectRepo
 
 	async pushToDeployments(projectId: string, userId: string, newDeployment: string | Types.ObjectId): Promise<IProject | null> {
 		return await Project.findOneAndUpdate(
-			{ _id: projectId, user: userId },
+			{ _id: projectId, user: userId }, //currentDeployment: newDeployment.toString(),
 			{ lastDeployedAt: new Date(), $addToSet: { deployments: newDeployment } },
 			{ new: true },
 		);
 	}
 
-	async pullDeployments(projectId: string, userId: string, deployment: string | Types.ObjectId): Promise<IProject | null> {
-		return await Project.findOneAndUpdate({ _id: projectId, user: userId }, { $pull: { deployments: deployment } }, { new: true });
+	async pullDeployments(projectId: string, userId: string, deployment: string | Types.ObjectId, backUpDeployment: string | null): Promise<IProject | null> {
+		return await Project.findOneAndUpdate(
+			{ _id: projectId, user: userId },
+			{
+				currentDeployment: backUpDeployment,
+				$pull: { deployments: deployment }
+			}, { new: true }
+		);
 	}
 	async __findProject(projectId: string): Promise<IProject | null> {
 		// container

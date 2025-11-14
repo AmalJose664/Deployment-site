@@ -8,7 +8,7 @@ export default async function Page({
 }) {
 	const { id } = await params
 	const { tab } = await searchParams
-	const filteredTab = ['analytics', 'settings', 'deployments', 'project'].includes((tab as string) || "") ? tab : ""
+	const filteredTab = ['analytics', 'settings', 'deployments', 'project', "files"].includes((tab as string) || "") ? tab : ""
 	return (
 		<div className="min-h-screen flex flex-col">
 

@@ -2,8 +2,8 @@ import { TabsList, TabsTrigger } from "@/components/ui/tabs"
 const ProjectTabs = () => {
 	return (
 
-		<TabsList className="flex border-b border-neutral-300 dark:border-neutral-800 mb-4 bg-background">
-			{["project", "deployments", "analytics", "settings"].map(tab => (
+		<TabsList className="ml-6 flex  bg-background">
+			{["project", "deployments", "analytics", "settings", "files"].map(tab => (
 				<TabsTrigger
 					key={tab}
 					value={tab}

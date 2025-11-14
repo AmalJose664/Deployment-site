@@ -19,6 +19,7 @@ export interface Project {
 	branch: string;
 	rootDir: string;
 	outputDirectory: string;
+	currentDeployment: string | null;
 	techStack: string;
 	env: {
 		name: string

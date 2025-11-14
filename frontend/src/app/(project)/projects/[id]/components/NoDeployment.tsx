@@ -1,7 +1,5 @@
 import { Button } from "@/components/ui/button"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
-import { useCreateDeploymentMutation } from "@/store/services/deploymentApi"
-import Link from "next/link"
 import { HiMiniArrowUpRight } from "react-icons/hi2"
 import { IoRocketOutline } from "react-icons/io5"
 import { LuFolderCode } from "react-icons/lu"
@@ -9,7 +7,7 @@ import { LuFolderCode } from "react-icons/lu"
 const NoDeployment = ({ onCreateDeployment }: { onCreateDeployment: () => void }) => {
 
 	return (
-		<div className="mt-6 flex items-center justify-center">
+		<div className="border rounded-md mt-6 flex items-center justify-center">
 			<Empty>
 				<EmptyHeader>
 					<EmptyMedia variant="default">
