@@ -7,7 +7,7 @@ import { LuFolderCode } from "react-icons/lu"
 const NoDeployment = ({ onCreateDeployment }: { onCreateDeployment: () => void }) => {
 
 	return (
-		<div className="border rounded-md mt-6 flex items-center justify-center">
+		<div className="border rounded-md mt-3 flex items-center justify-center">
 			<Empty>
 				<EmptyHeader>
 					<EmptyMedia variant="default">

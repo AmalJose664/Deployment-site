@@ -37,7 +37,7 @@ const TabProject = ({ project, deployment, onCreateDeployment, setShowBuild, sho
 					goToSettings={() => setTabs("settings")}
 				/>
 
-				<div className="border dark:border-neutral-600 border-neutral-400 rounded-md">
+				<div className="border dark:border-neutral-700 border-neutral-300 rounded-md">
 					<button
 						className="p-4 w-full"
 						onClick={() => setShowBuild(!showBuild)}

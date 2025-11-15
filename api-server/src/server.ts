@@ -4,7 +4,7 @@ import { startKafkaConsumer, stopKafkaConsumer } from "./events/index.js";
 import { analyticsService } from "./instances.js";
 const PORT = process.env.PORT || 8000;
 const startServer = async () => {
-	httpServer.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+	httpServer.listen(PORT, () => console.log(`🎉🎉 Server running on port ${PORT}`));
 	// await startKafkaConsumer()
 };
 
@@ -24,5 +24,5 @@ process.on("SIGTERM", async () => {
 });
 
 process.on("exit", (code) => {
-	console.log(`👋 Process exited`);
+	console.log(`🎊🥀 Process exited`);
 });

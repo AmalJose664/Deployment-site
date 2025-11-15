@@ -6,11 +6,11 @@ yarn-debug.log*
 yarn-error.log*
 
 build-server/script.js
-test-server/index.js
+test-server/config/kafka.ts
 test-server/public/user-projects/
 
-output-try/
-output-try/*
+test-grounds/
+test-grounds/*
 
 nginx-1.28.0/logs/
 nginx-1.28.0/temp/

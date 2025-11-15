@@ -50,12 +50,15 @@ class DeploymentEventHandler {
 					install_ms: updates.install_ms,
 					build_ms: updates.build_ms,
 					duration_ms: updates.duration_ms,
-					file_structure: { files: updates.file_structure.files, totalSize: updates.file_structure.totalSize }
+					file_structure: {
+						files: updates.file_structure?.files || [],
+						totalSize: updates.file_structure?.totalSize || 0
+					}
 				});
 				await projectService.__updateProjectById(projectId, {
 					status: updates.status as unknown as ProjectStatus,
 					techStack: updates.techStack,
-					...(updates.status === "READY" && { currentDeployment: deploymentId })
+					...(updates.status === "READY" && { currentDeployment: deploymentId, tempDeployment: null })
 				});
 				break;
 			}
@@ -66,6 +69,7 @@ class DeploymentEventHandler {
 				});
 				await projectService.__updateProjectById(projectId, {
 					status: updates.status as unknown as ProjectStatus,
+					tempDeployment: null
 				});
 				break;
 			}

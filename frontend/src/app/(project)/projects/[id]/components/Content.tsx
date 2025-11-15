@@ -3,7 +3,7 @@
 
 import { FiMoreHorizontal } from "react-icons/fi"
 import { TiArrowLeft } from "react-icons/ti"
-import ProjectTabs from "./ProjectTabs"
+import ProjectTabs from "../../../../../components/ProjectTabs"
 import { Project } from "@/types/Project"
 import { Deployment } from "@/types/Deployment"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"

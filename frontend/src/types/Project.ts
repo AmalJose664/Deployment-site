@@ -20,6 +20,7 @@ export interface Project {
 	rootDir: string;
 	outputDirectory: string;
 	currentDeployment: string | null;
+	tempDeployment: string | null;
 	techStack: string;
 	env: {
 		name: string

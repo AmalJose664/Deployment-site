@@ -46,7 +46,8 @@ async function mongodbData() {
 		await connectDb();
 		const p = new P_repo()
 		const de = new D_repo()
-		// console.log(await Project.updateMany({}, { deployments: [] }), await Deployment.deleteMany({}));
+		// console.log(await Project.updateMany({ _id: "68fb1ccb10b93de245fa9f55" }, { $set: { currentDeployment: "69174b4b03eac77021fc8cff" } }),)
+
 		const project = await Project.findById("6915d856e9c778440b64bf8d").populate("deployments", "commit_hash")
 		const userId = "68e4a04f1e57fa3fe5b1a81e"
 		const user = await User.findById(userId)
@@ -99,7 +100,7 @@ async function commitAllMessages() {
 	});
 
 	const topic = "deployment.logs";
-	const groupId = "vercel-api-clone";
+	const groupId = "vercel-logs-group";
 	const admin = kafka.admin();
 	await admin.connect();
 
@@ -153,47 +154,15 @@ async function getClickhouseData() {
 	}
 
 	const data = await client.query({
-		query: `SELECT *, toTimeZone(timestamp, 'Asia/Kolkata') as timestamp FROM analytics `,
-		format: "JSON",
+		query: `truncate log_events `,
+		// format: "JSON",
 	})
 	const datas = await data.json()
+	console.log(datas.data.length)
 	// await client.query({
 	// 	query: "TRUNCATE analytics"
 	// })
 
-	console.log(datas)
-	console.log(typeof (datas as any).data[0].timestamp)
 }
 // getClickhouseData().then(() => process.exit(0))
 
-const buildFileTree = (files: { name: string; size: number }[]) => {
-	const root: any = { name: 'root', children: {}, files: [] };
-	files.forEach(file => {
-		const parts = file.name.split('/');
-		let current = root;
-		parts.forEach((part, index) => {
-			if (index === parts.length - 1) {
-				// It's a file
-				current.files.push({ name: part, size: file.size, fullPath: file.name });
-			} else {
-				// It's a directory
-				if (!current.children[part]) {
-					current.children[part] = { name: part, children: {}, files: [] };
-				}
-				current = current.children[part];
-			}
-		});
-	});
-	console.log(JSON.stringify(root, null, 2))
-}
-buildFileTree([
-	{ name: "index.html", size: 4523 },
-	{ name: "assets/main-abc123.js", size: 245678 },
-	{ name: "assets/vendor-def456.js", size: 1234567 },
-	{ name: "assets/styles-ghi789.css", size: 45678 },
-	{ name: "_next/static/chunks/main.js", size: 123456 },
-	{ name: "_next/static/chunks/webpack.js", size: 67890 },
-	{ name: "images/logo.png", size: 12345 },
-	{ name: "images/hero.jpg", size: 234567 },
-	{ name: "favicon.ico", size: 1234 }
-])

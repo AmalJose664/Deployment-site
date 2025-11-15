@@ -16,6 +16,7 @@ interface ProjectResponseDTO {
 		rootDir: string;
 		outputDirectory: string;
 		currentDeployment: string | null;
+		tempDeployment: string | null;
 		env: {
 			name: string;
 			value: string;
@@ -54,6 +55,7 @@ export class ProjectMapper {
 				rootDir: project.rootDir,
 				status: project.status,
 				currentDeployment: project.currentDeployment,
+				tempDeployment: project.tempDeployment,
 				subdomain: project.subdomain,
 				user: !userFill
 					? project.user.toString()

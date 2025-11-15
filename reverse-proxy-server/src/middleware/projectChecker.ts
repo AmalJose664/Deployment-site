@@ -13,9 +13,11 @@ declare global {
 
 
 export async function checkProject(req: Request, res: Response, next: NextFunction) {
+	const ownDomain = process.env.OWN_DOMAIN
 	try {
 		const slug = req.hostname.split('.')[0];
-		if (!slug || slug === 'localhost' || slug === 'www') {
+		if (!slug || slug === ownDomain || slug === 'www') {
+			console.log(slug)
 			res.status(400).json({ error: 'Invalid subdomain' });
 			return;
 		}

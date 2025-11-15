@@ -7,7 +7,7 @@ import { projectApis, useGetProjectByIdQuery } from "@/store/services/projectsAp
 import { deployemntApis, useCreateDeploymentMutation, useGetDeploymentByIdQuery } from "@/store/services/deploymentApi"
 
 import ProjectLoading from "./components/ProjectLoading"
-import ProjectError from "./components/ProjectError"
+import ProjectError from "../../../../components/ProjectError"
 import { ProjectContent } from "./components/Content"
 import { useDeploymentSSE } from "@/hooks/useUpdatesSse"
 import { useGetDeploymentLogsQuery } from "@/store/services/logsApi"
@@ -39,6 +39,15 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 		await refetch()
 		setShowBuild(true)
 	}
+	const { data: tempDeployment } = useGetDeploymentByIdQuery(
+		{
+			id: project?.deployments?.length !== 0 && project?.tempDeployment
+				? project?.tempDeployment
+				: "",
+			params: {},
+		},
+		{ skip: (project?.deployments?.length === 0 && !!project.tempDeployment) }
+	)
 	const { data: deployment } = useGetDeploymentByIdQuery(
 		{
 			id: project?.deployments?.length !== 0 && project?.currentDeployment
@@ -59,7 +68,7 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 		}
 		return () => { dispatch(clearLogs()) }
 	}, [initialLogs, dispatch])
-	useDeploymentSSE(project?._id, deployment?.status, deployment?._id,)
+	useDeploymentSSE(project, refetch, tempDeployment,)
 
 	const reDeploy = async () => {
 		if (!project || !deployment) return

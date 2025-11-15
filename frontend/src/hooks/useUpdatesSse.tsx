@@ -4,28 +4,28 @@ import { addLog } from "@/store/slices/logSlice";
 import { useAppDispatch } from "@/store/store";
 import { Deployment, DeploymentUpdates } from "@/types/Deployment";
 import { Log } from "@/types/Log";
-import { ProjectStatus } from "@/types/Project";
+import { Project, ProjectStatus } from "@/types/Project";
 import { useEffect, useRef } from "react";
 
 
-export function useDeploymentSSE(projectId?: string,
-	deploymentStatus?: ProjectStatus, deploymentId?: string) {
+export function useDeploymentSSE(project: Project | undefined, refetch: () => void,
+	deployment?: Deployment,) {
 	const dispatch = useAppDispatch();
 	const eventSourceRef = useRef<EventSource | null>(null)
 	useEffect(() => {
-		if (!deploymentId || !deploymentStatus) return
+		if (!deployment?._id || !deployment.status) return
 		if (eventSourceRef.current) return
 
 		if (
-			deploymentStatus !== ProjectStatus.BUILDING &&
-			deploymentStatus !== ProjectStatus.QUEUED
+			deployment.status !== ProjectStatus.BUILDING &&
+			deployment.status !== ProjectStatus.QUEUED
 		) {
 			return
 		}
 
-		console.log("Starting SSE for deployment:", deploymentId)
+		console.log("Starting SSE for deployment:", deployment._id)
 		const eventSource = new EventSource(
-			`${process.env.NEXT_PUBLIC_API_SERVER_ENDPOINT}/deployments/${deploymentId}/logs/stream`,
+			`${process.env.NEXT_PUBLIC_API_SERVER_ENDPOINT}/deployments/${deployment._id}/logs/stream`,
 			{ withCredentials: true }
 		)
 		eventSourceRef.current = eventSource
@@ -69,13 +69,20 @@ export function useDeploymentSSE(projectId?: string,
 								const newData = {
 									status: update.status,
 									...(update.techStack && { techStack: update.techStack }),
-									...(update.status === ProjectStatus.READY && { currentDeployment: update.deploymentId })
+									...(update.status === ProjectStatus.READY && {
+										currentDeployment: update.deploymentId,
+										tempDeployment: null
+									})
 								}
 								Object.assign(draft, newData)
 							}
 						)
 					)
-
+					if (update.status === ProjectStatus.READY ||
+						update.status === ProjectStatus.FAILED || update.status === ProjectStatus.CANCELED) {
+						// refetch()
+						console.log("end here .... ... .")
+					}
 				}
 			} catch (err) {
 				console.error("parse error:", err)
@@ -111,6 +118,6 @@ export function useDeploymentSSE(projectId?: string,
 		})
 
 		return () => { eventSource.close(); eventSourceRef.current = null }
-	}, [deploymentId, deploymentStatus, dispatch])
+	}, [deployment?._id, deployment?.status, dispatch])
 	return null
 }

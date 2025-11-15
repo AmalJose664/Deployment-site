@@ -1,58 +1,86 @@
 import { formatBytes } from "@/lib/utils"
 import { useGetDeploymentFilesQuery } from "@/store/services/deploymentApi"
 
-import { RiFileWarningLine } from "react-icons/ri";
-import { FaFolder, FaRegFileAlt } from "react-icons/fa";
+import { FaFolder, FaRegFileAlt, FaDownload } from "react-icons/fa";
 import { FiChevronRight } from "react-icons/fi";
 import { CiFolderOn } from "react-icons/ci";
 
-import { useState } from "react"
+import { memo, useCallback, useMemo, useState } from "react"
+import { Button } from "@/components/ui/button";
+import axios from "axios";
+import { toast } from "sonner";
+import { TabFilesError, TabFilesLoading, TabFilesNoDeployment, TabFilesNoFiles } from "@/components/TabFilesComponents";
 
 interface TabFilesProps {
 	projectId: string
 	deploymentId?: string
 }
+type InputFile = {
+	name: string;
+	size: number;
+};
+type FileEntry = {
+	name: string;
+	size: number;
+	fullPath: string;
+};
+type FileTreeNode = {
+	name: string;
+	children: Record<string, FileTreeNode>;
+	files: FileEntry[];
+};
+type FileTreeNodeProps = {
+	node: FileTreeNode
+	depth?: number
+	downloadFile: (path: string) => void
+}
+
 
 
 const TabFiles = ({ projectId, deploymentId }: TabFilesProps) => {
-
-	const { data: filesData, isLoading, error } = useGetDeploymentFilesQuery({ id: deploymentId || "", params: {} }, {
+	const { data: filesData, isLoading, error, isError } = useGetDeploymentFilesQuery({ id: deploymentId || "", params: {} }, {
 		skip: !deploymentId
 	})
 
+
 	const files = filesData?.fileStructure?.files || []
+	const root = useMemo(() => buildFileTree(files || []), [files]);
+	const downloadFile = useCallback(
+		async (path: string) => {
+			try {
+				const protocol = window.location.protocol
+				const url = `${protocol}//${process.env.NEXT_PUBLIC_PROXY_SERVER}/extras/download-file/${projectId}/${deploymentId}?filePath=${encodeURIComponent(path)}`
+				console.log(url)
+				const result = await axios({ url, method: "GET", responseType: 'blob' })
+				const fileUrl = window.URL.createObjectURL(result.data);
+				const a = document.createElement('a');
+				a.href = fileUrl;
+				a.download = path.split('/').pop() || 'file';
+				document.body.appendChild(a);
+				a.click();
+				document.body.removeChild(a);
+				window.URL.revokeObjectURL(fileUrl);
+
+			} catch (error) {
+				toast.error("Error on downloading file, file=" + path)
+				console.warn("error on downloading file  ", error, path)
+			}
+		}, [projectId, deploymentId]
+	)
 	const [viewMode, setViewMode] = useState<'tree' | 'list'>('tree');
+	if (isLoading) {
+		return <TabFilesLoading />
+	}
+	if (error || isError) {
+		return <TabFilesError error={error} />
+	}
 	if (!deploymentId) {
-		return (
-			<div className="flex flex-col gap-2 dark:bg-[#111111] border items-center justify-center bg-white text-neutral-400 p-8 rounded-lg text-center">
-				<RiFileWarningLine size={22} />  <p>No deployment to show files</p>
-				<div className="space-y-1 w-full">
-					{[1, 1, 1, 1, 1, 1, 1].map((_, index) => (
-						<div
-							key={index}
-							className="flex border items-center  justify-between group gap-4 py-2 px-3 hover:bg-secondary rounded"
-						>
-							<div className="flex items-center gap-2 animate-pulse group-hover:border flex-1 min-w-0">
-								<FaRegFileAlt size={16} className="text-less shrink-0" />
-								<span className="text-some-less text-sm group-hover:border truncate rounded-md bg-secondary w-[30%] h-4 ">{''}</span>
-							</div>
-							<span className="text-less text-xs shrink-0">
-								{''}
-							</span>
-						</div>
-					))}
-				</div>
-			</div>
-		);
+		return <TabFilesNoDeployment />
 	}
 	if (!filesData?.fileStructure) {
-		return (
-			<div className="flex gap-2 dark:bg-[#111111] border items-center justify-center bg-white text-neutral-400 p-8 rounded-lg text-center">
-				<RiFileWarningLine size={22} />  <p>No files available for this deployment currently</p>
-			</div>
-		);
+		return <TabFilesNoFiles />
 	}
-	const root = buildFileTree(files || [])
+
 
 	return (
 		<div className="border rounded-md px-4 py-6 dark:bg-[#111111] bg-white">
@@ -89,7 +117,7 @@ const TabFiles = ({ projectId, deploymentId }: TabFilesProps) => {
 
 				<div className="border rounded-md">
 					{viewMode === 'tree' ? (
-						<FileTreeNode node={root} />
+						<FileTreeNode node={root} downloadFile={downloadFile} />
 					) : (
 						<div className="space-y-1">
 							{files.map((file, index) => (
@@ -101,9 +129,15 @@ const TabFiles = ({ projectId, deploymentId }: TabFilesProps) => {
 										<FaRegFileAlt size={16} className="text-less shrink-0" />
 										<span className="text-some-less text-sm truncate">{file.name}</span>
 									</div>
-									<span className="text-less text-xs shrink-0">
+									<span className="text-neutral-500 text-xs shrink-0 mr-6">
+										{(file.name)}
+									</span>
+									<span className="text-neutral-500 text-xs shrink-0">
 										{formatBytes(file.size)}
 									</span>
+									<Button onClick={() => downloadFile(file.name)} variant={"outline"} className="text-neutral-500 text-xs">
+										<FaDownload className="size-3" />
+									</Button>
 								</div>
 							))}
 						</div>
@@ -114,8 +148,8 @@ const TabFiles = ({ projectId, deploymentId }: TabFilesProps) => {
 	)
 }
 
-const buildFileTree = (files: { name: string, size: number }[]) => {
-	const root: any = { name: "root", children: {}, files: [] }
+const buildFileTree = (files: InputFile[]) => {
+	const root: FileTreeNode = { name: "root", children: {}, files: [] }
 	files.forEach((file) => {
 
 		const parts = file.name.split("/")
@@ -123,7 +157,7 @@ const buildFileTree = (files: { name: string, size: number }[]) => {
 		parts.forEach((part, index) => {
 			if (index === parts.length - 1) {
 				// its a file, end of string in files[].name
-				current.files.push({ name: part, size: file.size, fullPath: file.name })
+				current.files?.push({ name: part, size: file.size, fullPath: file.name })
 			}
 			else {
 				// its a directory
@@ -136,17 +170,8 @@ const buildFileTree = (files: { name: string, size: number }[]) => {
 	})
 	return root
 }
-type node = {
-	children: node,
-	name: string,
-	files?: {
-		name: string,
-		size: number,
-		fullPath: string
-	}[]
 
-}
-const FileTreeNode = ({ node, depth = 0 }: { node: node; depth?: number }) => {
+const FileTreeNode = memo(({ node, depth = 0, downloadFile }: FileTreeNodeProps) => {
 	const [isOpen, setIsOpen] = useState(depth === 0);
 
 	return (
@@ -171,7 +196,7 @@ const FileTreeNode = ({ node, depth = 0 }: { node: node; depth?: number }) => {
 				<>
 					{/* Render subdirectories */}
 					{Object.values(node.children).map((child: any) => (
-						<FileTreeNode key={child.name} node={child} depth={depth + 1} />
+						<FileTreeNode key={child.name} node={child} depth={depth + 1} downloadFile={downloadFile} />
 					))}
 
 					{/* Render files */}
@@ -191,12 +216,15 @@ const FileTreeNode = ({ node, depth = 0 }: { node: node; depth?: number }) => {
 							<span className="text-neutral-500 text-xs shrink-0">
 								{formatBytes(file.size)}
 							</span>
+							<Button onClick={() => downloadFile(file.fullPath)} variant={"outline"} className="text-neutral-500 text-xs">
+								<FaDownload className="size-3" />
+							</Button>
 						</div>
 					))}
 				</>
 			)}
 		</div>
 	);
-};
+});
 
 export default TabFiles

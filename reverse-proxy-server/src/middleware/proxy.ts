@@ -1,23 +1,20 @@
 import { Request, } from "express";
 import { createProxyMiddleware, } from "http-proxy-middleware"
-
 import { isbot } from 'isbot';
 import { IAnalytics } from "../models/Analytics.js";
 import { analyticsService } from "../service/analytics.service.js";
 import parseUA from "../utils/uaParser.js";
+import { STORAGE_SERVER_FILES } from "../contants/paths.js";
 
-const BUCKET_NAME = "new-vercel-664" //                             FILL HERE
-const BASE_PATH_S3 = `https://${BUCKET_NAME}.s3.us-east-1.amazonaws.com/__app_build_outputs`
-
-const BASE_PATH_LOCAL = `http://localhost:4000/projects/`
 
 
 export const proxy = createProxyMiddleware({
 	changeOrigin: true,
 	router: (req: Request) => {
+		console.log("real proxy endpoint <<<<<<<<<<<<<<<-------\n\n")
 		const project = req.project;
 		if (!project) return undefined
-		return `${BASE_PATH_LOCAL}${project._id}/${project.currentDeployment}`;
+		return `${STORAGE_SERVER_FILES}${project._id}/${project.currentDeployment}`;
 	},
 
 	on: {

@@ -48,7 +48,7 @@ class DeploymentService implements IDeploymentService {
 		const deployment = await this.deploymentRepository.createDeployment(deploymentData);
 		await this.projectRepository.pushToDeployments(correspondindProject.id, userId, deployment?.id);
 		if (deployment?._id) {
-			this.deployLocal(deployment?._id, projectId)
+			// this.deployLocal(deployment?._id, projectId)
 		}
 		return deployment;
 	}
@@ -96,14 +96,23 @@ class DeploymentService implements IDeploymentService {
 
 		if (project.currentDeployment === deploymentId) {
 			const allDeployments = await this.deploymentRepository.__findAllProjectDeployment(projectId, "createdAt");
-
 			const currentIndex = allDeployments.findIndex(d => d._id.toString() === deploymentId);
+			console.log(allDeployments, '<<<<', currentIndex)
+
 			if (currentIndex > 0) {
 				newCurrentDeployment = allDeployments[currentIndex - 1]._id;
 			}
 		}
+
 		await this.deleteLocal(deploymentId, project._id)
-		await this.projectRepository.pullDeployments(projectId, userId, deploymentId, newCurrentDeployment);
+		await this.projectRepository.pullDeployments(
+			projectId,
+			userId,
+			deploymentId,
+			newCurrentDeployment
+				? newCurrentDeployment
+				: deploymentId === project.currentDeployment ? null : project.currentDeployment
+		);
 		return await this.deploymentRepository.deleteDeployment(projectId, deploymentId, userId);
 	}
 
