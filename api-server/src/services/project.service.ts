@@ -73,16 +73,7 @@ class ProjectService implements IProjectService {
 	}
 	async __updateProjectById(projectId: string, updateData: Partial<IProject>): Promise<IProject | null> {
 		//container
-		const status = updateData.status as string as ProjectStatus;
-		return await this.projectRepository.__updateProject(projectId, {
-			status,
-			...(updateData.techStack && {
-				techStack: updateData.techStack,
-			}),
-			...(updateData.currentDeployment && {
-				currentDeployment: updateData.currentDeployment,
-			})
-		});
+		return await this.projectRepository.__updateProject(projectId, updateData);
 	}
 }
 

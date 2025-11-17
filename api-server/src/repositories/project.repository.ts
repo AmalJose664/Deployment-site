@@ -48,8 +48,8 @@ class ProjectRepository extends BaseRepository<IProject> implements IProjectRepo
 
 	async pushToDeployments(projectId: string, userId: string, newDeployment: string | Types.ObjectId): Promise<IProject | null> {
 		return await Project.findOneAndUpdate(
-			{ _id: projectId, user: userId, tempDeployment: newDeployment.toString(), },
-			{ lastDeployedAt: new Date(), $addToSet: { deployments: newDeployment } },
+			{ _id: projectId, user: userId },
+			{ lastDeployedAt: new Date(), tempDeployment: newDeployment.toString(), $addToSet: { deployments: newDeployment } },
 			{ new: true },
 		);
 	}

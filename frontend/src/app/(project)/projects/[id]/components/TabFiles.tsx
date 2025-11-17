@@ -9,7 +9,7 @@ import { memo, useCallback, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { toast } from "sonner";
-import { TabFilesError, TabFilesLoading, TabFilesNoDeployment, TabFilesNoFiles } from "@/components/TabFilesComponents";
+import { TabFilesError, TabFilesLoading, TabFilesNoDeployment, TabFilesNoFiles } from "@/components/project/TabFilesComponents";
 
 interface TabFilesProps {
 	projectId: string

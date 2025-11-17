@@ -3,7 +3,7 @@
 
 import { FiMoreHorizontal } from "react-icons/fi"
 import { TiArrowLeft } from "react-icons/ti"
-import ProjectTabs from "../../../../../components/ProjectTabs"
+import ProjectTabs from "../../../../../components/project/ProjectTabs"
 import { Project } from "@/types/Project"
 import { Deployment } from "@/types/Deployment"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -17,6 +17,7 @@ import TabFiles from "./TabFiles"
 interface ProjectContentProps {
 	project: Project
 	deployment?: Deployment
+	tempDeployment?: Deployment
 	refetch: () => void
 	onBack: () => void
 	showBuild: boolean
@@ -29,6 +30,7 @@ interface ProjectContentProps {
 export function ProjectContent({
 	project,
 	deployment,
+	tempDeployment,
 	refetch,
 	onBack,
 	tabFromUrl,
@@ -38,7 +40,7 @@ export function ProjectContent({
 	onCreateDeployment
 }: ProjectContentProps) {
 	const [tab, setTabs] = useState(tabFromUrl || "project")
-	console.log("--------------------project--------------------", project.name)
+	console.log("------------project-------------", (project?.deployments?.length === 0 && !project.currentDeployment))
 	return (
 		<div className="min-h-screen">
 			<Tabs defaultValue="project" value={tab} onValueChange={setTabs} className="w-full ">
@@ -73,6 +75,7 @@ export function ProjectContent({
 						<TabProject
 							project={project}
 							deployment={deployment}
+							tempDeployment={tempDeployment}
 							onCreateDeployment={onCreateDeployment}
 							setShowBuild={setShowBuild}
 							reDeploy={reDeploy}

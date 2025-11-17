@@ -11,6 +11,7 @@ import { Deployment } from "@/types/Deployment"
 interface TabProjectProps {
 	project: Project
 	deployment?: Deployment
+	tempDeployment?: Deployment
 	onCreateDeployment: () => void
 	setShowBuild: (state: boolean) => void;
 	showBuild: boolean
@@ -19,13 +20,13 @@ interface TabProjectProps {
 }
 
 
-const TabProject = ({ project, deployment, onCreateDeployment, setShowBuild, showBuild, setTabs, reDeploy }: TabProjectProps) => {
+const TabProject = ({ project, deployment, tempDeployment, onCreateDeployment, setShowBuild, showBuild, setTabs, reDeploy }: TabProjectProps) => {
 
 	return (
 		<>
 			<div className="dark:bg-neutral-900 border bg-white w-full rounded-md mb-6 mt-4 px-4 py-4">
 
-				{(!project.deployments || project.deployments.length === 0) && (
+				{(project.deployments && project.deployments.length === 0) && (
 					<NoDeployment onCreateDeployment={onCreateDeployment} />
 				)}
 
@@ -69,12 +70,23 @@ const TabProject = ({ project, deployment, onCreateDeployment, setShowBuild, sho
 				</div>
 			</div>
 
+			{project.tempDeployment && project.deployments && project.deployments?.length > 0 && tempDeployment && (
+				<ProjectCurrentDeployment
+					deployment={tempDeployment}
+					projectBranch={project.branch}
+					repoURL={project.repoURL}
+					showLogs={() => setShowBuild(true)}
+					isCurrent={false}
+				/>
+			)}
+
 			{project.deployments && project.deployments?.length > 0 && deployment && (
 				<ProjectCurrentDeployment
 					deployment={deployment}
 					projectBranch={project.branch}
 					repoURL={project.repoURL}
 					showLogs={() => setShowBuild(true)}
+					isCurrent={true}
 				/>
 			)}
 

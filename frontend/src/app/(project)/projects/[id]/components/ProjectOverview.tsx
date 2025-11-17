@@ -11,7 +11,7 @@ import { RxExternalLink } from "react-icons/rx";
 import { User } from "@/types/User";
 import { Project, ProjectStatus } from "@/types/Project";
 import Link from "next/link";
-import TechStack from "@/components/TechStack";
+import TechStack from "@/components/project/TechStack";
 import { getGithubBranchUrl, getGithubCommitUrl, getStatusColor, timeToSeconds } from "@/lib/utils";
 import StatusIcon, { AnimationBuild } from "@/components/ui/StatusIcon";
 import { toast } from "sonner"
@@ -144,7 +144,7 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, goToSett
 								Re Deploy < GrRotateRight className="text-green-400 group-hover:rotate-z-90 transition-all duration-300" />
 							</Button>
 						}
-						<Button variant={"secondary"} onClick={triggerReDeploy} className='border group px-4 py-2  rounded-lg text-sm font-medium  transition-colors'>
+						<Button variant={"secondary"} onClick={goToSettings} className='border group px-4 py-2  rounded-lg text-sm font-medium  transition-colors'>
 							Settings <IoSettingsOutline className="group-hover:translate-x-1.5 group-hover:rotate-z-45 transition-all duration-300" />
 						</Button>
 

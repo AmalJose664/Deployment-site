@@ -6,12 +6,14 @@ import { Deployment, DeploymentUpdates } from "@/types/Deployment";
 import { Log } from "@/types/Log";
 import { Project, ProjectStatus } from "@/types/Project";
 import { useEffect, useRef } from "react";
+import { toast } from "sonner";
 
 
 export function useDeploymentSSE(project: Project | undefined, refetch: () => void,
 	deployment?: Deployment,) {
 	const dispatch = useAppDispatch();
 	const eventSourceRef = useRef<EventSource | null>(null)
+	const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 	useEffect(() => {
 		if (!deployment?._id || !deployment.status) return
 		if (eventSourceRef.current) return
@@ -71,7 +73,7 @@ export function useDeploymentSSE(project: Project | undefined, refetch: () => vo
 									...(update.techStack && { techStack: update.techStack }),
 									...(update.status === ProjectStatus.READY && {
 										currentDeployment: update.deploymentId,
-										tempDeployment: null
+										// tempDeployment: null
 									})
 								}
 								Object.assign(draft, newData)
@@ -80,12 +82,18 @@ export function useDeploymentSSE(project: Project | undefined, refetch: () => vo
 					)
 					if (update.status === ProjectStatus.READY ||
 						update.status === ProjectStatus.FAILED || update.status === ProjectStatus.CANCELED) {
-						// refetch()
+						refreshTimerRef.current = setTimeout(() => {
+							console.log("refeching...........")
+							update.status === ProjectStatus.READY
+								? toast.success("New Deployment resulted in Success 🎉🎉")
+								: toast.error("New Deployment resulted in Failure")
+							refetch()
+						}, 1300)
 						console.log("end here .... ... .")
 					}
 				}
 			} catch (err) {
-				console.error("parse error:", err)
+				console.error("parse error:  ", err)
 			}
 		}
 
@@ -108,7 +116,7 @@ export function useDeploymentSSE(project: Project | undefined, refetch: () => vo
 
 		eventSource.addEventListener("done", () => {
 			eventSource.close();
-			console.log('SSE connection closed by server 22');
+			console.log('SSE connection closed by server');
 			eventSourceRef.current = null
 		})
 		eventSource.addEventListener("close", () => {
@@ -117,7 +125,11 @@ export function useDeploymentSSE(project: Project | undefined, refetch: () => vo
 			eventSourceRef.current = null
 		})
 
-		return () => { eventSource.close(); eventSourceRef.current = null }
-	}, [deployment?._id, deployment?.status, dispatch])
+		return () => {
+			eventSource.close(); eventSourceRef.current = null
+			console.log("closed sse.............")
+			if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current)
+		}
+	}, [deployment?._id, dispatch])
 	return null
 }

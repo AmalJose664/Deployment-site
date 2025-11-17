@@ -1,7 +1,7 @@
 'use client'
 
 import { ProjectFormInput } from "@/types/Project"
-import { useForm, useFieldArray, UseFormReturn } from "react-hook-form"
+import { useForm, } from "react-hook-form"
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ProjectFormSchema } from "@/lib/schema/project";
 import { AnimatePresence, motion } from "motion/react"
@@ -9,13 +9,14 @@ import { useEffect, useState } from "react";
 
 import { MdKeyboardArrowRight } from "react-icons/md";
 import { CiSettings } from "react-icons/ci";
-import axios from "axios";
+
 import { useCreateProjectMutation } from "@/store/services/projectsApi";
 import { useRouter } from "next/navigation";
 import { FaArrowLeft } from "react-icons/fa6";
 import { BaseSettings } from "./BasicDetails";
 import { AdvancedSettings } from "./AdvancedDetails";
 import { ConfigPreview } from "./ConfigPreview";
+import { getBranches, repoCheck } from "@/lib/form";
 
 
 function ProjectForm() {
@@ -37,24 +38,9 @@ function ProjectForm() {
 	const [createProject, { isLoading, isSuccess }] = useCreateProjectMutation()
 
 	const [showAdvanced, setShowAdvanced] = useState(false)
-	const [branches, setBranches] = useState<[string] | undefined>()
+	const [branches, setBranches] = useState<string[] | undefined>()
 
-	const repoCheck = async (fieldValue: string) => {
-		console.log("searching repo.....")
-		const values = fieldValue.replace(/\/$/, "").split("/")
-		const repoName = values[values.length - 1]
-		const user = values[values.length - 2]
-		if (!user || !repoName) return false
-		try {
-			const res = await axios.get("https://api.github.com/repos/" + user + "/" + repoName.replace(".git", ""))
-			const data = res.data
-			console.log(data, '<<<<')
-			return res.status === 200
-		} catch (error) {
 
-			return false
-		}
-	}
 	const { handleSubmit, formState,
 		watch
 	} = form
@@ -63,25 +49,9 @@ function ProjectForm() {
 	} = formState
 
 	const repoUrl = watch("repoURL")
-	const getBranches = async () => {
-		const repo = form.getValues("repoURL")
-		if (!repo) return
-		const values = repo.replace(/\/$/, "").split("/")
-		const repoName = values[values.length - 1].replace(".git", "")
-		const user = values[values.length - 2]
-		if (!user || !repoName) return
-		try {
-			const res = await axios.get(`https://api.github.com/repos/${user}/${repoName}/branches`)
-			const { data } = res
-			const newData = data.map((d: any) => d.name)
-			setBranches(newData)
-		} catch (error) {
-			console.log("Invalid git url")
-		}
-	}
-	useEffect(() => {
 
-		getBranches()
+	useEffect(() => {
+		getBranches(form.getValues("repoURL"), setBranches)
 	}, [repoUrl])
 
 

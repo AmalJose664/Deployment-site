@@ -65,4 +65,5 @@ export const deployemntApis = createApi({
 export const {
 	useCreateDeploymentMutation, useGetDeploymentFilesQuery,
 	useGetDeploymentByIdQuery, useGetProjectDeploymentsQuery,
-	useGetDeploymentsQuery } = deployemntApis
+	useGetDeploymentsQuery
+} = deployemntApis

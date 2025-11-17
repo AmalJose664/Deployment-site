@@ -58,7 +58,8 @@ class DeploymentEventHandler {
 				await projectService.__updateProjectById(projectId, {
 					status: updates.status as unknown as ProjectStatus,
 					techStack: updates.techStack,
-					...(updates.status === "READY" && { currentDeployment: deploymentId, tempDeployment: null })
+					tempDeployment: null,
+					...(updates.status === "READY" && { currentDeployment: deploymentId, })
 				});
 				break;
 			}

@@ -46,9 +46,10 @@ class DeploymentService implements IDeploymentService {
 		deploymentData.userId = correspondindProject.user;
 
 		const deployment = await this.deploymentRepository.createDeployment(deploymentData);
-		await this.projectRepository.pushToDeployments(correspondindProject.id, userId, deployment?.id);
+
+		console.log(await this.projectRepository.pushToDeployments(correspondindProject.id, userId, deployment?.id))
 		if (deployment?._id) {
-			// this.deployLocal(deployment?._id, projectId)
+			this.deployLocal(deployment?._id, projectId)
 		}
 		return deployment;
 	}

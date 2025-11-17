@@ -46,8 +46,8 @@ async function mongodbData() {
 		await connectDb();
 		const p = new P_repo()
 		const de = new D_repo()
-		// console.log(await Project.updateMany({ _id: "68fb1ccb10b93de245fa9f55" }, { $set: { currentDeployment: "69174b4b03eac77021fc8cff" } }),)
-
+		// console.log(await Project.updateMany({}, { $set: { currentDeployment: null, tempDeployment: null, deployments: [] } }),)
+		return
 		const project = await Project.findById("6915d856e9c778440b64bf8d").populate("deployments", "commit_hash")
 		const userId = "68e4a04f1e57fa3fe5b1a81e"
 		const user = await User.findById(userId)
@@ -84,7 +84,7 @@ async function mongodbData() {
 		process.exit(0);
 	}
 }
-// mongodbData()
+mongodbData()
 
 
 async function commitAllMessages() {

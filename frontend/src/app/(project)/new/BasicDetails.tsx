@@ -3,7 +3,7 @@
 
 import { Input } from "@/components/ui/input"
 import { ProjectFormInput } from "@/types/Project"
-import { UseFormReturn } from "react-hook-form"
+import { Controller, UseFormReturn } from "react-hook-form"
 
 import { LuGithub } from "react-icons/lu";
 import { IoIosGitBranch } from "react-icons/io";
@@ -62,18 +62,27 @@ export function BaseSettings({ form, branches }: {
 					<IoIosGitBranch />{" "}<span className="text-primary">Branch</span>
 				</label>
 
-				<Select {...register("branch")}>
-					<SelectTrigger className="w-full text-primary dark:placeholder:text-[#474747] placeholder:text-[#bdbdbd]">
-						<SelectValue placeholder="main" />
-					</SelectTrigger>
-					<SelectContent>
-						{branches ? branches.map((branch: string, index: number) => (
-							<SelectItem key={index} value={branch}>{branch}</SelectItem>
-						)) :
-							<SelectItem value={"main"}>{"main"}</SelectItem>
-						}
-					</SelectContent>
-				</Select>
+				<Controller
+					control={form.control}
+					name="branch"
+					render={({ field }) => (
+						<Select onValueChange={field.onChange} defaultValue={field.value}>
+							<SelectTrigger className="w-full text-primary dark:placeholder:text-[#474747] placeholder:text-[#bdbdbd]">
+								<SelectValue placeholder="main" />
+							</SelectTrigger>
+							<SelectContent>
+								{branches
+									? branches.map((branch, index) => (
+										<SelectItem key={index} value={branch}>
+											{branch}
+										</SelectItem>
+									))
+									: <SelectItem value="main">main</SelectItem>
+								}
+							</SelectContent>
+						</Select>
+					)}
+				/>
 				{errors.branch && <p className="text-sm text-red-500 mt-1">{errors.branch.message}</p>}
 			</div>
 		</div>

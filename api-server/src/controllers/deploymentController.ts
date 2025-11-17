@@ -63,6 +63,7 @@ class DeploymentController implements IDeploymentController {
 		try {
 			const userId = req.user?.id as string;
 			const deploymentId = req.params.deploymentId;
+
 			const result = await this.deploymentService.getDeploymentById(deploymentId, userId);
 			if (!result) {
 				res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ status: 404, error: "not_found" });

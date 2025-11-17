@@ -17,8 +17,7 @@ interface AllDeploymentProps {
 const AllDeployments = ({ projectId, repoURL, projectBranch, setTab }: AllDeploymentProps) => {
 
 	const { data: deployments, isLoading, isError, error } = useGetProjectDeploymentsQuery(projectId)
-	console.log(error)
-
+	console.log("re render")
 	return (
 		<div>
 			{isLoading && (

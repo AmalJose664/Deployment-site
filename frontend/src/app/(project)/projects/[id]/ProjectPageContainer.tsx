@@ -7,13 +7,14 @@ import { projectApis, useGetProjectByIdQuery } from "@/store/services/projectsAp
 import { deployemntApis, useCreateDeploymentMutation, useGetDeploymentByIdQuery } from "@/store/services/deploymentApi"
 
 import ProjectLoading from "./components/ProjectLoading"
-import ProjectError from "../../../../components/ProjectError"
+import ProjectError from "../../../../components/project/ProjectError"
 import { ProjectContent } from "./components/Content"
 import { useDeploymentSSE } from "@/hooks/useUpdatesSse"
 import { useGetDeploymentLogsQuery } from "@/store/services/logsApi"
 import { addLogs, clearLogs } from "@/store/slices/logSlice"
 import { ProjectStatus } from "@/types/Project"
 import { useAppDispatch } from "@/store/store"
+import { toast } from "sonner"
 
 interface ProjectPageContainerProps {
 	projectId: string
@@ -35,27 +36,28 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 	const [createDeployment, { }] = useCreateDeploymentMutation()
 	const [showBuild, setShowBuild] = useState(false)
 	const handleCreateDeployment = async () => {
+		toast.success("New Deployment Started")
 		await createDeployment(projectId)
-		await refetch()
 		setShowBuild(true)
+		await refetch()
 	}
 	const { data: tempDeployment } = useGetDeploymentByIdQuery(
 		{
-			id: project?.deployments?.length !== 0 && project?.tempDeployment
-				? project?.tempDeployment
-				: "",
+			id: project?.tempDeployment || "",
 			params: {},
 		},
-		{ skip: (project?.deployments?.length === 0 && !!project.tempDeployment) }
+		{
+			skip: !project?.tempDeployment
+		}
 	)
 	const { data: deployment } = useGetDeploymentByIdQuery(
 		{
-			id: project?.deployments?.length !== 0 && project?.currentDeployment
-				? project?.currentDeployment
-				: "",
+			id: project?.currentDeployment || "",
 			params: {},
 		},
-		{ skip: (project?.deployments?.length === 0 && !!project.currentDeployment) }
+		{
+			skip: !project?.currentDeployment
+		}
 	)
 	const { data: initialLogs } = useGetDeploymentLogsQuery(
 		{ deploymentId: deployment?._id ?? "" },
@@ -84,20 +86,9 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 				}
 			)
 		)
-		dispatch(
-			deployemntApis.util.updateQueryData(
-				"getDeploymentById",
-				{ id: deployment._id, params: {} },
-				(draft) => {
-					const newData = {
-						status: ProjectStatus.QUEUED,
-					}
-					Object.assign(draft, newData)
-				}
-			)
-		)
-		await handleCreateDeployment()
 
+		await handleCreateDeployment()
+		await refetch()
 	}
 
 
@@ -117,6 +108,7 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 		<ProjectContent
 			project={project}
 			deployment={deployment}
+			tempDeployment={tempDeployment}
 			tabFromUrl={tab}
 			refetch={refetch}
 			reDeploy={reDeploy}

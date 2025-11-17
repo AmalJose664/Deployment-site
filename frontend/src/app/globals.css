@@ -54,7 +54,7 @@ button {
 
 :root {
 	--radius: 0.625rem;
-
+	--background: #d73232;
 	--less: #5e5e5e;
 	--some-less: #272727;
 	--card: oklch(1 0 0);
@@ -86,7 +86,7 @@ button {
 	--sidebar-accent-foreground: oklch(0.205 0 0);
 	--sidebar-border: oklch(0.922 0 0);
 	--sidebar-ring: oklch(0.708 0 0);
-	--background: oklch(1 0 0);
+	--background: oklch(0.9702 0 0);
 	--foreground: oklch(0.145 0 0);
 }
 .dark {
@@ -167,6 +167,7 @@ button {
 		@apply text-primary hover:underline hover:text-primary/80;
 	}
 }
+
 .logs-container-build {
 	@apply [&::-webkit-scrollbar]:w-2
     [&::-webkit-scrollbar-track]:rounded-full

@@ -14,14 +14,15 @@ interface ProjectDeploymentProps {
 	projectBranch: string;
 	repoURL: string
 	showLogs: () => void
+	isCurrent: boolean
 }
 
-const ProjectCurrentDeployment = ({ deployment, projectBranch, repoURL, showLogs }: ProjectDeploymentProps) => {
+const ProjectCurrentDeployment = ({ deployment, projectBranch, repoURL, showLogs, isCurrent }: ProjectDeploymentProps) => {
 
 	return (
-		<div className="border  rounded-xl overflow-hidden dark:bg-neutral-900 bg-white">
+		<div className="border  rounded-xl overflow-hidden dark:bg-neutral-900 bg-white mb-4">
 			<div className="px-6 py-4 border-b border-gray-800">
-				<h2 className="text-lg font-semibold">Current Deployment</h2>
+				<h2 className="text-lg font-semibold">{isCurrent ? "Current" : "Progress"} Deployment</h2>
 			</div>
 
 
