@@ -11,8 +11,24 @@ const projectRouter = Router();
 projectRouter.get("/", authenticateToken, validateQuery(ProjectQueryScheme), projectController.getAllProjects.bind(projectController));
 projectRouter.post("/", authenticateToken, validateBody(CreateProjectSchema), projectController.createProject.bind(projectController));
 
-projectRouter.get("/:projectId", authenticateToken, validateObjectId("projectId"), projectController.getProject.bind(projectController));
-projectRouter.delete("/:projectId", authenticateToken, validateObjectId("projectId"), projectController.deleteProject.bind(projectController));
+projectRouter.get("/:projectId",
+	authenticateToken,
+	validateObjectId("projectId"),
+	projectController.getProject.bind(projectController)
+);
+projectRouter.patch(
+	"/:projectId",
+	authenticateToken,
+	validateObjectId("projectId"),
+	validateBody(CreateProjectSchema.omit({ repoURL: true })),
+	projectController.updateProject.bind(projectController)
+);
+projectRouter.delete(
+	"/:projectId",
+	authenticateToken,
+	validateObjectId("projectId"),
+	projectController.deleteProject.bind(projectController)
+);
 
 projectRouter.get(
 	"/:projectId/deployments",

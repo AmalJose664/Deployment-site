@@ -87,7 +87,7 @@ export function ProjectContent({
 						<AllDeployments projectId={project._id} projectBranch={project.branch} repoURL={project.repoURL} setTab={() => setTabs("project")} />
 					</TabsContent>
 					<TabsContent value="settings">
-						<ProjectSettings project={project} />
+						<ProjectSettings project={project} reDeploy={reDeploy} />
 					</TabsContent>
 					<TabsContent value="analytics">
 						<ProjectAnalytics projectId={project._id} />

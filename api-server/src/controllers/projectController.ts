@@ -63,6 +63,24 @@ class ProjectController implements IProjectController {
 			next(err);
 		}
 	}
+	async updateProject(req: Request, res: Response, next: NextFunction): Promise<void> {
+		try {
+
+			const userId = req.user?.id as string;
+			const projectId = req.params.projectId;
+			const dto = req.validatedBody as Omit<CreateProjectDTO, "repoURL">;
+
+			const result = await this.projectService.updateProject(projectId, userId, dto)
+			if (!result) {
+				res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ project: null });
+				return;
+			}
+			const response = ProjectMapper.toProjectResponse(result);
+			res.status(HTTP_STATUS_CODE.OK).json(response);
+		} catch (err) {
+			next(err);
+		}
+	}
 	async deleteProject(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
 			const userId = req.user?.id as string;

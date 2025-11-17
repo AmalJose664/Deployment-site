@@ -57,6 +57,15 @@ class ProjectService implements IProjectService {
 
 		return project;
 	}
+	async updateProject(id: string, userId: string, data: Partial<IProject>): Promise<IProject | null> {
+		const user = await this.userRepository.findByUserId(userId);
+		await new Promise((res) => setTimeout(res, 3000))
+		if (!user) {
+			throw new AppError("User not found", 404);
+		}
+		const project = await this.projectRepository.updateProject(id, userId, data);
+		return project;
+	}
 
 	async deleteProject(projectId: string, userId: string): Promise<boolean> {
 		const user = this.userRepository.findByUserId(userId);

@@ -78,7 +78,7 @@ function ProjectForm() {
 
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-background dark:via-neutral-800 via-neutral-100 to-background  text-primary">
+		<div className="min-h-screen bg-linear-to-br from-background dark:via-neutral-800 via-neutral-100 to-background  text-primary">
 			<header className="border-b border-gray-800/50 backdrop-blur-xl  sticky top-0 z-10">
 				<div className="max-w-7xl mx-auto px-8 py-2">
 					<div className="flex items-center gap-4">

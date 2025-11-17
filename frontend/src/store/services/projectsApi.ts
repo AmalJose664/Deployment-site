@@ -46,11 +46,24 @@ export const projectApis = createApi({
 				method: "DELETE",
 			}),
 			transformResponse: (data) => {
-				console.log(data, "from api")
 				return data as Project
 			},
 			invalidatesTags: (result, error, projectId) => ([
 				{ type: "Projects", id: projectId },
+				{ type: "Projects", id: "LIST" },
+			])
+		}),
+		updateProject: builder.mutation<Project, Partial<Project>>({
+			query: (project) => ({
+				url: "/projects/" + project._id,
+				method: "PATCH",
+				data: { ...project, _id: null }
+			}),
+			transformResponse: (data: any) => {
+				return data.project as Project
+			},
+			invalidatesTags: (result, error, project) => ([
+				{ type: "Projects", id: project._id },
 				{ type: "Projects", id: "LIST" },
 			])
 		})
@@ -59,6 +72,10 @@ export const projectApis = createApi({
 
 
 export const {
-	useGetProjectsQuery, useCreateProjectMutation, useGetProjectByIdQuery, useDeleteProjectMutation
+	useGetProjectsQuery,
+	useCreateProjectMutation,
+	useGetProjectByIdQuery,
+	useDeleteProjectMutation,
+	useUpdateProjectMutation
 } = projectApis;
 
