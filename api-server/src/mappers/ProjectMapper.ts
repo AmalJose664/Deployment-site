@@ -5,7 +5,7 @@ import { IUser } from "../models/User.js";
 interface ProjectResponseDTO {
 	project: {
 		_id: string;
-		user: any; //string | Types.ObjectId | { _id: string, name: string; email: string, profileImage: string };
+		user: string | { _id: string, name: string; email: string, profileImage: string };
 		name: string;
 		repoURL: string;
 		subdomain: string;
@@ -17,6 +17,7 @@ interface ProjectResponseDTO {
 		outputDirectory: string;
 		currentDeployment: string | null;
 		tempDeployment: string | null;
+		isDisabled: boolean;
 		env: {
 			name: string;
 			value: string;
@@ -40,7 +41,7 @@ type ProjectResponseWithUserDTO = Omit<IProject, "user"> & {
 	user: any;
 };
 export class ProjectMapper {
-	static toProjectResponse(project: ProjectResponseWithUserDTO, userFill: boolean = false): ProjectResponseDTO {
+	static toProjectResponse(project: ProjectResponseWithUserDTO,): ProjectResponseDTO {
 		return {
 			project: {
 				_id: project._id,
@@ -57,14 +58,15 @@ export class ProjectMapper {
 				currentDeployment: project.currentDeployment,
 				tempDeployment: project.tempDeployment,
 				subdomain: project.subdomain,
-				user: !userFill
-					? project.user.toString()
-					: {
+				isDisabled: project.isDisabled,
+				user: this.isPopulatedObject(project.user)
+					? {
 						_id: project.user._id,
 						name: project.user.name,
 						email: project.user.email,
 						profileImage: project.user.profileImage,
-					},
+					}
+					: project.user.toString(),
 				deployments: project.deployments?.map((d) => d.toString()),
 				lastDeployedAt: project.lastDeployedAt,
 				createdAt: project.createdAt,
@@ -81,5 +83,8 @@ export class ProjectMapper {
 				totalPages: Math.ceil(total / limit),
 			},
 		};
+	}
+	static isPopulatedObject(object: any): boolean {
+		return 'email' in object && 'name' in object;
 	}
 }

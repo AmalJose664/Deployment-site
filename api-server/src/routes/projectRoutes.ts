@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authenticateToken } from "../middlewares/authMiddleware.js";
 import { validateBody, validateQuery } from "../middlewares/validateRequest.js";
-import { CreateProjectSchema, ProjectQueryScheme } from "../dtos/project.dto.js";
+import { CreateProjectSchema, ProjectQueryScheme, UpdateProjectScheme } from "../dtos/project.dto.js";
 import { deploymentController, logsController, projectController } from "../instances.js";
 import { validateObjectId } from "../middlewares/validateObjectId.js";
 import { DeploymentQueryScheme } from "../dtos/deployment.dto.js";
@@ -20,7 +20,7 @@ projectRouter.patch(
 	"/:projectId",
 	authenticateToken,
 	validateObjectId("projectId"),
-	validateBody(CreateProjectSchema.omit({ repoURL: true })),
+	validateBody(UpdateProjectScheme),
 	projectController.updateProject.bind(projectController)
 );
 projectRouter.delete(

@@ -24,9 +24,16 @@ export async function checkProject(req: Request, res: Response, next: NextFuncti
 
 		const project = await projectService.findProjectBySlug(slug);
 
-		if (!project) {
+		if (!project || project.isDeleted) {
 			res.status(404).json({
 				error: 'Project not found',
+				slug
+			});
+			return
+		}
+		if (project.isDisabled) {
+			res.status(404).json({
+				error: 'Project not accesible, Project disabled',
 				slug
 			});
 			return

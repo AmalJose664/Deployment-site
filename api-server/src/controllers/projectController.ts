@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { IProjectController } from "../interfaces/controller/IProjectController.js";
 import ProjectService from "../services/project.service.js";
 import { HTTP_STATUS_CODE } from "../utils/statusCodes.js";
-import { CreateProjectDTO, QueryProjectDTO } from "../dtos/project.dto.js";
+import { CreateProjectDTO, QueryProjectDTO, UpdateProjectDTO } from "../dtos/project.dto.js";
 import { ProjectMapper } from "../mappers/ProjectMapper.js";
 import AppError from "../utils/AppError.js";
 
@@ -57,7 +57,7 @@ class ProjectController implements IProjectController {
 				res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ project: null });
 				return;
 			}
-			const response = ProjectMapper.toProjectResponse(result, userFill);
+			const response = ProjectMapper.toProjectResponse(result);
 			res.status(HTTP_STATUS_CODE.OK).json(response);
 		} catch (err) {
 			next(err);
@@ -68,7 +68,7 @@ class ProjectController implements IProjectController {
 
 			const userId = req.user?.id as string;
 			const projectId = req.params.projectId;
-			const dto = req.validatedBody as Omit<CreateProjectDTO, "repoURL">;
+			const dto = req.validatedBody as UpdateProjectDTO;
 
 			const result = await this.projectService.updateProject(projectId, userId, dto)
 			if (!result) {

@@ -32,10 +32,11 @@ class DeploymentController implements IDeploymentController {
 		try {
 			const userId = req.user?.id as string;
 			const deploymentId = req.params.deploymentId;
+			const fillProject = req.query.project
 
 			const result = await this.deploymentService.getDeploymentById(deploymentId, userId);
 			if (result) {
-				const response = DeploymentMapper.toDeploymentResponse(result);
+				const response = DeploymentMapper.toDeploymentResponse(result,);
 				res.status(HTTP_STATUS_CODE.OK).json(response);
 				return;
 			}
@@ -49,6 +50,7 @@ class DeploymentController implements IDeploymentController {
 		try {
 			const userId = req.user?.id as string;
 			const query = req.validatedQuery as QueryDeploymentDTO;
+
 			const projectId = req.params.projectId;
 
 			const result = await this.deploymentService.getProjectDeployments(userId, projectId, query);
@@ -80,13 +82,8 @@ class DeploymentController implements IDeploymentController {
 			const userId = req.user?.id as string;
 			const query = req.validatedQuery as QueryDeploymentDTO;
 
-			const result = await this.deploymentService.getAllDeployments(userId, {
-				page: query.page,
-				limit: query.limit,
-				status: query.status,
-				search: query.search,
-			});
-			const response = DeploymentMapper.toDeploymentsResponse(result.deployments, result.total, query.page, query.limit);
+			const result = await this.deploymentService.getAllDeployments(userId, query);
+			const response = DeploymentMapper.toDeploymentsResponse(result.deployments, result.total, query.page, query.limit,);
 			res.status(HTTP_STATUS_CODE.OK).json(response);
 		} catch (error) {
 			next(error);
@@ -113,11 +110,9 @@ class DeploymentController implements IDeploymentController {
 	async __getDeployment(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
 			const deploymentId = req.params.id;
-			console.log("triyng");
 			const deployment = await this.deploymentService.__getDeploymentById(deploymentId);
-			console.log("finded");
 			if (deployment) {
-				const response = DeploymentMapper.toDeploymentResponse(deployment);
+				const response = DeploymentMapper.toDeploymentResponse(deployment,);
 				res.status(HTTP_STATUS_CODE.OK).json(response);
 				return;
 			}

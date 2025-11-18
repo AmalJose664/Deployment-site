@@ -17,7 +17,7 @@ class AnalyticsService implements IAnalyticsService {
 		this.kafkaProducer = producer
 		this.kafkaTopic = topic
 		this.FLUSH_INTERVAL_REF = setInterval(this.sendAnalyticsBatch.bind(this), this.FLUSH_INTERVAL);
-		// this.kafkaProducer.connect()
+		this.kafkaProducer.connect()
 	}
 
 	async sendAnalyticsBatch(): Promise<void> {

@@ -46,6 +46,14 @@ export const ProjectFormSchema = z.object({
 		.string()
 		.trim()
 		.min(1, "Root directory cannot be empty")
+		.regex(
+			/^\/(?!\.\.)[a-zA-Z0-9\/_-]*$/,
+			"Path must start with / and contain only alphanumeric characters, hyphens, underscores, and forward slashes"
+		)
+		.refine(
+			(path) => !path.includes('..') && !['/etc', '/root', '/sys', '/proc', '/dev'].some(dir => path.startsWith(dir)),
+			"Invalid or restricted path"
+		)
 		.default("/")
 		.catch("/")
 		.optional(),

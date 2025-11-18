@@ -57,13 +57,26 @@ class ProjectService implements IProjectService {
 
 		return project;
 	}
-	async updateProject(id: string, userId: string, data: Partial<IProject>): Promise<IProject | null> {
+	async updateProject(id: string, userId: string, dto: Partial<IProject>): Promise<IProject | null> {
 		const user = await this.userRepository.findByUserId(userId);
-		await new Promise((res) => setTimeout(res, 3000))
 		if (!user) {
 			throw new AppError("User not found", 404);
 		}
-		const project = await this.projectRepository.updateProject(id, userId, data);
+		const newData: Partial<IProject> = {
+			...(dto.name && { name: dto.name }),
+			...(dto.branch && { branch: dto.branch }),
+			...(dto.installCommand && { installCommand: dto.installCommand }),
+			...(dto.buildCommand && { buildCommand: dto.buildCommand }),
+			...(dto.rootDir && { rootDir: dto.rootDir }),
+			...(dto.outputDirectory && { outputDirectory: dto.outputDirectory }),
+			...((dto.hasOwnProperty('isDisabled')) && { isDisabled: dto.isDisabled }),
+			...(dto.env?.length && { env: dto.env.map((en) => ({ name: en.name, value: en.value })) })
+		}
+		console.log(newData, dto)
+		if (!newData || Object.keys(newData).length === 0) {
+			return null
+		}
+		const project = await this.projectRepository.updateProject(id, userId, newData);
 		return project;
 	}
 

@@ -1,10 +1,10 @@
-import { ProjectStatus } from "./Project";
+import { Project, ProjectStatus } from "./Project";
 import { User } from "./User";
 
 export interface Deployment {
 	_id: string;
-	project: string;
-	commitHash: string;
+	project: Partial<Project> | string;
+	commit: { id: string, msg: string };
 	userId: string;
 	status: ProjectStatus;
 	performance: {

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 
 import { projectApis, useGetProjectByIdQuery } from "@/store/services/projectsApi"
-import { deployemntApis, useCreateDeploymentMutation, useGetDeploymentByIdQuery } from "@/store/services/deploymentApi"
+import { useCreateDeploymentMutation, useGetDeploymentByIdQuery } from "@/store/services/deploymentApi"
 
 import ProjectLoading from "./components/ProjectLoading"
 import ProjectError from "../../../../components/project/ProjectError"
@@ -73,6 +73,7 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 	useDeploymentSSE(project, refetch, tempDeployment,)
 
 	const reDeploy = async () => {
+
 		if (!project || !deployment) return
 		dispatch(
 			projectApis.util.updateQueryData(
@@ -86,9 +87,7 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 				}
 			)
 		)
-
 		await handleCreateDeployment()
-		await refetch()
 	}
 
 

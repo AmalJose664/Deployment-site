@@ -29,7 +29,7 @@ function ProjectForm() {
 			branch: "main",
 			installCommand: "install",
 			buildCommand: "build",
-			rootDir: "./",
+			rootDir: "/",
 			outputDirectory: 'dist'
 		},
 

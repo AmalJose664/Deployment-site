@@ -91,7 +91,11 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, goToSett
 									<FiGitCommit className='size-4 text-less' />
 								</div>
 								<div>
-									<Link target="_blank" href={getGithubCommitUrl(project.repoURL, deployment?.commitHash || "")} className='text-sm font-medium hover:underline'>{deployment?.commitHash || ""}</Link>
+									<Link target="_blank" href={getGithubCommitUrl(project.repoURL, deployment?.commit.id || "")} className='text-sm flex gap-2 items-center font-medium hover:underline'>
+										{deployment?.commit.id.slice(0, 10) + "..." || ""}
+										<p className="text-xl">/</p>
+										{deployment?.commit.msg}
+									</Link>
 								</div>
 							</div>
 						</div>

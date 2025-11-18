@@ -23,7 +23,7 @@ interface ProjectContentProps {
 	showBuild: boolean
 	setShowBuild: (state: boolean) => void;
 	tabFromUrl?: string
-	reDeploy: () => void;
+	reDeploy: () => Promise<void>;
 	onCreateDeployment: () => void
 }
 
@@ -84,10 +84,10 @@ export function ProjectContent({
 						/>
 					</TabsContent>
 					<TabsContent value="deployments">
-						<AllDeployments projectId={project._id} projectBranch={project.branch} repoURL={project.repoURL} setTab={() => setTabs("project")} />
+						<AllDeployments projectId={project._id} currentDeployment={project.currentDeployment || ""} repoURL={project.repoURL} setTab={() => setTabs("project")} />
 					</TabsContent>
 					<TabsContent value="settings">
-						<ProjectSettings project={project} reDeploy={reDeploy} />
+						<ProjectSettings project={project} reDeploy={reDeploy} setTabs={setTabs} />
 					</TabsContent>
 					<TabsContent value="analytics">
 						<ProjectAnalytics projectId={project._id} />

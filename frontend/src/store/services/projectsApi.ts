@@ -54,11 +54,15 @@ export const projectApis = createApi({
 			])
 		}),
 		updateProject: builder.mutation<Project, Partial<Project>>({
-			query: (project) => ({
-				url: "/projects/" + project._id,
-				method: "PATCH",
-				data: { ...project, _id: null }
-			}),
+			query: (project) => {
+				const fields = { ...project, projectId: project._id }
+				delete fields._id
+				return {
+					url: "/projects/" + project._id,
+					method: "PATCH",
+					data: fields,
+				}
+			},
 			transformResponse: (data: any) => {
 				return data.project as Project
 			},

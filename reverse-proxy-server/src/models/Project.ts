@@ -25,12 +25,13 @@ export interface IProject extends Document {
 	rootDir: string;
 	outputDirectory: string;
 	currentDeployment: string | null;
+	tempDeployment: string | null;
 	env: IEnvVar[];
 	lastDeployedAt?: Date;
 	status: ProjectStatus;
 	deployments?: Types.ObjectId[];
 	isDeleted: boolean;
-
+	isDisabled: boolean;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -44,13 +45,15 @@ const projectSchema = new Schema<IProject>(
 		buildCommand: { type: String, required: true, default: "build" },
 		branch: { type: String, required: true, default: "main" },
 		rootDir: { type: String, required: true, default: "/" },
-		installCommand: { type: String, required: true, default: "npm install" },
+		installCommand: { type: String, required: true, default: "install" },
 		techStack: { type: String },
 		outputDirectory: { type: String, required: true, default: "dist" },
-		currentDeployment: { type: String, },
+		currentDeployment: { type: String, default: null },
+		tempDeployment: { type: String, default: null },
 		env: [{ name: String, value: String }],
 		lastDeployedAt: { type: Date, default: Date.now() },
 		isDeleted: { type: Boolean, default: false },
+		isDisabled: { type: Boolean, default: false },
 		status: {
 			type: String,
 			required: true,

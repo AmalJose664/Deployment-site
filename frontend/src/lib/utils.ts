@@ -46,6 +46,8 @@ export const getStatusBg = (status: string) => {
 	switch (status) {
 		case 'READY':
 			return 'bg-emerald-500';
+		case 'QUEUED':
+			return 'bg-amber-300';
 		case 'BUILDING':
 			return 'bg-amber-500';
 		case 'FAILED':

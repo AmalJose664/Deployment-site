@@ -1,10 +1,12 @@
+import { Types } from "mongoose";
 import { IDeployment } from "../models/Deployment.js";
+import { IProject } from "../models/Projects.js";
 
 interface toDeploymentResponseDTO {
 	deployment: {
 		_id: string;
-		project: string;
-		commitHash: string;
+		project: string | { name: string, _id: string, subdomain: string, branch: string };
+		commit: { id: string, msg: string };
 		userId: string;
 		status: "NOT_STARTED" | "QUEUED" | "BUILDING" | "READY" | "FAILED" | "CANCELLED";
 		performance: {
@@ -41,15 +43,30 @@ interface toDeploymentsResponseDTO {
 		totalPages: number;
 	};
 }
+const ar = [
+	"NOT_STARTED",
+	"QUEUED",
+	"BUILDING",
+	"READY",
+	"FAILED",
+	"CANCELLED"
+]
 export class DeploymentMapper {
 	static toDeploymentResponse(deployment: IDeployment): toDeploymentResponseDTO {
 		return {
 			deployment: {
-				_id: deployment._id,
-				project: deployment.project.toString(),
-				commitHash: deployment.commit_hash,
+				_id: deployment._id + "___" + Math.random().toString(36).slice(2, 12),
+				project: this.isPopulatedObject(deployment.project)
+					? {
+						name: (deployment.project as any).name,
+						_id: (deployment.project as any)._id,
+						subdomain: (deployment.project as any).subdomain,
+						branch: (deployment.project as any).branch
+					}
+					: deployment.project.toString(),
+				commit: { msg: deployment.commit_hash.split("||")[1], id: deployment.commit_hash.split("||")[0] },
 				userId: deployment.userId.toString(),
-				status: deployment.status,
+				status: ar[Math.floor(Math.random() * ar.length)] as any,
 				performance: {
 					installTime: deployment.install_ms,
 					buildTime: deployment.build_ms,
@@ -66,8 +83,10 @@ export class DeploymentMapper {
 	}
 
 	static toDeploymentsResponse(deployments: IDeployment[], total: number, page: number, limit: number): toDeploymentsResponseDTO {
+		const newDe = [...deployments, ...deployments, ...deployments, ...deployments, ...deployments, ...deployments, ...deployments, ...deployments, ...deployments,]
+
 		return {
-			deployments: deployments.map((dep) => this.toDeploymentResponse(dep).deployment),
+			deployments: newDe.map((dep) => this.toDeploymentResponse(dep).deployment),
 			pagination: {
 				total,
 				page,
@@ -76,7 +95,9 @@ export class DeploymentMapper {
 			},
 		};
 	}
-
+	static isPopulatedObject(project: any): boolean {
+		return 'name' in project && 'branch' in project;
+	}
 	static toDeploymentSummary(deployment: IDeployment) {
 		// INCLUDE TYPES
 		return {

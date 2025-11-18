@@ -19,12 +19,7 @@ class DeploymentRepository extends BaseRepository<IDeployment> implements IDeplo
 	}
 	async findAllDeployments(
 		userId: string,
-		query: {
-			page: number;
-			limit: number;
-			status?: DeploymentStatus;
-			search?: string;
-		},
+		query: QueryDeploymentDTO,
 	): Promise<{ deployments: IDeployment[]; total: number }> {
 		let dbQuery: FilterQuery<IDeployment> = { userId };
 		if (query.search) {
@@ -33,11 +28,13 @@ class DeploymentRepository extends BaseRepository<IDeployment> implements IDeplo
 		if (query.status) {
 			dbQuery.status = { $eq: query.status };
 		}
-
-		const deployments = await this.findMany(dbQuery)
+		let deploymentsQuery = this.findMany(dbQuery)
 			.limit(query.limit)
-			.skip((query.page - 1) * query.limit)
-			.exec();
+			.skip((query.page - 1) * query.limit);
+		if (query.project) {
+			deploymentsQuery = deploymentsQuery.populate("project", "name branch subdomain");
+		}
+		const deployments = await deploymentsQuery.sort("-_id").exec();
 		const total = await this.count(dbQuery);
 		return { deployments, total };
 	}
@@ -54,10 +51,13 @@ class DeploymentRepository extends BaseRepository<IDeployment> implements IDeplo
 		if (query.status) {
 			dbQuery.status = { $eq: query.status };
 		}
-		const deployments = await this.findMany(dbQuery)
+		let deploymentsQuery = this.findMany(dbQuery)
 			.limit(query.limit)
-			.skip((query.page - 1) * query.limit)
-			.exec();
+			.skip((query.page - 1) * query.limit);
+		if (query.project) {
+			deploymentsQuery = deploymentsQuery.populate("project", "name branch subdomain");
+		}
+		const deployments = await deploymentsQuery.sort("-_id").exec();
 		const total = await this.count(dbQuery);
 		return { deployments, total };
 	}

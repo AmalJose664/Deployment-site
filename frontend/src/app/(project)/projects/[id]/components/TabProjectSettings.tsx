@@ -1,9 +1,14 @@
+import { LuEye } from "react-icons/lu";
+import { IoClipboardOutline } from "react-icons/io5";
+import { IoIosClose } from "react-icons/io";
+import { FaPlus } from "react-icons/fa";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
+
 import { Input } from "@/components/ui/input"
 import { Project, ProjectFormInput } from "@/types/Project"
 import { User } from "@/types/User"
 import { JSX, memo, useMemo, useState } from "react"
-import { LuEye } from "react-icons/lu";
-import { IoClipboardOutline } from "react-icons/io5";
+
 import DisableProject from "@/components/project/DisableProject";
 import { DeleteProjectDialog } from "@/components/project/DeleteProject";
 import { toast } from "sonner"
@@ -14,10 +19,7 @@ import { Controller, useFieldArray, useForm, UseFormReturn, useFormState, useWat
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getBranches } from "@/lib/form";
-import { IoIosClose } from "react-icons/io";
-import { FaPlus } from "react-icons/fa";
 import { useUpdateProjectMutation } from "@/store/services/projectsApi";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 
 
@@ -106,7 +108,6 @@ const Details = ({ project, form, branches }: { project: Project, form: UseFormR
 			/>
 		);
 	});
-	console.log("re render basics")
 	return (
 
 		<div className="dark:bg-neutral-900 bg-white rounded-md py-3 px-5 border mb-3">
@@ -212,7 +213,6 @@ const Configurations = ({ project, form }: { project: Project, form: UseFormRetu
 	const installCommand = useWatch({ control: form.control, name: 'installCommand' })
 	const outputDirectory = useWatch({ control: form.control, name: 'outputDirectory' })
 
-	console.log("re render config")
 	return (
 		<div className="dark:bg-neutral-900 bg-white rounded-md py-3 px-5 border mb-3">
 			<h2 className="text-xl mb-2">Build Settings</h2>
@@ -319,7 +319,7 @@ const EnvVariables = ({ project, form }: { project: Project, form: UseFormReturn
 		changeMode(false)
 	}
 	const env = useWatch({ control: form.control, name: 'env' }) || []
-	console.log("re render envss")
+
 	return (
 
 		<div className="dark:bg-neutral-900 bg-white rounded-md py-3 px-5 border mb-3">
@@ -443,7 +443,7 @@ const SaveBar = memo(({ control, handleSubmit, saveAndDeploy }: { control: any, 
 })
 
 
-const ProjectSettings = ({ project, reDeploy }: { project: Project, reDeploy: () => void }) => {
+const ProjectSettings = ({ project, reDeploy, setTabs }: { project: Project, reDeploy: () => Promise<void>, setTabs: (state: string) => void }) => {
 
 	const [branches, setBranches] = useState<string[] | null>(null)
 	useMemo(() => getBranches(project.repoURL, setBranches), [project.repoURL])
@@ -462,11 +462,33 @@ const ProjectSettings = ({ project, reDeploy }: { project: Project, reDeploy: ()
 		),
 	});
 	const [updateProject, { isLoading, error, }] = useUpdateProjectMutation()
-	const { handleSubmit, } = form
+	const { handleSubmit, formState: { dirtyFields } } = form
+
+	function getDirtyValues<T extends Record<string, any>>(
+		dirty: Partial<Record<keyof T, boolean>>,
+		values: T
+	): Partial<T> {
+		const fields = Object.fromEntries(
+			Object.keys(dirty)
+				.map((key) =>
+					dirty[key as keyof T] === true
+						? [key, values[key as keyof T]]
+						: null
+				)
+				.filter((entry): entry is [string, T[keyof T]] => entry !== null)
+		) as Partial<T>;
+		if (values?.env?.length !== 0) {
+			(fields as any).env = values.env
+		}
+		return fields
+	}
 
 	const saveData = async (data: Omit<ProjectFormInput, "repoURL">) => {
 		try {
-			await updateProject({ _id: project._id, ...data }).unwrap()
+			const changed = getDirtyValues<Omit<ProjectFormInput, "repoURL">>(dirtyFields as any, data)
+			console.log({ changed, dirtyFields, data })
+
+			await updateProject({ _id: project._id, ...changed }).unwrap()
 			toast.success("Settings saved!")
 			form.reset(data)
 		} catch (error: any) {
@@ -476,10 +498,9 @@ const ProjectSettings = ({ project, reDeploy }: { project: Project, reDeploy: ()
 
 	const saveAndDeploy = async (data: Omit<ProjectFormInput, "repoURL">) => {
 		await saveData(data)
-		// await reDeploy()      // Then deploy
-		toast.success("Saved")
+		await reDeploy()
+		setTabs("project")
 	}
-	console.log("re render base")
 	return (
 		<div>
 			<div className="px-2 py-3">
@@ -517,7 +538,7 @@ const ProjectSettings = ({ project, reDeploy }: { project: Project, reDeploy: ()
 										Disable this project so that no one can access it.
 									</p>
 								</div>
-								<DisableProject projectId={project._id} />
+								<DisableProject projectId={project._id} isDisabled={project.isDisabled} />
 							</div>
 							<div className="flex items-center justify-between">
 								<div>
@@ -547,8 +568,8 @@ function RenderEnv({ env, index }: { env: Project['env'][number], index: number 
 		<div key={index} className="flex gap-2 items-center ">
 			<span style={{ fontFamily: "Consolas, 'Fira Code', 'Source Code Pro', monospace" }} className="border px-3 py-2 rounded-md ">{env.name}</span>
 			<Input readOnly className="w-auto text-primary" type={showEnv ? "text" : "password"} value={env.value} style={{ fontFamily: "Consolas, 'Fira Code', 'Source Code Pro', monospace" }} />
-			<button onClick={() => setShowEnv(!showEnv)}><LuEye /></button>
-			<button onClick={() => {
+			<button type="button" onClick={() => setShowEnv(!showEnv)}><LuEye className={showEnv ? "opacity-100" : "opacity-50"} /></button>
+			<button type="button" onClick={() => {
 				navigator.clipboard.writeText(env.value)
 				toast.info("Env value copied")
 			}}><IoClipboardOutline /></button>
