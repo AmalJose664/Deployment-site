@@ -15,12 +15,14 @@ class ProjectRepository extends BaseRepository<IProject> implements IProjectRepo
 		const savedProject = await project.save();
 		return savedProject;
 	}
-	async findProject(projectId: string, userId: string, userFill?: boolean): Promise<IProject | null> {
-		if (userFill) {
+	async findProject(projectId: string, userId: string, include?: string): Promise<IProject | null> {
+		if (include?.includes("user")) {
 			return await Project.findOne({ _id: projectId, user: userId, isDeleted: false }).populate("user", "name email profileImage");
 		}
 		return await Project.findOne({ _id: projectId, user: userId, isDeleted: false }); // 
 	}
+
+
 	async getAllProjects(userId: string, query: QueryProjectDTO): Promise<{ projects: IProject[]; total: number }> {
 		const dbQuery: FilterQuery<IProject> = { user: userId, isDeleted: false };
 		if (query.search) {
@@ -29,13 +31,14 @@ class ProjectRepository extends BaseRepository<IProject> implements IProjectRepo
 		if (query.status) {
 			dbQuery.status = { $eq: query.status };
 		}
-
-		const projects = await this.findMany(dbQuery)
+		let findQuery = this.findMany(dbQuery)
 			.limit(query.limit)
-			.skip((query.page - 1) * query.limit)
-			.exec();
+			.skip((query.page - 1) * query.limit);
+		if (query.include?.includes("user")) {
+			findQuery = findQuery.populate("user", "name email profileImage");
+		}
+		const projects = await findQuery.sort("-_id").exec();
 		const total = await this.count(dbQuery);
-
 		return { projects, total };
 	}
 

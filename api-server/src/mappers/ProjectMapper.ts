@@ -59,7 +59,7 @@ export class ProjectMapper {
 				tempDeployment: project.tempDeployment,
 				subdomain: project.subdomain,
 				isDisabled: project.isDisabled,
-				user: this.isPopulatedObject(project.user)
+				user: this.isPopulatedObject(project.user, ["profileImage", "email", "name"])
 					? {
 						_id: project.user._id,
 						name: project.user.name,
@@ -84,7 +84,8 @@ export class ProjectMapper {
 			},
 		};
 	}
-	static isPopulatedObject(object: any): boolean {
-		return 'email' in object && 'name' in object;
+	static isPopulatedObject(object: any, fields: string[]): boolean {
+		return object && fields.every((f) => f in object)
+		// return 'name' in object && 'branch' in object;
 	}
 }

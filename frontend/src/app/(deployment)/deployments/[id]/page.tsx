@@ -1,5 +1,5 @@
 import Navbar from "@/components/Navbar"
-import DeploymentPageContainer from "../DeploymentPageContainer";
+import DeploymentPageContainer from "./DeploymentPageContainer";
 
 export default async function Page({
 	params, searchParams

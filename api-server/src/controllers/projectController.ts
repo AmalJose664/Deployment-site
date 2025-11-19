@@ -35,9 +35,7 @@ class ProjectController implements IProjectController {
 	async getAllProjects(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
 			const userId = req.user?.id as string;
-
 			const query = req.validatedQuery as unknown as QueryProjectDTO;
-
 			const result = await this.projectService.getAllProjects(userId, query);
 			const response = ProjectMapper.toProjectsResponse(result.projects, result.total, query.page, query.limit);
 
@@ -50,9 +48,9 @@ class ProjectController implements IProjectController {
 		try {
 			const userId = req.user?.id as string;
 			const projectId = req.params.projectId;
-			const userFill = !!req.query.user;
+			const include = req.query.include as string;
 
-			const result = await this.projectService.getProjectById(projectId, userId, userFill);
+			const result = await this.projectService.getProjectById(projectId, userId, include);
 			if (!result) {
 				res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ project: null });
 				return;

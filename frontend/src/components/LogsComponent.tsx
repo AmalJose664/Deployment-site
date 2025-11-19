@@ -17,11 +17,13 @@ import { addLogs, clearLogs } from '@/store/slices/logSlice';
 import { formatLogTime, getLevelColor } from '@/lib/utils';
 import { useGetDeploymentLogsQuery } from '@/store/services/logsApi';
 
-interface LogsProps {
-	logsArray?: Log[]
+interface LogsComponentProps {
+	deploymentId: string,
+	refetch: () => void,
+	deploymentSpecificLogs?: Log[]
 }
 
-export function Logs({ deploymentId }: { deploymentId: string }) {
+export function Logs({ deploymentId, refetch, deploymentSpecificLogs }: LogsComponentProps) {
 	const dispatch = useDispatch()
 
 	const logs = useSelector((state: RootState) => state.logs)
@@ -32,16 +34,16 @@ export function Logs({ deploymentId }: { deploymentId: string }) {
 	const [autoScroll, setAutoScroll] = useState(true);
 	const listRef = useRef<ListType>(null);
 
+	const currentUsingLogs = deploymentSpecificLogs && deploymentSpecificLogs.length !== 0 ? deploymentSpecificLogs : logs
+
 	useEffect(() => {
 		if (autoScroll && listRef.current && filteredLogs.length > 0) {
 			listRef.current.scrollToRow(filteredLogs.length - 1);
 		}
 	}, [logs, autoScroll]);
 
-	const [logss, setLogs] = useState([])
 
-
-	const filteredLogs = (logss.length ? logss : logs).filter(log => {
+	const filteredLogs = currentUsingLogs.filter(log => {
 
 		if (!log) return false
 		const matchesFilter = filter === 'all' || log.level === filter;
@@ -53,7 +55,7 @@ export function Logs({ deploymentId }: { deploymentId: string }) {
 
 
 	const downloadLogs = () => {
-		const logText = logs.map(log =>
+		const logText = (currentUsingLogs).map(log =>
 			`[${log.timestamp}] [${log.level.toUpperCase()}] ${log.message}`
 		).join('\n');
 
@@ -72,8 +74,8 @@ export function Logs({ deploymentId }: { deploymentId: string }) {
 
 
 	const getFilterCount = (level: string) => {
-		if (level === 'all') return logs.length;
-		return logs.filter(log => log.level === level).length;
+		if (level === 'all') return currentUsingLogs.length;
+		return currentUsingLogs.filter(log => log.level === level).length;
 	};
 
 	const rowRenderer = ({ index, key, style }: any) => { // FIX TYPE
@@ -114,8 +116,9 @@ export function Logs({ deploymentId }: { deploymentId: string }) {
 							</div>
 							<div className="flex gap-1">
 								<button
+									onClick={refetch}
 									className="px-2 py-1 text-xs dark:bg-gray-900  dark:hover:bg-gray-800 hover:bg-gray-200 text-less  flex items-center gap-1"
-									title="Add test log"
+									title="Refetch Logs"
 								>
 									<LuRotateCw className="w-3 h-3" />
 								</button>
@@ -206,7 +209,7 @@ export function Logs({ deploymentId }: { deploymentId: string }) {
 					{/* Footer */}
 					<div className="border-t  px-3 py-1 dark:bg-neutral-950 bg-white">
 						<div className="flex justify-between text-xs text-gray-700">
-							<span>{filteredLogs.length} / {logs.length}</span>
+							<span>{filteredLogs.length} / {currentUsingLogs.length}</span>
 							<span>virtualized</span>
 						</div>
 					</div>

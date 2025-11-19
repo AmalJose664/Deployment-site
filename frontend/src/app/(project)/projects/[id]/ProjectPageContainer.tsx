@@ -59,7 +59,7 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 			skip: !project?.currentDeployment
 		}
 	)
-	const { data: initialLogs } = useGetDeploymentLogsQuery(
+	const { data: initialLogs, refetch: refetchLogs } = useGetDeploymentLogsQuery(
 		{ deploymentId: deployment?._id ?? "" },
 		{ skip: !deployment?._id }
 	)
@@ -115,6 +115,7 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 			showBuild={showBuild}
 			setShowBuild={setShowBuild}
 			onCreateDeployment={handleCreateDeployment}
+			refetchLogs={refetchLogs}
 		/>
 	)
 }

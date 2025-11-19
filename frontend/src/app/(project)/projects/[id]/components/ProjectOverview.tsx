@@ -38,7 +38,7 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, goToSett
 
 	return (
 		<>
-			<div className="flex flex-col items-stretch  sm:flex-row  md:flex-row gap-2 sm:gap-4 lg:gap-6 p-2 sm:p-4 lg:p-6 w-full h-full">
+			<div className="flex flex-col items-stretch sm:flex-row md:flex-row gap-2 sm:gap-4 lg:gap-6 p-1 sm:p-1 lg:p-1 w-full h-full">
 
 				<div className='flex flex-col justify-between w-3/5 border  rounded-xl p-6 shadow-sm'>
 

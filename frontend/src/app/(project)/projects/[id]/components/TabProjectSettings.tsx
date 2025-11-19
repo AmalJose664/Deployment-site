@@ -502,8 +502,8 @@ const ProjectSettings = ({ project, reDeploy, setTabs }: { project: Project, reD
 		setTabs("project")
 	}
 	return (
-		<div>
-			<div className="px-2 py-3">
+		<div className="">
+			<div className="">
 				<form className="flex flex-col gap-3 p-4" noValidate onSubmit={handleSubmit(saveData)}>
 					{isLoading && (
 						<motion.div

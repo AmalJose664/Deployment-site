@@ -1,13 +1,14 @@
 import { Types } from "mongoose";
 import { IDeployment } from "../models/Deployment.js";
 import { IProject } from "../models/Projects.js";
+import { IUser } from "../models/User.js";
 
 interface toDeploymentResponseDTO {
 	deployment: {
 		_id: string;
 		project: string | { name: string, _id: string, subdomain: string, branch: string };
 		commit: { id: string, msg: string };
-		userId: string;
+		user: string | Partial<IUser>;
 		status: "NOT_STARTED" | "QUEUED" | "BUILDING" | "READY" | "FAILED" | "CANCELLED";
 		performance: {
 			installTime: number;
@@ -43,20 +44,14 @@ interface toDeploymentsResponseDTO {
 		totalPages: number;
 	};
 }
-const ar = [
-	"NOT_STARTED",
-	"QUEUED",
-	"BUILDING",
-	"READY",
-	"FAILED",
-	"CANCELLED"
-]
+
 export class DeploymentMapper {
 	static toDeploymentResponse(deployment: IDeployment): toDeploymentResponseDTO {
+		console.log(deployment.user, " < ", deployment)
 		return {
 			deployment: {
-				_id: deployment._id + "___" + Math.random().toString(36).slice(2, 12),
-				project: this.isPopulatedObject(deployment.project)
+				_id: deployment._id,
+				project: this.isPopulatedObject(deployment.project, ["branch", "_id", "name"])
 					? {
 						name: (deployment.project as any).name,
 						_id: (deployment.project as any)._id,
@@ -65,8 +60,14 @@ export class DeploymentMapper {
 					}
 					: deployment.project.toString(),
 				commit: { msg: deployment.commit_hash.split("||")[1], id: deployment.commit_hash.split("||")[0] },
-				userId: deployment.userId.toString(),
-				status: ar[Math.floor(Math.random() * ar.length)] as any,
+				user: this.isPopulatedObject(deployment.user, ["profileImage", "email", "name"])
+					? {
+						name: (deployment.user as any).name,
+						profileImage: (deployment.user as any).profileImage,
+						email: (deployment.user as any).email,
+					}
+					: deployment.user.toString(),
+				status: deployment.status,
 				performance: {
 					installTime: deployment.install_ms,
 					buildTime: deployment.build_ms,
@@ -83,10 +84,8 @@ export class DeploymentMapper {
 	}
 
 	static toDeploymentsResponse(deployments: IDeployment[], total: number, page: number, limit: number): toDeploymentsResponseDTO {
-		const newDe = [...deployments, ...deployments, ...deployments, ...deployments, ...deployments, ...deployments, ...deployments, ...deployments, ...deployments,]
-
 		return {
-			deployments: newDe.map((dep) => this.toDeploymentResponse(dep).deployment),
+			deployments: deployments.map((dep) => this.toDeploymentResponse(dep).deployment),
 			pagination: {
 				total,
 				page,
@@ -95,8 +94,9 @@ export class DeploymentMapper {
 			},
 		};
 	}
-	static isPopulatedObject(project: any): boolean {
-		return 'name' in project && 'branch' in project;
+	static isPopulatedObject(object: any, fields: string[]): boolean {
+		return object && fields.every((f) => f in object)
+		// return 'name' in object && 'branch' in object;
 	}
 	static toDeploymentSummary(deployment: IDeployment) {
 		// INCLUDE TYPES

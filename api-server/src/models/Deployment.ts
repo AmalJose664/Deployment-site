@@ -20,7 +20,7 @@ export interface IDeployment extends Document {
 	_id: string;
 	project: Types.ObjectId;
 	commit_hash: string;
-	userId: Types.ObjectId;
+	user: Types.ObjectId;
 	status: DeploymentStatus;
 	install_ms: number;
 	build_ms: number;
@@ -38,7 +38,7 @@ const deploymentSchema = new Schema<IDeployment>(
 		project: { type: Schema.Types.ObjectId, ref: "Project", required: true },
 		status: { type: String, enum: Object.values(DeploymentStatus), default: DeploymentStatus.NOT_STARTED },
 		s3Path: { type: String, required: true },
-		userId: { type: Schema.Types.ObjectId, ref: "Project", required: true },
+		user: { type: Schema.Types.ObjectId, ref: "User", required: true },
 		commit_hash: { type: String, required: true },
 		install_ms: { type: Number, default: 0 },
 		build_ms: { type: Number, default: 0 },

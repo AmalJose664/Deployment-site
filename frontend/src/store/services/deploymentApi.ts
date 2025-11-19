@@ -9,28 +9,28 @@ export const deployemntApis = createApi({
 	}),
 	tagTypes: ['Deployments'],
 	endpoints: (builder) => ({
-		getDeployments: builder.query<Deployment[], {}>({
+		getDeployments: builder.query<{ data: Deployment[], meta: Record<string, any> }, {}>({
 			query: () => ({ url: '/deployments', method: 'get' }),
 			transformResponse: (data: any) => {
-				return data.deployments
+				return { data: data.deployments, meta: data.pagination }
 			},
 			providesTags: (result) =>
 				result
 					? [
-						...result.map(({ _id }) => ({ type: 'Deployments' as const, _id })),
+						...result.data.map(({ _id }) => ({ type: 'Deployments' as const, _id })),
 						{ type: 'Deployments', id: 'LIST' }
 					]
 					: [{ type: 'Deployments', id: 'LIST' }]
 		}),
-		getProjectDeployments: builder.query<Deployment[], { id: string, params?: Record<string, any> }>({
+		getProjectDeployments: builder.query<{ data: Deployment[], meta: Record<string, any> }, { id: string, params?: Record<string, any> }>({
 			query: ({ id, params }) => ({ url: `/projects/${id}/deployments`, method: 'get', params }),
 			transformResponse: (data: any) => {
-				return data.deployments
+				return { data: data.deployments, meta: data.pagination }
 			},
 			providesTags: (result, error, { id }) =>
 				result
 					? [
-						...result.map(({ _id }) => ({ type: 'Deployments' as const, _id })),
+						...result.data.map(({ _id }) => ({ type: 'Deployments' as const, _id })),
 						{ type: 'Deployments', id: `PROJECT_${id}` }
 					]
 					: [{ type: 'Deployments', id: `PROJECT_${id}` }]

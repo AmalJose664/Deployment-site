@@ -17,14 +17,16 @@ interface TabProjectProps {
 	showBuild: boolean
 	setTabs: (state: string) => void;
 	reDeploy: () => void;
+	refetchLogs: () => void;
+
 }
 
 
-const TabProject = ({ project, deployment, tempDeployment, onCreateDeployment, setShowBuild, showBuild, setTabs, reDeploy }: TabProjectProps) => {
+const TabProject = ({ project, deployment, tempDeployment, onCreateDeployment, setShowBuild, showBuild, setTabs, reDeploy, refetchLogs }: TabProjectProps) => {
 
 	return (
 		<>
-			<div className="dark:bg-neutral-900 border bg-white w-full rounded-md mb-6 mt-4 px-4 py-4">
+			<div className="dark:bg-neutral-900 border bg-white w-full rounded-md mb-6 mt-4 p-4">
 
 				{(project.deployments && project.deployments.length === 0) && (
 					<NoDeployment onCreateDeployment={onCreateDeployment} />
@@ -38,7 +40,7 @@ const TabProject = ({ project, deployment, tempDeployment, onCreateDeployment, s
 					goToSettings={() => setTabs("settings")}
 				/>
 
-				<div className="border dark:border-neutral-700 border-neutral-300 rounded-md">
+				<div className="border dark:border-neutral-700 mt-2 border-neutral-300 rounded-md">
 					<button
 						className="p-4 w-full"
 						onClick={() => setShowBuild(!showBuild)}
@@ -63,7 +65,7 @@ const TabProject = ({ project, deployment, tempDeployment, onCreateDeployment, s
 								transition={{ duration: 0.4, ease: "easeInOut" }}
 								className="dark:bg-stone-900 bg-stone-100 h-auto"
 							>
-								<Logs deploymentId={deployment?._id || ""} />
+								<Logs deploymentId={deployment?._id || ""} refetch={refetchLogs} />
 							</motion.div>
 						)}
 					</AnimatePresence>

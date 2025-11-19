@@ -11,7 +11,7 @@ export const DeploymentQueryScheme = z
 		page: z.coerce.number().int().positive().default(1),
 		limit: z.coerce.number().int().min(1).max(100).default(10),
 		search: z.string().max(100).optional().default(""),
-		project: z.string().optional()
+		include: z.string().optional(),
 	})
 	.strict();
 

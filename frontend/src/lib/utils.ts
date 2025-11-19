@@ -42,22 +42,26 @@ export const getGithubCommitUrl = (repoUrl: string, commitId: string) => {
 	return `${repoUrl}/commit/${commitId}`;
 };
 
-export const getStatusBg = (status: string) => {
+export const getStatusBg = (status: string): string[] => {
 	switch (status) {
 		case 'READY':
-			return 'bg-emerald-500';
+			return ['bg-emerald-500', 'bg-emerald-400', 'dark:bg-emerald-700 bg-emerald-300'];
+
 		case 'QUEUED':
-			return 'bg-amber-300';
+			return ['bg-amber-300', 'bg-amber-200', 'dark:bg-amber-500 bg-amber-200'];
+
 		case 'BUILDING':
-			return 'bg-amber-500';
+			return ['bg-amber-500', 'bg-amber-400', 'dark:bg-amber-700 bg-amber-400'];
+
 		case 'FAILED':
-			return 'bg-red-500';
 		case 'CANCELLED':
-			return 'bg-red-500';
+			return ['bg-red-500', 'bg-red-400', 'dark:bg-red-700 bg-red-400'];
+
 		default:
-			return 'bg-gray-500';
+			return ['bg-gray-500', 'bg-gray-400', 'dark:bg-gray-700 bg-gray-400'];
 	}
 };
+
 export const getStatusColor = (status: string) => {
 	switch (status.toLowerCase()) {
 		case 'ready':
@@ -94,6 +98,12 @@ export const formatLogTime = (time: string | Date) => {
 	return `${date.getMonth() + 1}/${date.getDate()} - ${hours}:${minutes}:${seconds} ${ampm}`
 }
 
+export const formatDuration = (ms: number) => {
+	const seconds = Math.floor(ms / 1000);
+	const minutes = Math.floor(seconds / 60);
+	const remainingSeconds = seconds % 60;
+	return minutes > 0 ? `${minutes}m ${remainingSeconds}s` : `${seconds}s`;
+};
 
 export const getRandomBlue = () => {
 	const min = 1;

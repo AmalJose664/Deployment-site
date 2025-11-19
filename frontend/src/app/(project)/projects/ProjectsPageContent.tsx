@@ -27,9 +27,6 @@ export default function ProjectContent() {
 
 	const { data: projects, error, isLoading, refetch } = useGetProjectsQuery({ search: debouncedSearch });
 
-	if ((!projects || projects.length === 0) && !projectSeachState && !debouncedSearch && !isLoading) {
-		return <ProjectEmptyState />
-	}
 
 	const filteredProjects = projectFilter === null || projectFilter.value === "" || !projectFilter.value
 		? projects
@@ -77,6 +74,9 @@ export default function ProjectContent() {
 			return projectFilter.value === ProjectStatus.FAILED || projectFilter.value === ProjectStatus.CANCELED;
 		}
 		return projectFilter?.value === tabValue;
+	}
+	if ((!projects || projects.length === 0) && !projectSeachState && !debouncedSearch && !isLoading) {
+		return <ProjectEmptyState />
 	}
 	return (
 		<div>
@@ -181,7 +181,7 @@ export default function ProjectContent() {
 
 									<div className="flex items-center justify-between pt-4 border-t text-less border-gray-800">
 										<div className="flex items-center gap-2">
-											<div className={`w-2 h-2 rounded-full ${getStatusBg(project.status)}`}></div>
+											<div className={`w-2 h-2 rounded-full ${getStatusBg(project.status)[0]}`}></div>
 											<span className="text-sm ">{project.status}</span>
 										</div>
 										<span className="text-xs border rounded-full  px-2.5 py-1  text-some-less">

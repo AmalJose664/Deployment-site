@@ -32,9 +32,9 @@ class DeploymentController implements IDeploymentController {
 		try {
 			const userId = req.user?.id as string;
 			const deploymentId = req.params.deploymentId;
-			const fillProject = req.query.project
+			const includesField = req.query.include as string
 
-			const result = await this.deploymentService.getDeploymentById(deploymentId, userId);
+			const result = await this.deploymentService.getDeploymentById(deploymentId, userId, includesField);
 			if (result) {
 				const response = DeploymentMapper.toDeploymentResponse(result,);
 				res.status(HTTP_STATUS_CODE.OK).json(response);
@@ -50,6 +50,7 @@ class DeploymentController implements IDeploymentController {
 		try {
 			const userId = req.user?.id as string;
 			const query = req.validatedQuery as QueryDeploymentDTO;
+
 
 			const projectId = req.params.projectId;
 

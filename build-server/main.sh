@@ -13,7 +13,7 @@ repoURL=$(echo $project | jq -r .repoURL)
 branch=$(echo $project | jq -r .branch)
 
 echo "cloning git repo.."
-git clone -b "$branch" "$repoURL" /home/app/output/
+git clone --filter=blob:none -b "$branch" "$repoURL" /home/app/output/
 # git clone "$GIT_REPO_URL" /home/app/output/
 
 

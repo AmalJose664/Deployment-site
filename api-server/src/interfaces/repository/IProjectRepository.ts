@@ -7,7 +7,7 @@ export interface IProjectRepository {
 	createProject(project: Partial<IProject>): Promise<IProject | null>;
 
 	getAllProjects(userId: string, query: QueryProjectDTO): Promise<{ projects: IProject[]; total: number }>;
-	findProject(projectId: string, userId: string, userFill?: boolean): Promise<IProject | null>;
+	findProject(projectId: string, userId: string, include?: string): Promise<IProject | null>;
 	deleteProject(projectId: string, userId: string): Promise<IProject | null>;
 	updateProject(projectId: string, userId: string, updateData: Partial<IProject>): Promise<IProject | null>;
 	pushToDeployments(prjectId: string, userId: string, newDeployment: string | Types.ObjectId): Promise<IProject | null>;

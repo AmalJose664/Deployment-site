@@ -25,6 +25,7 @@ interface ProjectContentProps {
 	tabFromUrl?: string
 	reDeploy: () => Promise<void>;
 	onCreateDeployment: () => void
+	refetchLogs: () => void
 }
 
 export function ProjectContent({
@@ -37,7 +38,8 @@ export function ProjectContent({
 	showBuild,
 	setShowBuild,
 	reDeploy,
-	onCreateDeployment
+	onCreateDeployment,
+	refetchLogs
 }: ProjectContentProps) {
 	const [tab, setTabs] = useState(tabFromUrl || "project")
 	console.log("------------project-------------", (project?.deployments?.length === 0 && !project.currentDeployment))
@@ -81,6 +83,7 @@ export function ProjectContent({
 							reDeploy={reDeploy}
 							showBuild={showBuild}
 							setTabs={setTabs}
+							refetchLogs={refetchLogs}
 						/>
 					</TabsContent>
 					<TabsContent value="deployments">

@@ -48,12 +48,12 @@ class ProjectService implements IProjectService {
 		const result = await this.projectRepository.getAllProjects(userId, query);
 		return result;
 	}
-	async getProjectById(id: string, userId: string, userFill: boolean): Promise<IProject | null> {
+	async getProjectById(id: string, userId: string, include?: string): Promise<IProject | null> {
 		const user = await this.userRepository.findByUserId(userId);
 		if (!user) {
 			throw new AppError("User not found", 404);
 		}
-		const project = await this.projectRepository.findProject(id, userId, userFill);
+		const project = await this.projectRepository.findProject(id, userId, include);
 
 		return project;
 	}

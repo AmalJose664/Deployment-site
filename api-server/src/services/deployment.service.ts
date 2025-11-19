@@ -43,19 +43,19 @@ class DeploymentService implements IDeploymentService {
 		deploymentData.commit_hash = "######################################";
 		deploymentData.s3Path = correspondindProject._id.toString();
 		deploymentData.project = new Types.ObjectId(correspondindProject._id);
-		deploymentData.userId = correspondindProject.user;
+		deploymentData.user = correspondindProject.user;
 
 		const deployment = await this.deploymentRepository.createDeployment(deploymentData);
 
 		console.log(await this.projectRepository.pushToDeployments(correspondindProject.id, userId, deployment?.id))
 		if (deployment?._id) {
-			this.deployLocal(deployment?._id, projectId)
+			// this.deployLocal(deployment?._id, projectId)
 		}
 		return deployment;
 	}
 
-	async getDeploymentById(id: string, userId: string): Promise<IDeployment | null> {
-		return await this.deploymentRepository.findDeploymentById(id, userId);
+	async getDeploymentById(id: string, userId: string, includesField?: string): Promise<IDeployment | null> {
+		return await this.deploymentRepository.findDeploymentById(id, userId, includesField);
 	}
 
 

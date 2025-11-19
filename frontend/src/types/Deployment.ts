@@ -5,7 +5,7 @@ export interface Deployment {
 	_id: string;
 	project: Partial<Project> | string;
 	commit: { id: string, msg: string };
-	userId: string;
+	user: string | Partial<User>;
 	status: ProjectStatus;
 	performance: {
 		installTime: number;
