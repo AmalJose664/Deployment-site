@@ -4,82 +4,81 @@ import { IAnalyticsService } from "../interfaces/service/IAnalyticsService.js";
 import { AnalyticsMapper } from "../mappers/AnalyticsMapper.js";
 
 class AnalyticsController implements IAnalyticsController {
-	private analyticsService: IAnalyticsService
+    private analyticsService: IAnalyticsService;
 
-	constructor(analyticsService: IAnalyticsService) {
-		this.analyticsService = analyticsService
-	}
-	async bandWidth(req: Request, res: Response, next: NextFunction): Promise<void> {
-		const { projectId } = req.params
-		const { range, interval } = req.query
+    constructor(analyticsService: IAnalyticsService) {
+        this.analyticsService = analyticsService;
+    }
+    async bandWidth(req: Request, res: Response, next: NextFunction): Promise<void> {
+        const { projectId } = req.params;
+        const { range, interval } = req.query;
 
-		try {
-			const [data, queryOptions] = await this.analyticsService.getBandwidthData(projectId, range as string, interval as string)
-			const response = AnalyticsMapper.bandwidthResponseDTO(data, projectId, queryOptions)
+        try {
+            const [data, queryOptions] = await this.analyticsService.getBandwidthData(projectId, range as string, interval as string);
+            const response = AnalyticsMapper.bandwidthResponseDTO(data, projectId, queryOptions);
 
-			res.json(response)
-			return;
-		} catch (error) {
-			next(error);
-		}
-	}
-	async overview(req: Request, res: Response, next: NextFunction): Promise<void> {
-		const { projectId } = req.params
-		const { range, interval } = req.query
+            res.json(response);
+            return;
+        } catch (error) {
+            next(error);
+        }
+    }
+    async overview(req: Request, res: Response, next: NextFunction): Promise<void> {
+        const { projectId } = req.params;
+        const { range, interval } = req.query;
 
-		try {
-			const [data, queryOptions] = await this.analyticsService.getOverView(projectId, range as string, interval as string)
-			const response = AnalyticsMapper.overviewResponse(data, projectId, queryOptions)
+        try {
+            const [data, queryOptions] = await this.analyticsService.getOverView(projectId, range as string, interval as string);
+            const response = AnalyticsMapper.overviewResponse(data, projectId, queryOptions);
 
-			res.json(response)
-			return;
-		} catch (error) {
-			next(error);
-		}
-	}
-	async realtime(req: Request, res: Response, next: NextFunction): Promise<void> {
-		const { projectId } = req.params
-		const { interval, } = req.query
+            res.json(response);
+            return;
+        } catch (error) {
+            next(error);
+        }
+    }
+    async realtime(req: Request, res: Response, next: NextFunction): Promise<void> {
+        const { projectId } = req.params;
+        const { interval } = req.query;
 
-		try {
-			const [data, queryOptions] = await this.analyticsService.getRealtime(projectId, interval as string,)
-			const response = AnalyticsMapper.realtimeResponse(data, projectId, queryOptions)
+        try {
+            const [data, queryOptions] = await this.analyticsService.getRealtime(projectId, interval as string);
+            const response = AnalyticsMapper.realtimeResponse(data, projectId, queryOptions);
 
-			res.json(response)
-			return;
-		} catch (error) {
-			next(error);
-		}
-	}
-	async topPages(req: Request, res: Response, next: NextFunction): Promise<void> {
-		const { projectId } = req.params
-		const { interval, limit } = req.query
+            res.json(response);
+            return;
+        } catch (error) {
+            next(error);
+        }
+    }
+    async topPages(req: Request, res: Response, next: NextFunction): Promise<void> {
+        const { projectId } = req.params;
+        const { interval, limit } = req.query;
 
-		try {
-			const [data, queryOptions] = await this.analyticsService.getTopPages(projectId, interval as string, Number(limit || 30))
-			const response = AnalyticsMapper.topPagesResponse(data, projectId, queryOptions)
+        try {
+            const [data, queryOptions] = await this.analyticsService.getTopPages(projectId, interval as string, Number(limit || 30));
+            const response = AnalyticsMapper.topPagesResponse(data, projectId, queryOptions);
 
-			res.json(response)
-			return;
-		} catch (error) {
-			next(error);
-		}
-	}
-	async osStats(req: Request, res: Response, next: NextFunction): Promise<void> {
-		const { projectId } = req.params
-		const { interval } = req.query
+            res.json(response);
+            return;
+        } catch (error) {
+            next(error);
+        }
+    }
+    async osStats(req: Request, res: Response, next: NextFunction): Promise<void> {
+        const { projectId } = req.params;
+        const { interval } = req.query;
 
-		try {
-			const [data, queryOptions] = await this.analyticsService.getOsStats(projectId, interval as string)
-			const response = AnalyticsMapper.osStatsResponse(data, projectId, queryOptions)
+        try {
+            const [data, queryOptions] = await this.analyticsService.getOsStats(projectId, interval as string);
+            const response = AnalyticsMapper.osStatsResponse(data, projectId, queryOptions);
 
-			res.json(response)
-			return;
-		} catch (error) {
-			next(error);
-		}
-	}
+            res.json(response);
+            return;
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
-
-export default AnalyticsController
+export default AnalyticsController;
