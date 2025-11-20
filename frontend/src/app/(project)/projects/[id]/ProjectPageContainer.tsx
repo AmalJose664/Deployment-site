@@ -7,7 +7,7 @@ import { projectApis, useGetProjectByIdQuery } from "@/store/services/projectsAp
 import { useCreateDeploymentMutation, useGetDeploymentByIdQuery } from "@/store/services/deploymentApi"
 
 import ProjectLoading from "./components/ProjectLoading"
-import ProjectError from "../../../../components/project/ProjectError"
+import ErrorComponent from "../../../../components/ErrorComponent"
 import { ProjectContent } from "./components/Content"
 import { useDeploymentSSE } from "@/hooks/useUpdatesSse"
 import { useGetDeploymentLogsQuery } from "@/store/services/logsApi"
@@ -31,7 +31,7 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 		isError,
 		error,
 		refetch,
-	} = useGetProjectByIdQuery({ id: projectId, params: { user: "true" } })
+	} = useGetProjectByIdQuery({ id: projectId, params: { include: "user" } })
 
 	const [createDeployment, { }] = useCreateDeploymentMutation()
 	const [showBuild, setShowBuild] = useState(false)
@@ -78,7 +78,7 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 		dispatch(
 			projectApis.util.updateQueryData(
 				"getProjectById",
-				{ id: project._id, params: { user: "true" } },
+				{ id: project._id, params: { include: "user" } },
 				(draft) => {
 					const newData = {
 						status: ProjectStatus.QUEUED,
@@ -91,15 +91,15 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 	}
 
 
-	if (!project && !isLoading) {
-		return (
-			<ProjectError error={{ message: "project not found" }} />
-		)
-	}
 
-	if (isError) return <ProjectError error={error} />
 
 	if (isLoading) return <ProjectLoading />
+	if (isError) return <ErrorComponent error={error} id={projectId} field="Project" />
+	if (!project) {
+		return (
+			<ErrorComponent error={{ message: "project not found" }} id={projectId} field="Project" />
+		)
+	}
 
 
 

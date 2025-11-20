@@ -1,36 +1,35 @@
 export interface IAnalytics {
-	projectId: string;
-	subdomain: string;
-	path: string;
-	statusCode: number;
-	responseTime: number;
-	requestSize: number;
-	responseSize: number;
-	ip: string;
-	uaBrowser?: string
-	uaOs?: string;
-	isMobile?: boolean;
-	isBot?: boolean;
-	referer?: string;
-	timestamp: number;
+    projectId: string;
+    subdomain: string;
+    path: string;
+    statusCode: number;
+    responseTime: number;
+    requestSize: number;
+    responseSize: number;
+    ip: string;
+    uaBrowser?: string;
+    uaOs?: string;
+    isMobile?: boolean;
+    isBot?: boolean;
+    referer?: string;
+    timestamp: number;
 }
 export interface BufferAnalytics {
-	project_id: string;
-	subdomain: string;
-	path: string;
-	status_code: number;
-	response_time: number;
-	request_size: number;
-	response_size: number;
-	ip: string;
-	ua_browser: string | null;
-	ua_os: string | null;
-	is_mobile: 1 | 0;
-	is_bot: 1 | 0;
-	referer: null | string;
-	timestamp: number;
+    project_id: string;
+    subdomain: string;
+    path: string;
+    status_code: number;
+    response_time: number;
+    request_size: number;
+    response_size: number;
+    ip: string;
+    ua_browser: string | null;
+    ua_os: string | null;
+    is_mobile: 1 | 0;
+    is_bot: 1 | 0;
+    referer: null | string;
+    timestamp: number;
 }
-
 
 /**
  * 

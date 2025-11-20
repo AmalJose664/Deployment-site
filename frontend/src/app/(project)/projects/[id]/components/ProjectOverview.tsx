@@ -12,7 +12,7 @@ import { User } from "@/types/User";
 import { Project, ProjectStatus } from "@/types/Project";
 import Link from "next/link";
 import TechStack from "@/components/project/TechStack";
-import { getGithubBranchUrl, getGithubCommitUrl, getStatusColor, timeToSeconds } from "@/lib/utils";
+import { getGithubBranchUrl, getGithubCommitUrl, getStatusColor, parseGitHubRepo, timeToSeconds } from "@/lib/utils";
 import StatusIcon, { AnimationBuild } from "@/components/ui/StatusIcon";
 import { toast } from "sonner"
 import { Deployment } from "@/types/Deployment";
@@ -27,15 +27,12 @@ interface ProjectOverviewProps {
 }
 
 const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, goToSettings }: ProjectOverviewProps) => {
-	const repoValues = project.repoURL.split("/")
-	const repoWithUser = repoValues[3] + "/" + repoValues[4]
 
+	const repoValues = parseGitHubRepo(project.repoURL)
 	const triggerReDeploy = () => {
 		toast.info("New Deployment started")
 		reDeploy()
-		// post deploy events sse
 	}
-
 	return (
 		<>
 			<div className="flex flex-col items-stretch sm:flex-row md:flex-row gap-2 sm:gap-4 lg:gap-6 p-1 sm:p-1 lg:p-1 w-full h-full">
@@ -55,7 +52,7 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, goToSett
 							</span>
 							<Link href={project.repoURL} target="_blank">
 								<Button variant={"outline"} className='p-2 border flex gap-1 text-xs items-center rounded-lg group'>
-									<FiGithub className='size-3 text-primary group-hover:rotate-y-180 transition-all duration-300' /> {repoWithUser}
+									<FiGithub className='size-3 text-primary group-hover:rotate-y-180 transition-all duration-300' /> {repoValues[0] + "/" + repoValues[1]}
 								</Button>
 							</Link>
 						</div>
@@ -68,8 +65,10 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, goToSett
 									<IoMdGlobe className='size-4 text-less' />
 								</div>
 								<div>
-									<Link href={'http://' + project.subdomain + '.localhost'} className='flex gap-2 items-center text-sm font-medium '>
-										{"http://" + project.subdomain}
+									<Link
+										href={`${window.location.protocol}//${project.subdomain}.${process.env.NEXT_PUBLIC_PROXY_SERVER}`}
+										className='flex gap-2 items-center text-sm font-medium '>
+										{`${window.location.protocol}//${project.subdomain}`}
 										<RxExternalLink />
 									</Link>
 								</div>

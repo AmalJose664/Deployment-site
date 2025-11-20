@@ -9,8 +9,8 @@ export const deployemntApis = createApi({
 	}),
 	tagTypes: ['Deployments'],
 	endpoints: (builder) => ({
-		getDeployments: builder.query<{ data: Deployment[], meta: Record<string, any> }, {}>({
-			query: () => ({ url: '/deployments', method: 'get' }),
+		getDeployments: builder.query<{ data: Deployment[], meta: Record<string, any> }, { params: Record<string, any> }>({
+			query: ({ params }) => ({ url: '/deployments', method: 'get', params }),
 			transformResponse: (data: any) => {
 				return { data: data.deployments, meta: data.pagination }
 			},

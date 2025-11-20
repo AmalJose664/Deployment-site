@@ -2,6 +2,7 @@ import Link from "next/link";
 import ThemeSwitcher from "./ThemeIcon";
 import { GoBell } from "react-icons/go";
 import { cn } from "@/lib/utils";
+import { IoIosCube, IoMdCloudDone } from "react-icons/io";
 export default function Navbar({ className }: { className: string }) {
 
 	return (
@@ -38,19 +39,17 @@ export default function Navbar({ className }: { className: string }) {
 			</div>
 
 
-
-
 			<div className="flex items-center gap-6">
 
 				<ul className="hidden md:flex items-center gap-6 text-sm dark:text-white text-black">
 					<li>
-						<Link href="/projects" className="hover:text-blue-400">
-							Projects
+						<Link href="/projects" className="hover:text-blue-400 flex gap-2 items-center">
+							<IoIosCube />Projects
 						</Link>
 					</li>
 					<li>
-						<Link href="/ai" className="hover:text-blue-400">
-							Ship AI
+						<Link href="/deployments" className="hover:text-blue-400 flex gap-2 items-center">
+							<IoMdCloudDone />Deployments
 						</Link>
 					</li>
 					<li>

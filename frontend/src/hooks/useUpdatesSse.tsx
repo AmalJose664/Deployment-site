@@ -66,7 +66,7 @@ export function useDeploymentSSE(project: Project | undefined, refetch: () => vo
 					dispatch(
 						projectApis.util.updateQueryData(
 							"getProjectById",
-							{ id: update.projectId, params: { user: "true" } },
+							{ id: update.projectId, params: { include: "user" } },
 							(draft) => {
 								const newData = {
 									status: update.status,

@@ -16,6 +16,7 @@ import { RootState } from '@/store/store';
 import { addLogs, clearLogs } from '@/store/slices/logSlice';
 import { formatLogTime, getLevelColor } from '@/lib/utils';
 import { useGetDeploymentLogsQuery } from '@/store/services/logsApi';
+import { toast } from 'sonner';
 
 interface LogsComponentProps {
 	deploymentId: string,
@@ -53,8 +54,11 @@ export function Logs({ deploymentId, refetch, deploymentSpecificLogs }: LogsComp
 	});
 
 
-
 	const downloadLogs = () => {
+		if (currentUsingLogs.length === 0) {
+			toast.info("No logs found to download")
+			return
+		}
 		const logText = (currentUsingLogs).map(log =>
 			`[${log.timestamp}] [${log.level.toUpperCase()}] ${log.message}`
 		).join('\n');

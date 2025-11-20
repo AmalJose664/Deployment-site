@@ -17,6 +17,8 @@ import { BaseSettings } from "./BasicDetails";
 import { AdvancedSettings } from "./AdvancedDetails";
 import { ConfigPreview } from "./ConfigPreview";
 import { getBranches, repoCheck } from "@/lib/form";
+import { IoIosCube } from "react-icons/io";
+import { toast } from "sonner";
 
 
 function ProjectForm() {
@@ -72,10 +74,10 @@ function ProjectForm() {
 			console.log("Form submitted ", data)
 		} catch (error) {
 			console.log("Error!", error)
+			toast.error("Error on creating project")
 		}
 
 	}
-
 
 	return (
 		<div className="min-h-screen bg-linear-to-br from-background dark:via-neutral-800 via-neutral-100 to-background  text-primary">
@@ -83,12 +85,13 @@ function ProjectForm() {
 				<div className="max-w-7xl mx-auto px-8 py-2">
 					<div className="flex items-center gap-4">
 						<button
+							onClick={() => router.back()}
 							className="p-2.5  border rounded-xl transition-all duration-200 "
 						>
 							<FaArrowLeft size={20} />
 						</button>
 						<div>
-							<h1 className="text-2xl font-bold">Create New Project</h1>
+							<h1 className="text-2xl flex gap-2 items-center font-bold">Create New Project <IoIosCube /></h1>
 							<p className="text-sm text-gray-400 mt-1">Deploy your application in minutes</p>
 						</div>
 					</div>

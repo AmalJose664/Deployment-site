@@ -151,7 +151,7 @@ export default function ProjectContent() {
 									<div className="flex items-start justify-between mb-4">
 
 										<div className="flex-1">
-											<h3 className="text-lg text-primary  font-semibold mb-1 hover:underline transition-colors">
+											<h3 className="text-lg text-primary  font-semibold mb-1 transition-colors">
 												{project.name}
 											</h3>
 											<div className="flex items-center gap-2 text-sm ">

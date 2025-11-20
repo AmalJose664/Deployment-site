@@ -17,15 +17,8 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover"
-import {
-	Pagination,
-	PaginationContent,
-	PaginationEllipsis,
-	PaginationItem,
-	PaginationLink,
-	PaginationNext,
-	PaginationPrevious,
-} from "@/components/ui/pagination"
+import PaginationComponent from "@/components/Pagination"
+import { IoRocketOutline } from "react-icons/io5"
 
 interface AllDeploymentProps {
 	projectId: string;
@@ -38,7 +31,7 @@ const AllDeployments = ({ projectId, currentDeployment, repoURL, setTab }: AllDe
 
 	const [page, setPage] = useState(1)
 	const limit = 10
-	const { data, isLoading, isError, error } = useGetProjectDeploymentsQuery({ id: projectId, params: { project: true, page, limit } })
+	const { data, isLoading, isError, error } = useGetProjectDeploymentsQuery({ id: projectId, params: { include: "project", page, limit } })
 	const { data: deployments = [], meta } = data ?? {};
 
 
@@ -86,7 +79,7 @@ const AllDeployments = ({ projectId, currentDeployment, repoURL, setTab }: AllDe
 				<div className="relative w-full sm:w-[90%]">
 					<CiSearch className="absolute top-2 left-3 size-5" />
 					<Input value={search} onChange={(e) => setSearch(e.target.value)}
-						className="mb-4 pl-12 w-full"
+						className="mb-4 pl-12 w-full dark:bg-neutral-900 bg-white"
 						placeholder="Branches, commits, id"
 					/>
 				</div>
@@ -153,7 +146,7 @@ const AllDeployments = ({ projectId, currentDeployment, repoURL, setTab }: AllDe
 									)}`}
 								>
 									{deployment.status}
-									<span className="flex gap-2">
+									<span className="flex gap-2 items-center">
 										<MdAccessTime size={12} />
 										<span>{timeToSeconds(deployment.performance.totalDuration)}</span>
 									</span>
@@ -182,11 +175,17 @@ const AllDeployments = ({ projectId, currentDeployment, repoURL, setTab }: AllDe
 					</div>
 				)
 			})}
-			{meta?.totalPages > 1 && <DeploymentsPagination page={page} setPage={setPage} totalPages={totalPages} />}
+			{meta?.totalPages > 1 && <PaginationComponent page={page} setPage={setPage} totalPages={totalPages} />}
 			{((deployments?.length === 0 || !deployments) && !isLoading) && (
 				<div>
-
-					<NoDeployment onCreateDeployment={setTab} />
+					<NoDeployment
+						buttonAction={setTab}
+						titleText="No Deployments Yet"
+						descriptionText="You haven&apos;t created any project deployment yet. Run your project by creating your new Deployment."
+						buttonText="Create Deployment"
+						buttonIcon={<IoRocketOutline />}
+						learnMoreUrl="#"
+					/>
 				</div>
 			)}
 			{(isError && (error as any).status !== 404) && (
@@ -202,112 +201,3 @@ const AllDeployments = ({ projectId, currentDeployment, repoURL, setTab }: AllDe
 	)
 }
 export default AllDeployments
-interface PaginationProps {
-	page: number,
-	setPage: React.Dispatch<React.SetStateAction<number>>,
-	totalPages: number
-}
-const DeploymentsPagination = ({ page, setPage, totalPages }: PaginationProps) => {
-	return (
-		<Pagination>
-			<PaginationContent className="flex gap-4 items-center">
-				<PaginationItem>
-					<PaginationPrevious
-						size={1}
-						href="#"
-						onClick={(e) => {
-							e.preventDefault()
-							setPage(p => Math.max(1, p - 1))
-						}}
-						className={page === 1 ? "pointer-events-none opacity-50" : "no-underline hover:bg-accent"}
-					/>
-				</PaginationItem>
-
-				{/* First page */}
-				<PaginationItem>
-					<PaginationLink
-						size={1}
-						href="#"
-						onClick={(e) => {
-							e.preventDefault()
-							setPage(1)
-						}}
-						isActive={page === 1}
-						className="no-underline"
-					>
-						1
-					</PaginationLink>
-				</PaginationItem>
-
-				{/* Left ellipsis */}
-				{page > 3 && totalPages > 5 && (
-					<PaginationItem>
-						<PaginationEllipsis />
-					</PaginationItem>
-				)}
-
-				{/* Middle pages */}
-				{Array.from({ length: totalPages }, (_, i) => i + 1)
-					.filter(pageNum => {
-						// Show pages around current page
-						if (pageNum === 1 || pageNum === totalPages) return false
-						if (totalPages <= 5) return true // Show all middle pages if total <= 5
-						return Math.abs(pageNum - page) <= 1 // Show current ± 1
-					})
-					.map(pageNum => (
-						<PaginationItem key={pageNum}>
-							<PaginationLink
-								size={1}
-								href="#"
-								onClick={(e) => {
-									e.preventDefault()
-									setPage(pageNum)
-								}}
-								isActive={page === pageNum}
-								className="no-underline"
-							>
-								{pageNum}
-							</PaginationLink>
-						</PaginationItem>
-					))}
-
-				{/* Right ellipsis */}
-				{page < totalPages - 2 && totalPages > 5 && (
-					<PaginationItem>
-						<PaginationEllipsis />
-					</PaginationItem>
-				)}
-
-				{/* Last page */}
-				{totalPages > 1 && (
-					<PaginationItem>
-						<PaginationLink
-							size={1}
-							href="#"
-							onClick={(e) => {
-								e.preventDefault()
-								setPage(totalPages)
-							}}
-							isActive={page === totalPages}
-							className="no-underline"
-						>
-							{totalPages}
-						</PaginationLink>
-					</PaginationItem>
-				)}
-
-				<PaginationItem>
-					<PaginationNext
-						size={1}
-						href="#"
-						onClick={(e) => {
-							e.preventDefault()
-							setPage(p => Math.min(totalPages, p + 1))
-						}}
-						className={page === totalPages ? "pointer-events-none opacity-50" : "no-underline hover:bg-accent"}
-					/>
-				</PaginationItem>
-			</PaginationContent>
-		</Pagination>
-	)
-}

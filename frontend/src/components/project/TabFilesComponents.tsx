@@ -56,9 +56,13 @@ export const TabFilesNoFiles = () => {
 	);
 }
 export const TabFilesError = ({ error }: { error: any }) => {
+	if (error.status === 404) {
+		return <TabFilesNoFiles />
+	}
 	return (
 		<div className="flex gap-2 dark:bg-[#111111] border items-center justify-center bg-white text-neutral-400 p-8 rounded-lg text-center">
 			<RiFileWarningLine size={22} />  <p className="text-less mb-4">
+
 				{(error as any)?.message || (error as { data?: { message?: string } })?.data?.message || "Something went wrong"}
 			</p>
 		</div>

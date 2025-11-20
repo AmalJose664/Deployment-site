@@ -6,6 +6,7 @@ interface GetProjectsParams {
 	limit?: number;
 	search?: string;
 	page?: number;
+	include?: string;
 }
 export const projectApis = createApi({
 	reducerPath: "projectsApi",
@@ -21,7 +22,7 @@ export const projectApis = createApi({
 			},
 			providesTags: ['Projects'],
 		}),
-		getProjectById: builder.query<Project, { id: string, params: { user?: string } }>({
+		getProjectById: builder.query<Project, { id: string, params: { include?: string } }>({
 			query: ({ id, params }) => ({ url: `/projects/${id}`, method: 'get', params }),
 			transformResponse(baseQueryReturnValue: any, meta) {
 				return baseQueryReturnValue.project as Project

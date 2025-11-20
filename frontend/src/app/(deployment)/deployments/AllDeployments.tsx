@@ -1,0 +1,207 @@
+"use client"
+import StatusIcon from "@/components/ui/StatusIcon"
+import { getStatusBg, getStatusColor, timeToSeconds } from "@/lib/utils"
+import Link from "next/link"
+import { AnimatePresence, motion } from "motion/react";
+import { IoIosArrowDown, IoIosCube, IoMdCloudDone, IoMdGitBranch } from "react-icons/io"
+import { LiaExternalLinkAltSolid } from "react-icons/lia"
+import { MdAccessTime } from "react-icons/md"
+import { CiSearch } from "react-icons/ci"
+import { Project, ProjectStatus } from "@/types/Project"
+import { useMemo, useState } from "react"
+import { Input } from "@/components/ui/input"
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover"
+
+
+import { useGetDeploymentsQuery } from "@/store/services/deploymentApi"
+import PaginationComponent from "@/components/Pagination"
+import NoDeployment from "@/app/(project)/projects/[id]/components/NoDeployment"
+import { useRouter } from "next/navigation"
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
+
+const AllDeployments = () => {
+	const [page, setPage] = useState(1)
+	const limit = 10
+	const { data, isLoading, isError, error } = useGetDeploymentsQuery({ params: { include: "project", page, limit } })
+	const { data: deployments = [], meta } = data ?? {};
+
+	console.log(deployments)
+	const [search, setSearch] = useState("")
+	const [statuses, setStatuses] = useState<Record<string, boolean>>(
+		Object.fromEntries(Object.values(ProjectStatus).map((stats) => [stats, true]))
+	)
+
+	const { filteredDeployments, statusCounts } = useMemo(() => {
+		if (!deployments) return { filteredDeployments: [], statusCounts: {} }
+		const counts: Record<string, number> = {}
+		Object.values(ProjectStatus).forEach((status) => {
+			counts[status] = 0
+		})
+
+		const filtered = deployments.filter((d) => {
+			if (counts[d.status] !== undefined) {
+				counts[d.status]++
+			}
+			if (!statuses[d.status]) return false
+
+			const searchLower = search.toLowerCase()
+			const matchesSearch = !search ||
+				d._id.toLowerCase().includes(searchLower) ||
+				d.commit.id?.toLowerCase().includes(searchLower) ||
+				d.commit.msg?.toLowerCase().includes(searchLower) ||
+				(d.project as Project).name.toLowerCase().includes(searchLower)
+
+			return matchesSearch
+		})
+		return { filteredDeployments: filtered, statusCounts: counts }
+	}, [deployments, search, statuses])
+	const router = useRouter()
+
+	const totalPages = meta?.totalPages
+
+
+	return (
+		<div className="min-h-screen bg-background">
+			<div className="max-w-[1400px] mx-auto px-6  rounded-md py-4">
+				<h1 className="text-xl font-semibold text-primary flex gap-2 mb-4 items-center">
+					All Deployments  <IoMdCloudDone />
+				</h1>
+				<div>
+					<div className="relative flex flex-col sm:flex-row gap-2 items-start sm:items-center justify-between">
+						<div className="relative w-full sm:w-[90%]">
+							<CiSearch className="absolute top-2 left-3 size-5" />
+							<Input value={search} onChange={(e) => setSearch(e.target.value)}
+								className="mb-4 pl-12 w-full dark:bg-neutral-900 bg-white"
+								placeholder="Branches, commits, id"
+							/>
+						</div>
+						<Popover>
+							<PopoverTrigger className="border flex gap-2 mb-4 items-center py-1 px-2 rounded-md whitespace-nowrap">
+								<span className="text-sm text-primary">Status {Object.values(statuses).filter(Boolean).length} / 6 </span><IoIosArrowDown />
+							</PopoverTrigger>
+							<PopoverContent className="max-w-60">
+								<div>
+									{Object.keys(statuses).map((st) => (
+										<div key={st} className="flex gap-8 items-center hover:border-neutral-300 dark:hover:border-neutral-700 rounded-md border border-transparent pl-4">
+											<input
+												type="checkbox" className="border-none ring-0" checked={statuses[st]}
+												onChange={() => setStatuses({ ...statuses, [st]: !statuses[st] })} />
+											<div className={getStatusBg(st)[0] + " w-4 h-4 rounded-full border"} />
+											<label htmlFor="">{st.slice(0, 1).toUpperCase() + st.slice(1, 20).toLowerCase()}</label>
+										</div>
+									)
+									)}
+								</div>
+							</PopoverContent>
+						</Popover>
+
+					</div>
+					{isLoading && (
+						<motion.div
+							initial={{ y: 20, opacity: 0 }}
+							animate={{ y: 0, opacity: 1 }}
+							transition={{ duration: 0.3, ease: "easeInOut" }}
+							className="flex gap-6 items-center mb-10 justify-center">
+							<p className="text-gray-500 ">Loading...</p>
+							<AiOutlineLoading3Quarters className="animate-spin " />
+						</motion.div>
+					)}
+					<div className="flex items-center mb-4 gap-3 flex-wrap">
+						{Object.entries(statusCounts).map((value, i) => (
+							(statuses[value[0]] && value[1] > 0) && (
+								<div key={i} className={getStatusBg(value[0])[2] + " rounded-full flex items-center"}>
+									<span className="dark:text-gray-200 text-gray-700 text-xs px-2 py-1">
+										{value[0]}
+									</span>
+									<span className={getStatusBg(value[0])[1] + " text-black text-xs px-[8px] py-[2px] mr-1 rounded-full"}>
+										{value[1]}
+									</span>
+								</div>
+							)
+						)
+						)}
+
+					</div>
+					{filteredDeployments?.length !== 0 && filteredDeployments.map((deployment) => {
+						return (
+							<div key={deployment._id} className="divide-y dark:bg-neutral-900 bg-white divide-gray-800 border mb-3 dark:border-neutral-800 border-neutral-300 rounded-md">
+								<Link
+									href={"/deployments/" + deployment._id}
+									className="hover:no-underline px-3 py-2 flex flex-col sm:flex-row gap-2 sm:gap-4 justify-between items-start sm:items-center dark:hover:bg-zinc-800/50 hover:bg-neutral-300 transition-colors"
+								>
+									<div className="text-xs flex gap-2 items-center flex-wrap">
+										<StatusIcon status={deployment.status} />
+										<span className="text-primary break-all">
+											{deployment._id}
+										</span>
+
+									</div>
+									<div className="pt-1 flex gap-2 items-center text-sm">
+										<span
+											className={`text-xs flex flex-col font-medium px-2 py-1 rounded ${getStatusColor(
+												deployment.status
+											)}`}
+										>
+											{deployment.status}
+											<span className="flex gap-2 items-center">
+												<MdAccessTime size={12} />
+												<span>{timeToSeconds(deployment.performance.totalDuration)}</span>
+											</span>
+										</span>
+									</div>
+									<div className="w-full sm:w-auto">
+										<p className="text-sm">{(deployment.project as Project).name}</p>
+									</div>
+									<div className="flex gap-2 flex-col w-full sm:w-auto">
+										<div className="text-sm text-primary mb-1 max-w-full sm:max-w-[80px] overflow-hidden text-ellipsis whitespace-nowrap">
+											{deployment.commit.id}
+										</div>
+										<div className="text-sm text-primary mb-1 break-words">{deployment.commit.msg}</div>
+									</div>
+									<div className="flex items-center gap-4 text-xs text-gray-400">
+										<div className="flex items-center text-xs gap-1.5">
+											<IoMdGitBranch size={12} />
+											<div>{(deployment.project as Project).branch}</div>
+										</div>
+									</div>
+									<button className="text-xs text-gray-400 hover:text-white transition-colors flex items-center gap-1">
+										View Logs
+										<LiaExternalLinkAltSolid size={12} />
+									</button>
+								</Link>
+							</div>
+						)
+					})}
+					{meta?.totalPages > 1 && <PaginationComponent page={page} setPage={setPage} totalPages={totalPages} />}
+					{(isError && (error as any).status !== 404) && (
+						<div className="flex items-center justify-center px-4">
+							<div className="border p-4 rounded-md max-w-full">
+								<p>Error Loading Deployments</p>
+								<p className="break-words">{(error as any)?.message || (error as { data?: { message?: string } })?.data?.message || "Something went wrong"}</p>
+							</div>
+						</div>
+					)}
+
+					{((deployments?.length === 0 || !deployments) && !isLoading) && (
+						<div>
+
+							<NoDeployment
+								buttonAction={() => router.push("/projects/")}
+								titleText="No Deployments Yet"
+								descriptionText="You haven&apos;t created any project deployment yet. Run your project by creating your new Deployment."
+								buttonText="Create Project"
+								buttonIcon={<IoIosCube />}
+								learnMoreUrl="#"
+							/>
+						</div>
+					)}
+				</div>
+			</div>
+		</div>
+	)
+}
+export default AllDeployments

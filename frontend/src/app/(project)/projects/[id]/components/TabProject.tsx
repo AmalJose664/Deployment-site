@@ -7,6 +7,7 @@ import NoDeployment from "./NoDeployment"
 import { Logs } from "@/components/LogsComponent"
 import { Project } from "@/types/Project"
 import { Deployment } from "@/types/Deployment"
+import { IoRocketOutline } from "react-icons/io5"
 
 interface TabProjectProps {
 	project: Project
@@ -29,7 +30,14 @@ const TabProject = ({ project, deployment, tempDeployment, onCreateDeployment, s
 			<div className="dark:bg-neutral-900 border bg-white w-full rounded-md mb-6 mt-4 p-4">
 
 				{(project.deployments && project.deployments.length === 0) && (
-					<NoDeployment onCreateDeployment={onCreateDeployment} />
+					<NoDeployment
+						buttonAction={onCreateDeployment}
+						titleText="No Deployments Yet"
+						descriptionText="You haven&apos;t created any project deployment yet. Run your project by creating your new Deployment."
+						buttonText="Create Deployment"
+						buttonIcon={<IoRocketOutline />}
+						learnMoreUrl="#"
+					/>
 				)}
 
 				<ProjectOverview

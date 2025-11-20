@@ -119,3 +119,27 @@ export const formatBytes = (size: number): string => {
 	const i = Math.floor(Math.log(size) / Math.log(k))
 	return `${(size / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
 }
+
+export function parseGitHubRepo(input: string): string[] {
+	let str = input.trim();
+	if (str.endsWith("/")) {
+		str = str.slice(0, -1);
+	}
+	if (str.endsWith(".git")) {
+		str = str.slice(0, -4);
+	}
+	if (str.startsWith("git@")) {
+		const parts = str.split(":")[1].split("/");
+		return [parts[0], parts[1]];
+	}
+	try {
+		if (str.startsWith("http")) {
+			const url = new URL(str);
+			const parts = url.pathname.replace(/^\/+/g, "").split("/");
+			return [parts[0], parts[1]];
+		}
+	} catch (e) {
+	}
+	const parts = str.split("/");
+	return [parts[0], parts[1]];
+}

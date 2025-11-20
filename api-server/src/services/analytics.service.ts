@@ -3,134 +3,124 @@ import { IAnalyticsService } from "../interfaces/service/IAnalyticsService.js";
 import { BufferAnalytics } from "../models/Analytics.js";
 import { getInterval, getUnit, getRange } from "../utils/analyticsUnits.js";
 
-
 class AnalyticsService implements IAnalyticsService {
-	private analyticsRepo: IAnalyticsRepository
+    private analyticsRepo: IAnalyticsRepository;
 
-	private analyticsBuffer: BufferAnalytics[] = []
-	private readonly BATCH_SIZE = 170;
-	private readonly FLUSH_INTERVAL = 7000 * 10; // 7s
-	private readonly MAX_BUFFER_SIZE = 10000;
-	private flushTimer?: NodeJS.Timeout;
-	private isFlushing = false;
+    private analyticsBuffer: BufferAnalytics[] = [];
+    private readonly BATCH_SIZE = 170;
+    private readonly FLUSH_INTERVAL = 7000 * 10; // 7s
+    private readonly MAX_BUFFER_SIZE = 10000;
+    private flushTimer?: NodeJS.Timeout;
+    private isFlushing = false;
 
+    constructor(analyticsRepo: IAnalyticsRepository) {
+        this.analyticsRepo = analyticsRepo;
+        this.startFlushTimer();
+    }
 
-	constructor(analyticsRepo: IAnalyticsRepository) {
-		this.analyticsRepo = analyticsRepo
-		this.startFlushTimer()
+    private startFlushTimer(): void {
+        this.flushTimer = setInterval(() => {
+            console.log("---");
+            if (this.analyticsBuffer.length > 0) {
+                this.saveBatch().catch(console.error);
+            }
+        }, this.FLUSH_INTERVAL);
+    }
+    async saveBatch(): Promise<void> {
+        console.log("saving ....", this.analyticsBuffer.length);
+        if (this.isFlushing || this.analyticsBuffer.length === 0) {
+            console.log("returning ...");
+            return;
+        }
 
-	}
+        this.isFlushing = true;
+        const batch = this.analyticsBuffer.splice(0, this.BATCH_SIZE);
+        try {
+            await this.analyticsRepo.insertBatch(batch);
+            console.log(`✅ Saved ${batch.length} analytics events`);
+        } catch (error) {
+            console.error("save analytics error:", error, "Discarding data");
+        } finally {
+            this.isFlushing = false;
+        }
+    }
 
-	private startFlushTimer(): void {
-		this.flushTimer = setInterval(() => {
-			console.log("---")
-			if (this.analyticsBuffer.length > 0) {
-				this.saveBatch().catch(console.error);
-			}
-		}, this.FLUSH_INTERVAL);
+    async addEvent(event: BufferAnalytics): Promise<void> {
+        if (this.analyticsBuffer.length >= this.MAX_BUFFER_SIZE) {
+            console.warn("Analytics buffer full, dropping oldest events");
+            this.analyticsBuffer.splice(0, 1000);
+        }
+        this.analyticsBuffer.push(event);
 
-	}
-	async saveBatch(): Promise<void> {
-		console.log("saving ....", this.analyticsBuffer.length)
-		if (this.isFlushing || this.analyticsBuffer.length === 0) {
-			console.log("returning ...")
-			return;
-		}
+        if (this.analyticsBuffer.length >= this.BATCH_SIZE) {
+            this.saveBatch();
+        }
+    }
+    async addEventBatch(event: BufferAnalytics[]): Promise<void> {
+        if (this.analyticsBuffer.length >= this.MAX_BUFFER_SIZE) {
+            console.warn("Analytics buffer full, dropping oldest events");
+            this.analyticsBuffer.splice(0, 1000);
+        }
+        this.analyticsBuffer.push(...event);
 
-		this.isFlushing = true
-		const batch = this.analyticsBuffer.splice(0, this.BATCH_SIZE)
-		try {
-			await this.analyticsRepo.insertBatch(batch);
-			console.log(`✅ Saved ${batch.length} analytics events`);
-		} catch (error) {
-			console.error('save analytics error:', error, "Discarding data");
+        if (this.analyticsBuffer.length >= this.BATCH_SIZE) {
+            this.saveBatch();
+        }
+    }
 
-		} finally {
-			this.isFlushing = false;
-		}
-	}
+    async exitService(): Promise<void> {
+        console.log("service cleaning....");
+        clearInterval(this.flushTimer);
+        while (this.analyticsBuffer.length > 0) {
+            await this.saveBatch();
+        }
+    }
 
-	async addEvent(event: BufferAnalytics): Promise<void> {
-		if (this.analyticsBuffer.length >= this.MAX_BUFFER_SIZE) {
-			console.warn('Analytics buffer full, dropping oldest events');
-			this.analyticsBuffer.splice(0, 1000);
-		}
-		this.analyticsBuffer.push(event);
-
-		if (this.analyticsBuffer.length >= this.BATCH_SIZE) {
-			this.saveBatch();
-		}
-	}
-	async addEventBatch(event: BufferAnalytics[]): Promise<void> {
-		if (this.analyticsBuffer.length >= this.MAX_BUFFER_SIZE) {
-			console.warn('Analytics buffer full, dropping oldest events');
-			this.analyticsBuffer.splice(0, 1000);
-		}
-		this.analyticsBuffer.push(...event);
-
-		if (this.analyticsBuffer.length >= this.BATCH_SIZE) {
-			this.saveBatch();
-		}
-	}
-
-	async exitService(): Promise<void> {
-		console.log("service cleaning....")
-		clearInterval(this.flushTimer)
-		while (this.analyticsBuffer.length > 0) {
-			await this.saveBatch()
-		}
-	}
-
-
-	async getBandwidthData(projectId: string, range: string, interval: string): Promise<[unknown[], queryOptions]> {
-		const queryOptions = {
-			range: getRange(range),
-			rangeUnit: getUnit(range),
-			interval: getInterval(interval),
-			intervalUnit: getUnit(interval)
-		}
-		const data = await this.analyticsRepo.getBandwidth(projectId, queryOptions)
-		return [data, queryOptions]
-	}
-	async getOverView(projectId: string, range: string, interval: string): Promise<[unknown[], queryOptions]> {
-		const queryOptions = {
-			range: getRange(range),
-			rangeUnit: getUnit(range),
-			interval: getInterval(interval),
-			intervalUnit: getUnit(interval)
-		}
-		const data = await this.analyticsRepo.getOverview(projectId, queryOptions)
-		return [data, queryOptions]
-	}
-	async getRealtime(projectId: string, interval: string): Promise<[unknown[], queryOptions]> {
-		const queryOptions = {
-			interval: getInterval(interval),
-			intervalUnit: getUnit(interval)
-		}
-		const data = await this.analyticsRepo.getRealtime(projectId, queryOptions)
-		return [data, queryOptions]
-	}
-	async getTopPages(projectId: string, interval: string, limit: number): Promise<[unknown[], queryOptions]> {
-		const queryOptions = {
-			interval: getInterval(interval),
-			intervalUnit: getUnit(interval),
-			limit
-		}
-		const data = await this.analyticsRepo.getTopPages(projectId, queryOptions)
-		return [data, queryOptions]
-	}
-	async getOsStats(projectId: string, interval: string): Promise<[unknown[], queryOptions]> {
-		const queryOptions = {
-			interval: getInterval(interval),
-			intervalUnit: getUnit(interval)
-		}
-		const data = await this.analyticsRepo.getOsStats(projectId, queryOptions)
-		return [data, queryOptions]
-	}
-
-
-
-
+    async getBandwidthData(projectId: string, range: string, interval: string): Promise<[unknown[], queryOptions]> {
+        const queryOptions = {
+            range: getRange(range),
+            rangeUnit: getUnit(range),
+            interval: getInterval(interval),
+            intervalUnit: getUnit(interval),
+        };
+        const data = await this.analyticsRepo.getBandwidth(projectId, queryOptions);
+        return [data, queryOptions];
+    }
+    async getOverView(projectId: string, range: string, interval: string): Promise<[unknown[], queryOptions]> {
+        const queryOptions = {
+            range: getRange(range),
+            rangeUnit: getUnit(range),
+            interval: getInterval(interval),
+            intervalUnit: getUnit(interval),
+        };
+        const data = await this.analyticsRepo.getOverview(projectId, queryOptions);
+        return [data, queryOptions];
+    }
+    async getRealtime(projectId: string, interval: string): Promise<[unknown[], queryOptions]> {
+        const queryOptions = {
+            interval: getInterval(interval),
+            intervalUnit: getUnit(interval),
+        };
+        const data = await this.analyticsRepo.getRealtime(projectId, queryOptions);
+        return [data, queryOptions];
+    }
+    async getTopPages(projectId: string, interval: string, limit: number): Promise<[unknown[], queryOptions]> {
+        const queryOptions = {
+            interval: getInterval(interval),
+            intervalUnit: getUnit(interval),
+            limit,
+        };
+        const data = await this.analyticsRepo.getTopPages(projectId, queryOptions);
+        return [data, queryOptions];
+    }
+    async getOsStats(projectId: string, interval: string): Promise<[unknown[], queryOptions]> {
+        const queryOptions = {
+            interval: getInterval(interval),
+            intervalUnit: getUnit(interval),
+        };
+        const data = await this.analyticsRepo.getOsStats(projectId, queryOptions);
+        return [data, queryOptions];
+    }
 }
 
-export default AnalyticsService
+export default AnalyticsService;

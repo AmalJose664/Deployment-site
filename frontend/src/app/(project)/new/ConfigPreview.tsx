@@ -3,7 +3,7 @@
 import { ProjectFormInput } from "@/types/Project"
 import { UseFormReturn } from "react-hook-form"
 
-import { LuFolderTree } from "react-icons/lu";
+import { LuFolderTree, LuRocket } from "react-icons/lu";
 import { FiTerminal } from "react-icons/fi";
 import { IoIosGitBranch } from "react-icons/io";
 import { VscFileCode } from "react-icons/vsc";
@@ -35,7 +35,7 @@ export function ConfigPreview({ form }: { form: UseFormReturn<ProjectFormInput> 
 			hasValue: data.buildCommand
 		},
 		{
-			icon: FiTerminal,
+			icon: LuRocket,
 			title: "Ready to Launch",
 			desc: "Your project is configured for deployment.",
 			hasValue: form.formState.isValid,

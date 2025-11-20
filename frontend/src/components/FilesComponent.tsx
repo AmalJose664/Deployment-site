@@ -9,7 +9,7 @@ import { memo, useCallback, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { toast } from "sonner";
-import { TabFilesError, TabFilesLoading, TabFilesNoDeployment, TabFilesNoFiles } from "@/components/project/TabFilesComponents";
+import { TabFilesError, TabFilesLoading, TabFilesNoDeployment } from "@/components/project/TabFilesComponents";
 
 interface FilesProps {
 	projectId: string
@@ -70,6 +70,8 @@ const FilesComponent = ({ projectId, deploymentId, children }: FilesProps) => {
 		}, [projectId, deploymentId]
 	)
 	const [viewMode, setViewMode] = useState<'tree' | 'list'>('tree');
+
+
 	if (isLoading) {
 		return <TabFilesLoading />
 	}
@@ -79,9 +81,6 @@ const FilesComponent = ({ projectId, deploymentId, children }: FilesProps) => {
 	if (!deploymentId) {
 		return <TabFilesNoDeployment />
 	}
-	if (!filesData?.fileStructure) {
-		return <TabFilesNoFiles />
-	}
 
 	return (
 		<div className="">
@@ -89,7 +88,7 @@ const FilesComponent = ({ projectId, deploymentId, children }: FilesProps) => {
 				<div>
 					{children}
 					<p className="text-sm text-neutral-400">
-						{files.length} files • {formatBytes(filesData.fileStructure.totalSize)}
+						{files.length} files • {formatBytes(filesData?.fileStructure?.totalSize || 0)}
 					</p>
 				</div>
 

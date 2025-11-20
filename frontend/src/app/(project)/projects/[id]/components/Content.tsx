@@ -13,6 +13,7 @@ import ProjectSettings from "./TabProjectSettings"
 import ProjectAnalytics from "./TabProjectAnalytics"
 import TabProject from "./TabProject"
 import TabFiles from "./TabFiles"
+import { IoIosCube } from "react-icons/io"
 
 interface ProjectContentProps {
 	project: Project
@@ -54,12 +55,12 @@ export function ProjectContent({
 							<div className="flex items-center gap-6">
 								<button
 									onClick={onBack}
-									className="p-2 dark:hover:bg-zinc-800 hover:bg-zinc-200 rounded-lg transition-colors"
+									className="p-2 border group dark:hover:bg-zinc-800 hover:bg-zinc-200 rounded-lg transition-colors"
 								>
-									<TiArrowLeft size={20} />
+									<TiArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
 								</button>
 								<div>
-									<h1 className="text-xl font-semibold">{project.name}</h1>
+									<h1 className="text-xl flex gap-2 items-center font-semibold">{project.name} <IoIosCube /></h1>
 								</div>
 								<div>
 									<ProjectTabs />

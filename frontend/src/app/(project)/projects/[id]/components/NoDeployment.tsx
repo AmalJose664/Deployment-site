@@ -1,10 +1,18 @@
 import { Button } from "@/components/ui/button"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { HiMiniArrowUpRight } from "react-icons/hi2"
-import { IoRocketOutline } from "react-icons/io5"
 import { LuFolderCode } from "react-icons/lu"
 
-const NoDeployment = ({ onCreateDeployment }: { onCreateDeployment: () => void }) => {
+interface NoDeploymentProps {
+	buttonAction: () => void
+	titleText: string
+	descriptionText: string
+	buttonText: string
+	learnMoreUrl: string
+	buttonIcon: React.ReactNode
+}
+
+const NoDeployment = ({ buttonAction, buttonText, descriptionText, learnMoreUrl, titleText, buttonIcon }: NoDeploymentProps) => {
 
 	return (
 		<div className="border rounded-md mt-3 flex items-center justify-center">
@@ -13,14 +21,14 @@ const NoDeployment = ({ onCreateDeployment }: { onCreateDeployment: () => void }
 					<EmptyMedia variant="default">
 						<LuFolderCode />
 					</EmptyMedia>
-					<EmptyTitle className="text-primary">No Deployments Yet</EmptyTitle>
+					<EmptyTitle className="text-primary">{titleText}</EmptyTitle>
 					<EmptyDescription>
-						You haven&apos;t created any project deployment yet. Run your project by creating your new Deployment.
+						{descriptionText}
 					</EmptyDescription>
 				</EmptyHeader>
 				<EmptyContent>
 					<div className="flex gap-2">
-						<Button onClick={onCreateDeployment}>Create Deployment <IoRocketOutline /> </Button>
+						<Button onClick={buttonAction}>{buttonText} {buttonIcon} </Button>
 					</div>
 				</EmptyContent>
 				<Button
@@ -29,7 +37,7 @@ const NoDeployment = ({ onCreateDeployment }: { onCreateDeployment: () => void }
 					className="text-muted-foreground"
 					size="sm"
 				>
-					<a href="#">
+					<a href={learnMoreUrl}>
 						Learn More <HiMiniArrowUpRight />
 					</a>
 				</Button>

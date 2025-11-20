@@ -17,23 +17,19 @@ import AnalyticsController from "./controllers/analyticsController.js";
 
 import { client } from "./config/clickhouse.js";
 
-
 export const userRepo = new UserRepo();
 export const projectRepo = new ProjectRepo();
 export const deploymentRepo = new DeploymentRepo();
 export const logRepo = new LogRepo(client);
-export const analyticsRepo = new AnalyticsRepo(client)
-
+export const analyticsRepo = new AnalyticsRepo(client);
 
 export const userService = new UserService(userRepo);
 export const projectService = new ProjectService(projectRepo, userRepo);
 export const deploymentService = new DeploymentService(deploymentRepo, projectRepo);
 export const logsService = new LogsService(logRepo, deploymentRepo);
-export const analyticsService = new AnalyticsService(analyticsRepo)
-
-
+export const analyticsService = new AnalyticsService(analyticsRepo);
 
 export const projectController = new ProjectController(projectService);
 export const deploymentController = new DeploymentController(deploymentService);
 export const logsController = new LogsController(logsService);
-export const analyticsController = new AnalyticsController(analyticsService)
+export const analyticsController = new AnalyticsController(analyticsService);
