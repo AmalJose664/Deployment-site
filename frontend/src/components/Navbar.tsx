@@ -4,7 +4,7 @@ import { GoBell } from "react-icons/go";
 import { cn } from "@/lib/utils";
 import { IoIosCube, IoMdCloudDone } from "react-icons/io";
 import NavbarUser from "./NavbarUser";
-import { IoCubeSharp } from "react-icons/io5";
+import TitleWithLogo from "./TitleWithLogo";
 export default function Navbar({ className }: { className: string }) {
 
 	return (
@@ -24,14 +24,9 @@ export default function Navbar({ className }: { className: string }) {
 
 				<Link
 					href="/"
-					className="flex items-center space-x-2 hover:opacity-80 transition"
+					className="flex items-center space-x-2 hover:no-underline transition"
 				>
-					<div className="flex gap-2 items-center">
-						<span className="font-medium uppercase text-sm text-primary">
-							Lynfera
-						</span>
-						<IoCubeSharp size={20} className="rotate-z-180 transition-all duration-75" />
-					</div>
+					<TitleWithLogo />
 				</Link>
 				<svg
 					className="h-4 w-4 text-gray-400"

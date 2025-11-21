@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { RootState } from '@/store/store';
 import ThemeSwitcher from '@/components/ThemeIcon';
+import TitleWithLogo from '@/components/TitleWithLogo';
 
 
 export default function SignupPage() {
@@ -25,7 +26,9 @@ export default function SignupPage() {
 		<div className="relative min-h-screen flex items-center justify-center p-4">
 
 			<div className="absolute top-8 left-8">
-				<span className="text-2xl font-bold text-gray-100">Logo</span>
+				<Link href="/" className=' hover:no-underline'>
+					<TitleWithLogo />
+				</Link>
 			</div>
 
 			<div className="absolute top-8 right-8">
