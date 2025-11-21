@@ -3,14 +3,15 @@ import ThemeSwitcher from "./ThemeIcon";
 import { GoBell } from "react-icons/go";
 import { cn } from "@/lib/utils";
 import { IoIosCube, IoMdCloudDone } from "react-icons/io";
+import NavbarUser from "./NavbarUser";
+import { IoCubeSharp } from "react-icons/io5";
 export default function Navbar({ className }: { className: string }) {
 
 	return (
 		<nav className={cn(className, "flex w-full items-center justify-between px-6 py-3 border-b dark:border-gray-800 border-gray-300")}>
-
 			<div className="flex items-center space-x-3">
 				<svg
-					className="h-4 w-4 text-gray-400"
+					className="h-4 w-4 text-gray-400 rotate-x-180"
 					viewBox="0 0 16 16"
 					fill="currentColor"
 				>
@@ -22,20 +23,27 @@ export default function Navbar({ className }: { className: string }) {
 				</svg>
 
 				<Link
-					href="/amaljose664s-projects"
+					href="/"
 					className="flex items-center space-x-2 hover:opacity-80 transition"
 				>
-					<img
-						src="https://vercel.com/api/www/avatar/272277ae5942de6352a8328dabee24a5210945bb?s=44"
-						alt="amaljose664's projects"
-						width={22}
-						height={22}
-						className="rounded-full"
-					/>
-					<span className="font-medium text-sm dark:text-white text-black">
-						amaljose664’s projects
-					</span>
+					<div className="flex gap-2 items-center">
+						<span className="font-medium uppercase text-sm text-primary">
+							Lynfera
+						</span>
+						<IoCubeSharp size={20} className="rotate-z-180 transition-all duration-75" />
+					</div>
 				</Link>
+				<svg
+					className="h-4 w-4 text-gray-400"
+					viewBox="0 0 16 16"
+					fill="currentColor"
+				>
+					<path
+						fillRule="evenodd"
+						clipRule="evenodd"
+						d="M4.01526 15.3939L4.3107 14.7046L10.3107 0.704556L10.6061 0.0151978L11.9849 0.606077L11.6894 1.29544L5.68942 15.2954L5.39398 15.9848L4.01526 15.3939Z"
+					/>
+				</svg>
 			</div>
 
 
@@ -67,18 +75,8 @@ export default function Navbar({ className }: { className: string }) {
 				</button>
 				<ThemeSwitcher className="rounded-full" />
 
-				<button
-					className="flex items-center justify-center rounded-full overflow-hidden"
-					aria-label="User Menu"
-				>
-					<img
-						src="https://vercel.com/api/www/avatar?s=64&u=amaljose664"
-						alt="User Avatar"
-						width={24}
-						height={24}
-						className="rounded-full"
-					/>
-				</button>
+				<NavbarUser />
+
 			</div>
 		</nav>
 	);

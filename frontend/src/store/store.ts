@@ -7,6 +7,7 @@ import { projectApis } from './services/projectsApi'
 import { deployemntApis } from './services/deploymentApi'
 import { logsApis } from './services/logsApi'
 import { analyticsApi } from './services/analyticsApi'
+import { authApi } from './services/authApi'
 
 export const makeStore = () => {
 	return configureStore({
@@ -16,13 +17,15 @@ export const makeStore = () => {
 			[projectApis.reducerPath]: projectApis.reducer,
 			[deployemntApis.reducerPath]: deployemntApis.reducer,
 			[logsApis.reducerPath]: logsApis.reducer,
-			[analyticsApi.reducerPath]: analyticsApi.reducer
+			[analyticsApi.reducerPath]: analyticsApi.reducer,
+			[authApi.reducerPath]: authApi.reducer
 		},
 		middleware: (gDM) => gDM().concat(
 			projectApis.middleware,
 			deployemntApis.middleware,
 			logsApis.middleware,
-			analyticsApi.middleware
+			analyticsApi.middleware,
+			authApi.middleware
 		),
 	})
 }
