@@ -4,10 +4,12 @@ import { IoMdGlobe, IoMdGitBranch } from "react-icons/io";
 import { FiGithub, FiGitCommit, } from "react-icons/fi";
 import { CiCalendarDate } from "react-icons/ci";
 import { GrRotateRight } from "react-icons/gr";
+import { CgUnavailable } from "react-icons/cg";
 import { IoSettingsOutline } from "react-icons/io5";
 import { MdAccessTime } from "react-icons/md";
 import { MdOutlineLineStyle } from "react-icons/md";
 import { RxExternalLink } from "react-icons/rx";
+
 import { User } from "@/types/User";
 import { Project, ProjectStatus } from "@/types/Project";
 import Link from "next/link";
@@ -27,12 +29,13 @@ interface ProjectOverviewProps {
 }
 
 const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, goToSettings }: ProjectOverviewProps) => {
-
+	const isprojectError = project.status === ProjectStatus.CANCELED || project.status === ProjectStatus.FAILED
+	const isDeplymentError = project.deployments?.length !== 0
+		&& deployment
+		&& (deployment.status === ProjectStatus.CANCELED
+			|| deployment?.status === ProjectStatus.FAILED)
 	const repoValues = parseGitHubRepo(project.repoURL)
-	const triggerReDeploy = () => {
-		toast.info("New Deployment started")
-		reDeploy()
-	}
+
 	return (
 		<>
 			<div className="flex flex-col items-stretch mt-4 sm:flex-row md:flex-row gap-2 sm:gap-4 lg:gap-6 p-1 sm:p-1 lg:p-1 w-full h-full">
@@ -66,11 +69,18 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, goToSett
 								</div>
 								<div>
 									<Link
-										href={`${window.location.protocol}//${project.subdomain}.${process.env.NEXT_PUBLIC_PROXY_SERVER}`}
+										href={
+											project.status === ProjectStatus.READY
+												? `${window.location.protocol}//${project.subdomain}.${process.env.NEXT_PUBLIC_PROXY_SERVER}`
+												: ""
+										}
 										className='flex gap-2 items-center text-sm font-medium '>
 										{`${window.location.protocol}//${project.subdomain}`}
 										<RxExternalLink />
 									</Link>
+								</div>
+								<div>
+									{project.status !== ProjectStatus.READY && <CgUnavailable className="text-red-400" />}
 								</div>
 							</div>
 						</div>
@@ -111,14 +121,14 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, goToSett
 								}
 							</div>
 						</div>
-						{project.status === ProjectStatus.CANCELED && (
+						{isprojectError && (
 							<div className='flex items-center gap-2'>
 								<div className='p-2  rounded-lg'>
 									<StatusIcon status={project.status} />
 								</div>
 								<div className='flex gap-2 items-center'>
 									<p className='text-xs text-less font-medium'>Reason</p>
-									<p className={`text-sm font-bold rounded-xs px-1 ${getStatusColor(project.status)}`}>{deployment?.errorMessage}</p>
+									<p className="text-sm font-bold rounded-xs px-1 text-red-400 bg-red-800/30">{deployment?.errorMessage}</p>
 								</div>
 							</div>
 						)}
@@ -140,10 +150,10 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, goToSett
 						<Button variant={"secondary"} onClick={() => setShowBuild(true)} className='border px-4 py-2 rounded-lg text-sm font-medium  transition-colors'>
 							View Logs <MdOutlineLineStyle />
 						</Button>
-						{(project.status === ProjectStatus.CANCELED || project.status === ProjectStatus.FAILED)
+						{(isprojectError)
 							&&
-							(project.deployments?.length !== 0 && (deployment?.status === ProjectStatus.CANCELED || deployment?.status === ProjectStatus.FAILED)) &&
-							<Button variant={"secondary"} onClick={triggerReDeploy} className='border  group px-4 py-2 rounded-lg text-sm font-medium  transition-colors'>
+							(isDeplymentError) &&
+							<Button variant={"secondary"} onClick={reDeploy} className='border  group px-4 py-2 rounded-lg text-sm font-medium  transition-colors'>
 								Re Deploy < GrRotateRight className="text-green-400 group-hover:rotate-z-90 transition-all duration-300" />
 							</Button>
 						}

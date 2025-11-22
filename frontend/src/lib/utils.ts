@@ -143,3 +143,7 @@ export function parseGitHubRepo(input: string): string[] {
 	const parts = str.split("/");
 	return [parts[0], parts[1]];
 }
+
+export function shortHash(hash: string) {
+	return hash.slice(0, 7);
+}

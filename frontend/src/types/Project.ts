@@ -21,6 +21,7 @@ export interface Project {
 	outputDirectory: string;
 	currentDeployment: string | null;
 	tempDeployment: string | null;
+	lastDeployment: string | null;
 	isDisabled: boolean;
 	techStack: string;
 	env: {

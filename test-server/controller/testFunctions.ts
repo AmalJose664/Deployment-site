@@ -11,20 +11,11 @@ const infoAr = ['INFO', 'SUCCESS', 'WARN', 'ERROR']
 
 
 export async function testSubmit1(req: Request, res: Response) {
-	const { topic, message } = req.body;
-
-
-	if (!topic || !message) {
-		return res.status(400).json({ error: 'Both topic and message are required.' });
-	}
-
-
+	const number = req.query.number
 	const randomValue = infoAr[Math.floor(Math.random() * infoAr.length)];
-	console.log(`Received topic: ${topic}`);
-	console.log(`Received message: ${message}`);
-	const DEPLOYMENT_ID = "68ff74fc0c735bac01ff7347"
-	const PROJECT_ID = "68fb1ccb10b93de245fa9f55"
-	for (let i = 0; i < 1; i++) {
+	const DEPLOYMENT_ID = "6921a9af999a11682f69f697"
+	const PROJECT_ID = "691e1a1babe973c943c5cf7d"
+	for (let i = 0; i < Number(number || 1); i++) {
 		const value = JSON.stringify({
 			eventId: '38a86d69-a1b8-4f12-a488-5ff2bf61a489',
 			eventType: 'DEPLOYMENT_LOG',
@@ -39,16 +30,15 @@ export async function testSubmit1(req: Request, res: Response) {
 				}
 			}
 		})
-		console.log(value)
-
-		await producer.send({
+		// await new Promise((res) => setTimeout(res, 10))
+		producer.send({
 			topic: "deployment.logs", messages: [
 				{ key: "log", value: value }
 			]
 		});
 		console.log(i, "<<<<")
 	}
-	res.json({ success: true, topic, message });
+	res.json({ success: true, number: Number(number) });
 }
 
 export async function testSubmit2(req: Request, res: Response) {

@@ -4,7 +4,7 @@ import { IoMdGitBranch } from "react-icons/io";
 import { LiaExternalLinkAltSolid } from "react-icons/lia";
 import { MdAccessTime } from "react-icons/md";
 import { Deployment } from "@/types/Deployment";
-import { getElapsedTime, getGithubBranchUrl, getGithubCommitUrl, getStatusColor, timeToSeconds } from "@/lib/utils";
+import { getElapsedTime, getGithubBranchUrl, getGithubCommitUrl, getStatusColor, shortHash, timeToSeconds } from "@/lib/utils";
 import Link from "next/link";
 import StatusIcon from "@/components/ui/StatusIcon";
 
@@ -14,15 +14,15 @@ interface ProjectDeploymentProps {
 	projectBranch: string;
 	repoURL: string
 	showLogs: () => void
-	isCurrent: boolean
+	type: "Progress" | "Current" | "Last"
 }
 
-const ProjectCurrentDeployment = ({ deployment, projectBranch, repoURL, showLogs, isCurrent }: ProjectDeploymentProps) => {
+const ProjectDeploymentBox = ({ deployment, projectBranch, repoURL, showLogs, type }: ProjectDeploymentProps) => {
 
 	return (
 		<div className="border  rounded-xl overflow-hidden dark:bg-neutral-900 bg-white mb-4">
 			<div className="px-6 py-4 border-b border-gray-800">
-				<h2 className="text-lg font-semibold">{isCurrent ? "Current" : "Progress"} Deployment</h2>
+				<h2 className="text-lg font-semibold">{type} Deployment</h2>
 			</div>
 
 
@@ -43,11 +43,11 @@ const ProjectCurrentDeployment = ({ deployment, projectBranch, repoURL, showLogs
 										{deployment.status}
 									</span>
 									<span className="text-xs  font-mono">
-										{deployment.commitHash}
+										{shortHash(deployment.commit.id)}
 									</span>
-									<span className="text-xs text-gray-500">{deployment.completedAt ? getElapsedTime(deployment.completedAt) : "- - - -"}{"  "}ago</span>
+									<span className="text-xs text-gray-500">{getElapsedTime(deployment.completedAt || deployment.createdAt)}{"  "}ago</span>
 								</div>
-								<Link href={getGithubCommitUrl(repoURL, deployment.commitHash)} target="_blank" className="hover:underline text-sm text-primary mb-1">{deployment.commitHash}</Link>
+								<Link href={getGithubCommitUrl(repoURL, shortHash(deployment.commit.id))} target="_blank" className="hover:underline text-sm text-primary mb-1">{shortHash(deployment.commit.id)}</Link>
 								<div className="flex items-center gap-4 text-xs text-gray-400">
 									<div className="flex items-center text-xs gap-1.5">
 										<IoMdGitBranch size={12} />
@@ -70,4 +70,4 @@ const ProjectCurrentDeployment = ({ deployment, projectBranch, repoURL, showLogs
 		</div>
 	)
 }
-export default ProjectCurrentDeployment
+export default ProjectDeploymentBox

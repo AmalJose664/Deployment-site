@@ -19,6 +19,7 @@ interface ProjectContentProps {
 	project: Project
 	deployment?: Deployment
 	tempDeployment?: Deployment
+	lastDeployment?: Deployment
 	refetch: () => void
 	onBack: () => void
 	showBuild: boolean
@@ -33,6 +34,7 @@ export function ProjectContent({
 	project,
 	deployment,
 	tempDeployment,
+	lastDeployment,
 	refetch,
 	onBack,
 	tabFromUrl,
@@ -79,6 +81,7 @@ export function ProjectContent({
 							project={project}
 							deployment={deployment}
 							tempDeployment={tempDeployment}
+							lastDeployment={lastDeployment}
 							onCreateDeployment={onCreateDeployment}
 							setShowBuild={setShowBuild}
 							reDeploy={reDeploy}

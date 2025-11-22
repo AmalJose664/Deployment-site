@@ -1,6 +1,6 @@
 import { deployemntApis } from "@/store/services/deploymentApi";
 import { projectApis } from "@/store/services/projectsApi";
-import { addLog } from "@/store/slices/logSlice";
+import { addLog, addLogs } from "@/store/slices/logSlice";
 import { useAppDispatch } from "@/store/store";
 import { Deployment, DeploymentUpdates } from "@/types/Deployment";
 import { Log } from "@/types/Log";
@@ -10,14 +10,17 @@ import { toast } from "sonner";
 
 
 export function useDeploymentSSE(project: Project | undefined, refetch: () => void,
-	deployment?: Deployment,) {
+	sseActive: boolean, setSseActive: (state: boolean) => void, deployment?: Deployment,) {
 	const dispatch = useAppDispatch();
 	const eventSourceRef = useRef<EventSource | null>(null)
 	const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+	const logBatchRef = useRef<Log[]>([]);
+	const batchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
 	useEffect(() => {
+		if (!sseActive) return
 		if (!deployment?._id || !deployment.status) return
 		if (eventSourceRef.current) return
-
 		if (
 			deployment.status !== ProjectStatus.BUILDING &&
 			deployment.status !== ProjectStatus.QUEUED
@@ -34,8 +37,17 @@ export function useDeploymentSSE(project: Project | undefined, refetch: () => vo
 		eventSource.onmessage = (event) => {
 			try {
 				const receivedData = JSON.parse(event.data)
+				console.log(receivedData)
 				if (receivedData.type === "LOG") {
-					dispatch(addLog(receivedData.data as Log))
+					logBatchRef.current.push(receivedData.data as Log);
+					if (batchTimerRef.current) clearTimeout(batchTimerRef.current);
+					batchTimerRef.current = setTimeout(() => {
+						if (logBatchRef.current.length > 0) {
+							dispatch(addLogs(logBatchRef.current));
+							logBatchRef.current = [];
+						}
+					}, 100);
+					// dispatch(addLog(receivedData.data as Log))
 				} else if (receivedData.type === "UPDATE") {
 					const update = receivedData.data as DeploymentUpdates
 					dispatch(
@@ -88,6 +100,8 @@ export function useDeploymentSSE(project: Project | undefined, refetch: () => vo
 								? toast.success("New Deployment resulted in Success 🎉🎉")
 								: toast.error("New Deployment resulted in Failure")
 							refetch()
+							eventSource.close()
+							setSseActive(false)
 						}, 1300)
 						console.log("end here .... ... .")
 					}
@@ -124,12 +138,11 @@ export function useDeploymentSSE(project: Project | undefined, refetch: () => vo
 			console.log('SSE connection closed by server');
 			eventSourceRef.current = null
 		})
-
 		return () => {
 			eventSource.close(); eventSourceRef.current = null
 			console.log("closed sse.............")
 			if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current)
 		}
-	}, [deployment?._id, dispatch])
+	}, [deployment?._id, sseActive])
 	return null
 }

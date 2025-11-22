@@ -35,11 +35,17 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 
 	const [createDeployment, { }] = useCreateDeploymentMutation()
 	const [showBuild, setShowBuild] = useState(false)
+	const [sseActive, setSseActive] = useState(false)
 	const handleCreateDeployment = async () => {
-		toast.success("New Deployment Started")
-		await createDeployment(projectId)
-		setShowBuild(true)
-		await refetch()
+		try {
+			toast.success("New Deployment Started")
+			await createDeployment(projectId).unwrap()
+			setSseActive(true)
+			setShowBuild(true)
+			await refetch()
+		} catch (error) {
+			setSseActive(false)
+		}
 	}
 	const { data: tempDeployment } = useGetDeploymentByIdQuery(
 		{
@@ -48,6 +54,15 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 		},
 		{
 			skip: !project?.tempDeployment
+		}
+	)
+	const { data: lastDeployment } = useGetDeploymentByIdQuery(
+		{
+			id: project?.lastDeployment || "",
+			params: {},
+		},
+		{
+			skip: !project?.lastDeployment || !!project.currentDeployment
 		}
 	)
 	const { data: deployment } = useGetDeploymentByIdQuery(
@@ -60,8 +75,8 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 		}
 	)
 	const { data: initialLogs, refetch: refetchLogs } = useGetDeploymentLogsQuery(
-		{ deploymentId: deployment?._id ?? "" },
-		{ skip: !deployment?._id }
+		{ deploymentId: deployment?._id ?? lastDeployment?._id ?? "" },
+		{ skip: !showBuild || (!deployment?._id && !lastDeployment?._id) }
 	)
 
 	useEffect(() => {
@@ -70,11 +85,10 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 		}
 		return () => { dispatch(clearLogs()) }
 	}, [initialLogs, dispatch])
-	useDeploymentSSE(project, refetch, tempDeployment,)
+	useDeploymentSSE(project, refetch, sseActive, setSseActive, lastDeployment)
 
 	const reDeploy = async () => {
-
-		if (!project || !deployment) return
+		if (!project || (!deployment && !lastDeployment)) return
 		dispatch(
 			projectApis.util.updateQueryData(
 				"getProjectById",
@@ -108,6 +122,7 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 			project={project}
 			deployment={deployment}
 			tempDeployment={tempDeployment}
+			lastDeployment={lastDeployment}
 			tabFromUrl={tab}
 			refetch={refetch}
 			reDeploy={reDeploy}
