@@ -30,15 +30,16 @@ const TabProject = ({ project, deployment, tempDeployment, onCreateDeployment, s
 			<div className="dark:bg-neutral-900 border bg-white w-full rounded-md mb-6 mt-4 p-4">
 
 				{(project.deployments && project.deployments.length === 0) && (
-					<NoDeployment
-						buttonAction={onCreateDeployment}
-						titleText="No Deployments Yet"
-						descriptionText="You haven&apos;t created any project deployment yet. Run your project by creating your new Deployment."
-						buttonText="Create Deployment"
-						buttonIcon={<IoRocketOutline />}
-						learnMoreUrl="#"
-					/>
+					''
 				)}
+				<NoDeployment
+					buttonAction={onCreateDeployment}
+					titleText="No Deployments Yet"
+					descriptionText="You haven&apos;t created any project deployment yet. Run your project by creating your new Deployment."
+					buttonText="Create Deployment"
+					buttonIcon={<IoRocketOutline />}
+					learnMoreUrl="#"
+				/>
 
 				<ProjectOverview
 					project={project}

@@ -35,7 +35,7 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, goToSett
 	}
 	return (
 		<>
-			<div className="flex flex-col items-stretch sm:flex-row md:flex-row gap-2 sm:gap-4 lg:gap-6 p-1 sm:p-1 lg:p-1 w-full h-full">
+			<div className="flex flex-col items-stretch mt-4 sm:flex-row md:flex-row gap-2 sm:gap-4 lg:gap-6 p-1 sm:p-1 lg:p-1 w-full h-full">
 
 				<div className='flex flex-col justify-between w-3/5 border  rounded-xl p-6 shadow-sm'>
 
@@ -91,7 +91,7 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, goToSett
 								</div>
 								<div>
 									<Link target="_blank" href={getGithubCommitUrl(project.repoURL, deployment?.commit.id || "")} className='text-sm flex gap-2 items-center font-medium hover:underline'>
-										{deployment?.commit.id.slice(0, 10) + "..." || ""}
+										{deployment?.commit.id.slice(0, 10) || "" + "..."}
 										<p className="text-xl">/</p>
 										{deployment?.commit.msg}
 									</Link>
@@ -142,7 +142,7 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, goToSett
 						</Button>
 						{(project.status === ProjectStatus.CANCELED || project.status === ProjectStatus.FAILED)
 							&&
-							(deployment && (deployment?.status === ProjectStatus.CANCELED || deployment?.status === ProjectStatus.FAILED)) &&
+							(project.deployments?.length !== 0 && (deployment?.status === ProjectStatus.CANCELED || deployment?.status === ProjectStatus.FAILED)) &&
 							<Button variant={"secondary"} onClick={triggerReDeploy} className='border  group px-4 py-2 rounded-lg text-sm font-medium  transition-colors'>
 								Re Deploy < GrRotateRight className="text-green-400 group-hover:rotate-z-90 transition-all duration-300" />
 							</Button>

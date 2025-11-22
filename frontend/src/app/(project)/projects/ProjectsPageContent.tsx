@@ -81,7 +81,7 @@ export default function ProjectContent() {
 	return (
 		<div>
 			<div className="min-h-screen">
-				<header className="border-b border-gray-800">
+				<header className="border-b ">
 					<div className="max-w-7xl mx-auto px-6 py-4">
 						<div className="flex items-center justify-between">
 							<div className="flex items-center gap-8">
@@ -124,7 +124,7 @@ export default function ProjectContent() {
 								placeholder="Search projects..."
 								value={projectSeachState}
 								onChange={handleSearch}
-								className="w-full  border dark:border-gray-800 border-gray-300 dark:bg-inherit bg-white rounded-md pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-gray-700 focus:ring-1 focus:ring-gray-700"
+								className="w-full  border dark:bg-neutral-900 bg-white rounded-md pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-gray-700 focus:ring-1 focus:ring-gray-700"
 							/>
 						</div>
 					</div>
