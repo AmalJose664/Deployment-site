@@ -15,187 +15,187 @@ import { BUILD_SERVER_PATH, BUILD_SERVER_RUN_SCRIPT, LOCAL_TEST_SERVER_USER_FILE
 import { _Object, DeleteObjectCommand, DeleteObjectsCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 
 class DeploymentService implements IDeploymentService {
-    private deploymentRepository: IDeploymentRepository;
-    private projectRepository: IProjectRepository;
-    constructor(deploymentRepo: IDeploymentRepository, projectRepo: IProjectRepository) {
-        this.deploymentRepository = deploymentRepo;
-        this.projectRepository = projectRepo;
-    }
-    async newDeployment(deploymentData: Partial<IDeployment>, userId: string, projectId: string): Promise<IDeployment | null> {
-        const correspondindProject = await this.projectRepository.findProject(projectId, userId);
-        if (!correspondindProject) {
-            throw new AppError("Project not found", 404);
-        }
-        if (correspondindProject.status === ProjectStatus.BUILDING) {
-            throw new AppError("Project deployment already in progress", 400);
-        }
-        if (correspondindProject.isDeleted) {
-            throw new AppError("Project not available for deployment", 400);
-        }
+	private deploymentRepository: IDeploymentRepository;
+	private projectRepository: IProjectRepository;
+	constructor(deploymentRepo: IDeploymentRepository, projectRepo: IProjectRepository) {
+		this.deploymentRepository = deploymentRepo;
+		this.projectRepository = projectRepo;
+	}
+	async newDeployment(deploymentData: Partial<IDeployment>, userId: string, projectId: string): Promise<IDeployment | null> {
+		const correspondindProject = await this.projectRepository.findProject(projectId, userId);
+		if (!correspondindProject) {
+			throw new AppError("Project not found", 404);
+		}
+		if (correspondindProject.status === ProjectStatus.BUILDING) {
+			throw new AppError("Project deployment already in progress", 400);
+		}
+		if (correspondindProject.isDeleted) {
+			throw new AppError("Project not available for deployment", 400);
+		}
 
-        deploymentData.status = DeploymentStatus.QUEUED;
-        deploymentData.overWrite = false;
-        deploymentData.commit_hash = "######################################";
-        deploymentData.s3Path = correspondindProject._id.toString();
-        deploymentData.project = new Types.ObjectId(correspondindProject._id);
-        deploymentData.user = correspondindProject.user;
+		deploymentData.status = DeploymentStatus.QUEUED;
+		deploymentData.overWrite = false;
+		deploymentData.commit_hash = "-----------";
+		deploymentData.s3Path = correspondindProject._id.toString();
+		deploymentData.project = new Types.ObjectId(correspondindProject._id);
+		deploymentData.user = correspondindProject.user;
 
-        const deployment = await this.deploymentRepository.createDeployment(deploymentData);
+		const deployment = await this.deploymentRepository.createDeployment(deploymentData);
 
-        console.log(await this.projectRepository.pushToDeployments(correspondindProject.id, userId, deployment?.id));
-        if (deployment?._id) {
-            // this.deployLocal(deployment?._id, projectId)
-        }
-        return deployment;
-    }
+		console.log(await this.projectRepository.pushToDeployments(correspondindProject.id, userId, deployment?.id));
+		if (deployment?._id) {
+			this.deployLocal(deployment?._id, projectId)
+		}
+		return deployment;
+	}
 
-    async getDeploymentById(id: string, userId: string, includesField?: string): Promise<IDeployment | null> {
-        return await this.deploymentRepository.findDeploymentById(id, userId, includesField);
-    }
+	async getDeploymentById(id: string, userId: string, includesField?: string): Promise<IDeployment | null> {
+		return await this.deploymentRepository.findDeploymentById(id, userId, includesField);
+	}
 
-    async getAllDeployments(userId: string, query: QueryDeploymentDTO): Promise<{ deployments: IDeployment[]; total: number }> {
-        return await this.deploymentRepository.findAllDeployments(userId, query);
-    }
+	async getAllDeployments(userId: string, query: QueryDeploymentDTO): Promise<{ deployments: IDeployment[]; total: number }> {
+		return await this.deploymentRepository.findAllDeployments(userId, query);
+	}
 
-    async getProjectDeployments(
-        userId: string,
-        projectId: string,
-        query: QueryDeploymentDTO,
-    ): Promise<{ deployments: IDeployment[]; total: number }> {
-        const correspondindProject = await this.projectRepository.findProject(projectId, userId);
-        if (!correspondindProject) {
-            throw new AppError("Project not found", 404);
-        }
-        return await this.deploymentRepository.findProjectDeployments(userId, projectId, query);
-    }
+	async getProjectDeployments(
+		userId: string,
+		projectId: string,
+		query: QueryDeploymentDTO,
+	): Promise<{ deployments: IDeployment[]; total: number }> {
+		const correspondindProject = await this.projectRepository.findProject(projectId, userId);
+		if (!correspondindProject) {
+			throw new AppError("Project not found", 404);
+		}
+		return await this.deploymentRepository.findProjectDeployments(userId, projectId, query);
+	}
 
-    async deleteDeployment(projectId: string, deploymentId: string, userId: string): Promise<number> {
-        const project = await this.projectRepository.findProject(projectId, userId);
-        if (!project) throw new AppError("Project not found", 404);
+	async deleteDeployment(projectId: string, deploymentId: string, userId: string): Promise<number> {
+		const project = await this.projectRepository.findProject(projectId, userId);
+		if (!project) throw new AppError("Project not found", 404);
 
-        if (project.status === ProjectStatus.BUILDING || project.status === ProjectStatus.QUEUED) {
-            throw new AppError("Project is currently in progress state, please try later", 400);
-        }
+		if (project.status === ProjectStatus.BUILDING || project.status === ProjectStatus.QUEUED) {
+			throw new AppError("Project is currently in progress state, please try later", 400);
+		}
 
-        if (!project.deployments?.includes(deploymentId as any)) {
-            throw new AppError("Deployment not found", 404);
-        }
-        let newCurrentDeployment = null;
+		if (!project.deployments?.includes(deploymentId as any)) {
+			throw new AppError("Deployment not found", 404);
+		}
+		let newCurrentDeployment = null;
 
-        if (project.currentDeployment === deploymentId) {
-            const allDeployments = await this.deploymentRepository.__findAllProjectDeployment(projectId, "createdAt");
-            const currentIndex = allDeployments.findIndex((d) => d._id.toString() === deploymentId);
-            console.log(allDeployments, "<<<<", currentIndex);
+		if (project.currentDeployment === deploymentId) {
+			const allDeployments = await this.deploymentRepository.__findAllProjectDeployment(projectId, "createdAt");
+			const currentIndex = allDeployments.findIndex((d) => d._id.toString() === deploymentId);
+			console.log(allDeployments, "<<<<", currentIndex);
 
-            if (currentIndex > 0) {
-                newCurrentDeployment = allDeployments[currentIndex - 1]._id;
-            }
-        }
+			if (currentIndex > 0) {
+				newCurrentDeployment = allDeployments[currentIndex - 1]._id;
+			}
+		}
 
-        await this.deleteLocal(deploymentId, project._id);
-        await this.projectRepository.pullDeployments(
-            projectId,
-            userId,
-            deploymentId,
-            newCurrentDeployment ? newCurrentDeployment : deploymentId === project.currentDeployment ? null : project.currentDeployment,
-        );
-        return await this.deploymentRepository.deleteDeployment(projectId, deploymentId, userId);
-    }
+		await this.deleteLocal(deploymentId, project._id);
+		await this.projectRepository.pullDeployments(
+			projectId,
+			userId,
+			deploymentId,
+			newCurrentDeployment ? newCurrentDeployment : deploymentId === project.currentDeployment ? null : project.currentDeployment,
+		);
+		return await this.deploymentRepository.deleteDeployment(projectId, deploymentId, userId);
+	}
 
-    async __getDeploymentById(id: string): Promise<IDeployment | null> {
-        //container
-        return this.deploymentRepository.__findDeployment(id);
-    }
+	async __getDeploymentById(id: string): Promise<IDeployment | null> {
+		//container
+		return this.deploymentRepository.__findDeployment(id);
+	}
 
-    async __updateDeployment(projectId: string, deploymentId: string, updateData: Partial<IDeployment>): Promise<IDeployment | null> {
-        const result = await this.deploymentRepository.__updateDeployment(projectId, deploymentId, updateData);
-        return result;
-    }
+	async __updateDeployment(projectId: string, deploymentId: string, updateData: Partial<IDeployment>): Promise<IDeployment | null> {
+		const result = await this.deploymentRepository.__updateDeployment(projectId, deploymentId, updateData);
+		return result;
+	}
 
-    async deployLocal(deploymentId: string, projectId: string): Promise<void> {
-        const command = spawn("node", [BUILD_SERVER_RUN_SCRIPT], {
-            cwd: BUILD_SERVER_PATH,
-            env: {
-                ...process.env,
-                DEPLOYMENT_ID: deploymentId,
-                PROJECT_ID: projectId,
-            },
-        });
+	async deployLocal(deploymentId: string, projectId: string): Promise<void> {
+		const command = spawn("node", [BUILD_SERVER_RUN_SCRIPT], {
+			cwd: BUILD_SERVER_PATH,
+			env: {
+				...process.env,
+				DEPLOYMENT_ID: deploymentId,
+				PROJECT_ID: projectId,
+			},
+		});
 
-        command.stdout?.on("data", (data) => {
-            console.log(`[stdout]: -----data-----from----deployLocal`);
-        });
+		command.stdout?.on("data", (data) => {
+			console.log(`[stdout]: -----data-----from----deployLocal`);
+		});
 
-        command.stderr?.on("data", (data) => {
-            console.error(`[stderr]: ${data.toString().trim()}`);
-        });
+		command.stderr?.on("data", (data) => {
+			console.error(`[stderr]: ${data.toString().trim()}`);
+		});
 
-        command.on("exit", (code) => {
-            console.log(`Process exited with code ${code}`);
-        });
+		command.on("exit", (code) => {
+			console.log(`Process exited with code ${code}`);
+		});
 
-        command.on("error", (err) => {
-            console.error("Failed to start process:", err);
-        });
-    }
-    async deployAws(project: IProject, deployment: IDeployment): Promise<void> {
-        const command = new RunTaskCommand({
-            cluster: config.CLUSTER,
-            taskDefinition: config.TASK,
-            launchType: "FARGATE",
-            count: 1,
-            networkConfiguration: {
-                awsvpcConfiguration: {
-                    subnets: process.env.SUBNETS_STRING?.split(","),
-                    securityGroups: process.env.SECURITY_GROUPS?.split(","),
-                    assignPublicIp: "ENABLED",
-                },
-            },
-            overrides: {
-                containerOverrides: [
-                    {
-                        name: "custom-build-container", // docker image after build,
-                        environment: [
-                            ...project.env,
-                            { name: "SERVER_PUSHED_D_ID", value: deployment._id },
-                            { name: "SERVER_PUSHED_P_ID", value: project.id },
-                        ],
-                    },
-                ],
-            },
-        });
-        await ecsClient.send(command);
-    }
+		command.on("error", (err) => {
+			console.error("Failed to start process:", err);
+		});
+	}
+	async deployAws(project: IProject, deployment: IDeployment): Promise<void> {
+		const command = new RunTaskCommand({
+			cluster: config.CLUSTER,
+			taskDefinition: config.TASK,
+			launchType: "FARGATE",
+			count: 1,
+			networkConfiguration: {
+				awsvpcConfiguration: {
+					subnets: process.env.SUBNETS_STRING?.split(","),
+					securityGroups: process.env.SECURITY_GROUPS?.split(","),
+					assignPublicIp: "ENABLED",
+				},
+			},
+			overrides: {
+				containerOverrides: [
+					{
+						name: "custom-build-container", // docker image after build,
+						environment: [
+							...project.env,
+							{ name: "SERVER_PUSHED_D_ID", value: deployment._id },
+							{ name: "SERVER_PUSHED_P_ID", value: project.id },
+						],
+					},
+				],
+			},
+		});
+		await ecsClient.send(command);
+	}
 
-    async deleteLocal(deploymentId: string, projectId: string): Promise<void> {
-        const path = `${LOCAL_TEST_SERVER_USER_FILES}/${projectId}/${deploymentId}/`;
-        console.log("deleting files at ", path);
+	async deleteLocal(deploymentId: string, projectId: string): Promise<void> {
+		const path = `${LOCAL_TEST_SERVER_USER_FILES}/${projectId}/${deploymentId}/`;
+		console.log("deleting files at ", path);
 
-        await rm(path, {
-            recursive: true,
-            force: true,
-        });
-    }
+		await rm(path, {
+			recursive: true,
+			force: true,
+		});
+	}
 
-    async deleteAws(deploymentId: string, projectId: string): Promise<void> {
-        const prefix = `${S3_OUTPUTS_DIR}/${projectId}/${deploymentId}/`;
-        const APP_FILES_BUCKET = process.env.AWS_S3_BUCKET;
-        const listCommand = new ListObjectsV2Command({
-            Bucket: APP_FILES_BUCKET,
-            Prefix: prefix,
-        });
-        const listed = await s3Client.send(listCommand);
-        if (!listed.Contents || listed.Contents.length === 0) {
-            return;
-        }
-        const deleteCommand = new DeleteObjectsCommand({
-            Bucket: APP_FILES_BUCKET,
-            Delete: {
-                Objects: listed.Contents.map((obj: _Object) => ({ Key: obj.Key })),
-            },
-        });
-        await s3Client.send(deleteCommand);
-    }
+	async deleteAws(deploymentId: string, projectId: string): Promise<void> {
+		const prefix = `${S3_OUTPUTS_DIR}/${projectId}/${deploymentId}/`;
+		const APP_FILES_BUCKET = process.env.AWS_S3_BUCKET;
+		const listCommand = new ListObjectsV2Command({
+			Bucket: APP_FILES_BUCKET,
+			Prefix: prefix,
+		});
+		const listed = await s3Client.send(listCommand);
+		if (!listed.Contents || listed.Contents.length === 0) {
+			return;
+		}
+		const deleteCommand = new DeleteObjectsCommand({
+			Bucket: APP_FILES_BUCKET,
+			Delete: {
+				Objects: listed.Contents.map((obj: _Object) => ({ Key: obj.Key })),
+			},
+		});
+		await s3Client.send(deleteCommand);
+	}
 }
 
 export default DeploymentService;
