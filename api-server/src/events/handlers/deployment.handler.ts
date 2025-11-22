@@ -48,6 +48,7 @@ class DeploymentEventHandler {
 				await deploymentService.__updateDeployment(projectId, deploymentId, {
 					status: updates.status,
 					complete_at: new Date(updates.complete_at || ""),
+					...(updates.commit_hash && { commit_hash: updates.commit_hash, }),
 					install_ms: updates.install_ms,
 					build_ms: updates.build_ms,
 					duration_ms: updates.duration_ms,
