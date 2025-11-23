@@ -13,6 +13,7 @@ import { spawn } from "child_process";
 import { QueryDeploymentDTO } from "../dtos/deployment.dto.js";
 import { BUILD_SERVER_PATH, BUILD_SERVER_RUN_SCRIPT, LOCAL_TEST_SERVER_USER_FILES, S3_OUTPUTS_DIR } from "../constants/paths.js";
 import { _Object, DeleteObjectCommand, DeleteObjectsCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
+import getNessesaryEnvs from "../utils/getNessesaryEnvs.js";
 
 class DeploymentService implements IDeploymentService {
 	private deploymentRepository: IDeploymentRepository;
@@ -113,58 +114,72 @@ class DeploymentService implements IDeploymentService {
 	}
 
 	async deployLocal(deploymentId: string, projectId: string): Promise<void> {
-		const command = spawn("node", [BUILD_SERVER_RUN_SCRIPT], {
-			cwd: BUILD_SERVER_PATH,
-			env: {
-				...process.env,
-				DEPLOYMENT_ID: deploymentId,
-				PROJECT_ID: projectId,
-			},
-		});
+		try {
+			const envs = getNessesaryEnvs()
+			const command = spawn("node", [BUILD_SERVER_RUN_SCRIPT], {
+				cwd: BUILD_SERVER_PATH,
+				env: {
+					...process.env,
+					DEPLOYMENT_ID: deploymentId,
+					PROJECT_ID: projectId,
+				},
+			});
 
-		command.stdout?.on("data", (data) => {
-			console.log(`[stdout]: -----data-----from----deployLocal`);
-		});
+			command.stdout?.on("data", (data) => {
+				console.log(`[stdout]: -----data-----from----deployLocal`);
+			});
 
-		command.stderr?.on("data", (data) => {
-			console.error(`[stderr]: ${data.toString().trim()}`);
-		});
+			command.stderr?.on("data", (data) => {
+				console.error(`[stderr]: ${data.toString().trim()}`);
+			});
 
-		command.on("exit", (code) => {
-			console.log(`Process exited with code ${code}`);
-		});
+			command.on("exit", (code) => {
+				console.log(`Process exited with code ${code}`);
+			});
 
-		command.on("error", (err) => {
-			console.error("Failed to start process:", err);
-		});
+			command.on("error", (err) => {
+				console.error("Failed to start process:", err);
+			});
+
+		} catch (error: any) {
+			await this.__updateDeployment(projectId, deploymentId,
+				{ status: DeploymentStatus.FAILED, error_message: error.message }
+			)
+		}
 	}
 	async deployAws(project: IProject, deployment: IDeployment): Promise<void> {
-		const command = new RunTaskCommand({
-			cluster: config.CLUSTER,
-			taskDefinition: config.TASK,
-			launchType: "FARGATE",
-			count: 1,
-			networkConfiguration: {
-				awsvpcConfiguration: {
-					subnets: process.env.SUBNETS_STRING?.split(","),
-					securityGroups: process.env.SECURITY_GROUPS?.split(","),
-					assignPublicIp: "ENABLED",
-				},
-			},
-			overrides: {
-				containerOverrides: [
-					{
-						name: "custom-build-container", // docker image after build,
-						environment: [
-							...project.env,
-							{ name: "SERVER_PUSHED_D_ID", value: deployment._id },
-							{ name: "SERVER_PUSHED_P_ID", value: project.id },
-						],
+		try {
+			const command = new RunTaskCommand({
+				cluster: config.CLUSTER,
+				taskDefinition: config.TASK,
+				launchType: "FARGATE",
+				count: 1,
+				networkConfiguration: {
+					awsvpcConfiguration: {
+						subnets: process.env.SUBNETS_STRING?.split(","),
+						securityGroups: process.env.SECURITY_GROUPS?.split(","),
+						assignPublicIp: "ENABLED",
 					},
-				],
-			},
-		});
-		await ecsClient.send(command);
+				},
+				overrides: {
+					containerOverrides: [
+						{
+							name: "custom-build-container", // docker image after build,
+							environment: [
+								...getNessesaryEnvs(),
+								{ name: "SERVER_PUSHED_D_ID", value: deployment._id },
+								{ name: "SERVER_PUSHED_P_ID", value: project.id },
+							],
+						},
+					],
+				},
+			});
+			await ecsClient.send(command);
+		} catch (error: any) {
+			await this.__updateDeployment(project._id, deployment._id,
+				{ status: DeploymentStatus.FAILED, error_message: error.message }
+			)
+		}
 	}
 
 	async deleteLocal(deploymentId: string, projectId: string): Promise<void> {
