@@ -10,7 +10,7 @@ export default function ThemeProviderComponent({
 		attribute="class"
 		defaultTheme="dark"
 		enableSystem
-		disableTransitionOnChange
+		disableTransitionOnChange={false}
 	>
 		{children}
 	</ThemeProvider>
