@@ -10,6 +10,25 @@ export const timeToSeconds = (time: number | undefined) => {
 	return (time / 1000).toFixed(2) + " s";
 }
 
+export const formatDate = (date: Date | undefined) => {
+	return new Date(date || 0).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric'
+	});
+};
+
+export const getElapsedTimeClean = (createdAt: Date | undefined) => {
+	const now = new Date();
+	const created = new Date(createdAt || 0);
+	const diffTime = Math.abs((now as any) - (created as any));
+	const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+	const diffMonths = Math.floor(diffDays / 30);
+
+	if (diffMonths < 1) return `${diffDays} days`;
+	if (diffMonths < 12) return `${diffMonths} months`;
+	return `${Math.floor(diffMonths / 12)} years`;
+};
 
 export const getElapsedTime = (oldTime: Date | string): string => {
 	const diff = Date.now() - new Date(oldTime).getTime();

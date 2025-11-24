@@ -37,7 +37,7 @@ const DeploymentPageContainer = ({ deploymentId }: { deploymentId: string }) => 
 	}
 	return (
 		<div>
-			<div className="min-h-screen bg-background">
+			<div className="min-h-screen bg-gradient-to-br from-background to-slate-100 dark:from-background dark:to-neutral-900">
 				<div className="sticky top-0 z-10 bg-background dark:border-zinc-800 border-gray-200">
 					<div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3">
 						<button
