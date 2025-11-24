@@ -50,8 +50,13 @@
 button {
 	cursor: pointer;
 }
-* {
-	transition: background-color 0.1s ease, color 0.1s ease, border-color 0.1s ease;
+
+span,
+button,
+p,
+h1,
+h2 {
+	transition: background-color 0.9s ease, color 0.1s ease;
 }
 
 :root {
