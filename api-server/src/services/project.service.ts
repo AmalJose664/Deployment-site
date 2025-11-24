@@ -8,14 +8,18 @@ import { generateSlug } from "random-word-slugs";
 import { CreateProjectDTO, QueryProjectDTO } from "../dtos/project.dto.js";
 import AppError from "../utils/AppError.js";
 import { HTTP_STATUS_CODE } from "../utils/statusCodes.js";
+import { PLANS } from "../constants/plan.js";
+import { IProjectBandwidthRepository } from "../interfaces/repository/IProjectBandwidthRepository.js";
 
 class ProjectService implements IProjectService {
 	private projectRepository: IProjectRepository;
 	private userRepository: IUserRepository;
+	private projectBandwidthRepo: IProjectBandwidthRepository
 
-	constructor(projectRepo: IProjectRepository, userRepo: IUserRepository) {
+	constructor(projectRepo: IProjectRepository, userRepo: IUserRepository, projectBandwidthRepo: IProjectBandwidthRepository) {
 		this.projectRepository = projectRepo;
 		this.userRepository = userRepo;
+		this.projectBandwidthRepo = projectBandwidthRepo
 	}
 	async createProject(dto: CreateProjectDTO, userId: string): Promise<IProject | null> {
 		const projectData: Partial<Omit<IProject, keyof Document>> = {
@@ -35,10 +39,11 @@ class ProjectService implements IProjectService {
 		if (!user) {
 			throw new AppError("User not found", HTTP_STATUS_CODE.NOT_FOUND);
 		}
-		if (user?.projects > user?.plan.maxProjects) {
+		if (user?.projects > PLANS[user.plan].maxProjects) {
 			throw new AppError("Reached maximum projects", HTTP_STATUS_CODE.SERVICE_UNAVAILABLE);
 		}
 		const newProject = await this.projectRepository.createProject(projectData);
+		this.projectBandwidthRepo.addProjectField(newProject as IProject)
 		await this.userRepository.incrementProjects(user.id);
 
 		return newProject;
@@ -86,6 +91,7 @@ class ProjectService implements IProjectService {
 			throw new AppError("User not found, Cant delete project", 404);
 		}
 		const result = await this.projectRepository.deleteProject(projectId, userId);
+		await this.userRepository.decrementProjects(userId)
 		return result?.isDeleted ?? false;
 	}
 

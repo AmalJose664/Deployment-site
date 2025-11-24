@@ -10,8 +10,8 @@ import { fileURLToPath } from "url";
 import { randomUUID } from "crypto"
 import simpleGit from "simple-git";
 
-let DEPLOYMENT_ID = process.env.DEPLOYMENT_ID || "6921a9af999a11682f69f697"   // Received from env by apiserver or use backup for local testing
-let PROJECT_ID = process.env.PROJECT_ID || "691e1a1babe973c943c5cf7d"   // Received from env by apiserver or use backup for local testing
+let DEPLOYMENT_ID = process.env.DEPLOYMENT_ID || "692461eecfa1bb98cf35b16f"   // Received from env by apiserver or use backup for local testing
+let PROJECT_ID = process.env.PROJECT_ID || "692461b6cfa1bb98cf35b166"   // Received from env by apiserver or use backup for local testing
 
 const kafka = new Kafka({
 	clientId: `docker-build-server-${PROJECT_ID}`,
@@ -64,11 +64,11 @@ const deploymentStatus = {
 
 const settings = {
 	customBuildPath: true,
-	sendKafkaMessage: !true,
-	deleteSourcesAfter: !true,
+	sendKafkaMessage: true,
+	deleteSourcesAfter: true,
 	localDeploy: true,
-	runCommands: !true,            // for testing only 
-	cloneRepo: !true            // for testing only 
+	runCommands: true,            // for testing only 
+	cloneRepo: true            // for testing only 
 }
 
 console.log(DEPLOYMENT_ID, PROJECT_ID, "<<<<<")
@@ -477,7 +477,7 @@ async function uploadOrMoveFiles(sourceDir, targetDir) {
 
 			if (entry.isDirectory()) {
 				if (settings.localDeploy) {
-					// await mkdir(path.join(targetDir, relPath), { recursive: true });
+					await mkdir(path.join(targetDir, relPath), { recursive: true });
 					console.log("moving")
 				}
 				await processDirectory(fullPath, relPath);
@@ -505,7 +505,7 @@ async function uploadOrMoveFiles(sourceDir, targetDir) {
 				});
 				if (settings.localDeploy) {
 					const targetPath = path.join(targetDir, relPath);
-					// await rename(fullPath, targetPath);
+					await rename(fullPath, targetPath);
 					console.log("Moved " + relPath)
 				} else {
 					console.log("Uploading " + relPath);
@@ -528,15 +528,15 @@ async function uploadOrMoveFiles(sourceDir, targetDir) {
 // --------------------------------------------------------MAIN_TASK--------------------------------------------------
 
 async function init() {
+	if (settings.sendKafkaMessage) {
+		await producer.connect();
+	}
 	publishLogs({
 		DEPLOYMENT_ID, PROJECT_ID,
 		level: "INFO",
 		message: `Starting deployment..`, stream: "system"
 	})
 	const timerStart = performance.now()
-	if (settings.sendKafkaMessage) {
-		await producer.connect();
-	}
 	await publishUpdates({
 		DEPLOYMENT_ID, PROJECT_ID,
 		type: "START",
@@ -567,8 +567,8 @@ async function init() {
 			level: "INFO",
 			message: `cloning repo..`, stream: "system"
 		})
-		gitCommitData = getGitCommitData(taskDir)
 
+		gitCommitData = await getGitCommitData(taskDir) || gitCommitData
 		await cloneGitRepoAndValidate(taskDir, runDir, projectData)
 
 		publishLogs({

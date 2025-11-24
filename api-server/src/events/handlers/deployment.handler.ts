@@ -17,7 +17,7 @@ class DeploymentEventHandler {
 			...log,
 		});
 		console.log("logs inserted...", log.message);
-		return
+
 		await logsService.__insertLog(log.message, projectId, deploymentId, new Date(log.timestamp), log.level);
 		//stream
 	}
@@ -32,7 +32,7 @@ class DeploymentEventHandler {
 			deploymentId,
 			projectId,
 		});
-		return
+
 		switch (data.updateType) {
 			case UpdateTypes.START: {
 				await deploymentService.__updateDeployment(projectId, deploymentId, {
