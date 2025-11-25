@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { IProjectBandwidthRepository } from "../interfaces/repository/IProjectBandwidthRepository.js";
 import { BandWidthWithProjectType } from "../interfaces/service/IAnalyticsService.js";
 import { IProjectBandwiths, ProjectBandwidth } from "../models/ProjectBandwidths.js";
@@ -37,19 +38,47 @@ class ProjectBandwidthRepository extends BaseRepository<IProjectBandwiths> imple
 		}))
 		await ProjectBandwidth.bulkWrite(bulkUpdates)
 	}
+	private async sumMonthlyBandwidth(filter: Record<string, any>): Promise<number> {
+		const currentMonth = new Date().toISOString().slice(0, 7);
+
+		const result = await ProjectBandwidth.aggregate([
+			{ $match: { ...filter, currentMonth } },
+			{ $group: { _id: null, total: { $sum: "$bandwidthMonthly" } } }
+		]);
+
+		return result[0]?.total ?? 0;
+	}
+	private async sumTotalBandwidth(filter: Record<string, any>): Promise<number> {
+		const currentMonth = new Date().toISOString().slice(0, 7);
+
+		const result = await ProjectBandwidth.aggregate([
+			{ $match: { ...filter, currentMonth } },
+			{ $group: { _id: null, total: { $sum: "$bandwidthTotal" } } }
+		]);
+
+		return result[0]?.total ?? 0;
+	}
 	async getUserMonthlyBandwidth(userId: string): Promise<number> {
-		const currentMonth = new Date().toISOString().slice(0, 7);
-
-		return 9
+		return this.sumMonthlyBandwidth({ user: new Types.ObjectId(userId) });
 	}
 
-	async getProjectMonthlyBandwidth(projectId: string): Promise<number> {
-		return 9
+	async getProjectMonthlyBandwidth(projectId: string, userId: string): Promise<number> {
+		return this.sumMonthlyBandwidth({
+			user: new Types.ObjectId(userId),
+			project: new Types.ObjectId(projectId),
+		});
+	}
+	async getUserTotalBandwidth(userId: string): Promise<number> {
+		return this.sumMonthlyBandwidth({ user: new Types.ObjectId(userId) });
 	}
 
-	async getUserProjectsBandwidth(userId: string): Promise<Array<{ projectId: string, bandwidth: number }>> {
-		const currentMonth = new Date().toISOString().slice(0, 7);
-		return [{ bandwidth: 9, projectId: "" }]
+	async getProjectTotalBandwidth(projectId: string, userId: string): Promise<number> {
+		return this.sumMonthlyBandwidth({
+			user: new Types.ObjectId(userId),
+			project: new Types.ObjectId(projectId),
+		});
 	}
+
+
 }
 export default ProjectBandwidthRepository

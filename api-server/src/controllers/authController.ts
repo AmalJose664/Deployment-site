@@ -87,11 +87,21 @@ export const userLogout = (req: Request, res: Response) => {
 
 export const getAuthenticatedUser = async (req: Request, res: Response) => {
 	const userId = req.user?.id as string
-	const user = await userService.findUserById(userId)
+	const user = await userService.getUser(userId)
 	if (!user) {
 		res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: "user not found" })
 		return
 	}
 	const response = UserMapper.toUserResponse(user)
+	res.status(HTTP_STATUS_CODE.OK).json(response)
+}
+export const getAuthenticatedUserDetails = async (req: Request, res: Response) => {
+	const userId = req.user?.id as string
+	const { user, bandwidth } = await userService.getUserDetailed(userId)
+	if (!user) {
+		res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: "user not found" })
+		return
+	}
+	const response = UserMapper.toUserDetailedResponse({ user, bandwidth })
 	res.status(HTTP_STATUS_CODE.OK).json(response)
 }

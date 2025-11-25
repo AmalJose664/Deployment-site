@@ -3,11 +3,14 @@ import { IUserRepository } from "../interfaces/repository/IUserRepository.js";
 import { IUserSerivce } from "../interfaces/service/IUserService.js";
 import { IUser } from "../models/User.js";
 import AppError from "../utils/AppError.js";
+import { IProjectService } from "../interfaces/service/IProjectService.js";
 
 class UserService implements IUserSerivce {
 	private userRepository: IUserRepository;
-	constructor(userRepo: IUserRepository) {
+	private projectService: IProjectService
+	constructor(userRepo: IUserRepository, projectServce: IProjectService) {
 		this.userRepository = userRepo;
+		this.projectService = projectServce
 	}
 
 	async findUser(googleId: string, email: string): Promise<IUser | null> {
@@ -33,8 +36,16 @@ class UserService implements IUserSerivce {
 		return user;
 	}
 
-	async findUserById(userId: string): Promise<IUser | null> {
-		return this.userRepository.findByUserId(userId)
+	async getUser(userId: string): Promise<IUser | null> {
+		return await this.userRepository.findByUserId(userId)
+	}
+
+	async getUserDetailed(userId: string): Promise<{ user: IUser | null; bandwidth: number; }> {
+		const [user, bandwidth] = await Promise.all([
+			this.userRepository.findByUserId(userId),
+			this.projectService.getUserBandwidthData(userId, true)
+		]);
+		return { user, bandwidth };
 	}
 }
 

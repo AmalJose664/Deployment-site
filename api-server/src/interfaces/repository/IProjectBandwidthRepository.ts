@@ -5,6 +5,7 @@ export interface IProjectBandwidthRepository {
 	addBandwidth(projectWithSize: BandWidthWithProjectType): Promise<void>
 	addProjectField(project: IProject): Promise<void>
 	getUserMonthlyBandwidth(userId: string): Promise<number>
-	getProjectMonthlyBandwidth(projectId: string): Promise<number>
-	getUserProjectsBandwidth(userId: string): Promise<Array<{ projectId: string, bandwidth: number }>>
+	getProjectMonthlyBandwidth(projectId: string, userId: string): Promise<number>
+	getUserTotalBandwidth(userId: string): Promise<number>
+	getProjectTotalBandwidth(projectId: string, userId: string): Promise<number>
 }

@@ -43,7 +43,7 @@ class ProjectService implements IProjectService {
 			throw new AppError("Reached maximum projects", HTTP_STATUS_CODE.SERVICE_UNAVAILABLE);
 		}
 		const newProject = await this.projectRepository.createProject(projectData);
-		this.projectBandwidthRepo.addProjectField(newProject as IProject)
+		await this.projectBandwidthRepo.addProjectField(newProject as IProject)
 		await this.userRepository.incrementProjects(user.id);
 
 		return newProject;
@@ -94,6 +94,22 @@ class ProjectService implements IProjectService {
 		await this.userRepository.decrementProjects(userId)
 		return result?.isDeleted ?? false;
 	}
+
+	async getProjectBandwidthData(projectId: string, userId: string, isMonthly: boolean): Promise<number> {
+		if (isMonthly) {
+			return await this.projectBandwidthRepo.getProjectMonthlyBandwidth(projectId, userId)
+		}
+		return await this.projectBandwidthRepo.getProjectTotalBandwidth(projectId, userId)
+
+	}
+	async getUserBandwidthData(userId: string, isMonthly: boolean): Promise<number> {
+		if (isMonthly) {
+			console.log("through here ")
+			return this.projectBandwidthRepo.getUserMonthlyBandwidth(userId)
+		}
+		return await this.projectBandwidthRepo.getUserTotalBandwidth(userId)
+	}
+
 
 	async __getProjectById(id: string): Promise<IProject | null> {
 		//container  or internal only

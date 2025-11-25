@@ -9,5 +9,6 @@ export interface IUserSerivce {
 	updateUser?(userId: string, updateData: Partial<IUser>): Promise<IUser | null>;
 	updateUserProfile?(userId: string): Promise<IUser | null>;
 
-	findUserById(userId: string): Promise<IUser | null>;
+	getUser(userId: string): Promise<IUser | null>
+	getUserDetailed(userId: string): Promise<{ user: IUser | null; bandwidth: number; }>
 }

@@ -12,6 +12,10 @@ export interface IProjectService {
 	getProjectById(id: string, userId: string, include?: string): Promise<IProject | null>;
 	updateProject(id: string, userId: string, data: Partial<IProject>): Promise<IProject | null>;
 	deleteProject(projectId: string, userId: string): Promise<boolean>;
+	getProjectBandwidthData(projectId: string, userId: string, isMonthly: boolean): Promise<number>
+	getUserBandwidthData(userId: string, isMonthly: boolean): Promise<number>
+
+
 	__getProjectById(id: string): Promise<IProject | null>;
 	__updateProjectById(projectId: string, updateData: Partial<IProject>, options?: options): Promise<IProject | null>
 }
