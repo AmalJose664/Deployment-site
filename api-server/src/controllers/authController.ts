@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { Profile, VerifyCallback } from "passport-google-oauth20";
 
 import { HTTP_STATUS_CODE } from "../utils/statusCodes.js";
@@ -6,8 +6,9 @@ import { generateAccessToken, generateRefreshToken } from "../utils/generateToke
 import jwt from "jsonwebtoken";
 import { userService } from "../instances.js";
 import { UserMapper } from "../mappers/userMapper.js";
+import AppError from "../utils/AppError.js";
 
-export const googleLoginCallback = (req: Request, res: Response) => {
+export const googleLoginCallback = (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const accessToken = generateAccessToken(req.user);
 		const refreshToken = generateRefreshToken(req.user);
@@ -28,8 +29,7 @@ export const googleLoginCallback = (req: Request, res: Response) => {
 		const frontend = process.env.FRONTEND_URL + "/auth/success";
 		res.redirect(frontend);
 	} catch (error) {
-		console.error("Error during google callback", error);
-		res.status(500).json({ message: "Internal server error during login" });
+		next(new AppError("Error during google callback", 500, error))
 	}
 };
 
@@ -46,7 +46,7 @@ export const googleLoginStrategy = async (accessToken: string, refreshToken: str
 	}
 };
 
-export const refresh = (req: Request, res: Response) => {
+export const refresh = (req: Request, res: Response, next: NextFunction) => {
 	const refreshToken = req.cookies.refresh_token;
 	if (!refreshToken) {
 		console.log("No refresh token");
@@ -66,12 +66,12 @@ export const refresh = (req: Request, res: Response) => {
 		});
 		return res.status(200).json({ ok: true });
 	} catch (error) {
-		console.log("Error in token valiadation ", error);
-		return res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ message: "Error in cookie valiadation" });
+		next(new AppError("Error during token valiadation", 500, error))
+		console.log("Error in token valiadation ");
 	}
 };
 
-export const checkAuth = (req: Request, res: Response) => {
+export const checkAuth = (req: Request, res: Response, next: NextFunction) => {
 	return res.status(200).json({ ok: true, randomNumber: Math.floor(Math.random() * 1000) });
 };
 
@@ -85,23 +85,31 @@ export const userLogout = (req: Request, res: Response) => {
 	res.status(HTTP_STATUS_CODE.OK).json({ message: "user logged out" });
 };
 
-export const getAuthenticatedUser = async (req: Request, res: Response) => {
-	const userId = req.user?.id as string
-	const user = await userService.getUser(userId)
-	if (!user) {
-		res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: "user not found" })
-		return
+export const getAuthenticatedUser = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const userId = req.user?.id as string
+		const user = await userService.getUser(userId)
+		if (!user) {
+			res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: "user not found" })
+			return
+		}
+		const response = UserMapper.toUserResponse(user)
+		res.status(HTTP_STATUS_CODE.OK).json(response)
+	} catch (error) {
+		next(error)
 	}
-	const response = UserMapper.toUserResponse(user)
-	res.status(HTTP_STATUS_CODE.OK).json(response)
 }
-export const getAuthenticatedUserDetails = async (req: Request, res: Response) => {
-	const userId = req.user?.id as string
-	const { user, bandwidth } = await userService.getUserDetailed(userId)
-	if (!user) {
-		res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: "user not found" })
-		return
+export const getAuthenticatedUserDetails = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const userId = req.user?.id as string
+		const { user, bandwidth } = await userService.getUserDetailed(userId)
+		if (!user) {
+			res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ error: "user not found" })
+			return
+		}
+		const response = UserMapper.toUserDetailedResponse({ user, bandwidth })
+		res.status(HTTP_STATUS_CODE.OK).json(response)
+	} catch (error) {
+		next(error)
 	}
-	const response = UserMapper.toUserDetailedResponse({ user, bandwidth })
-	res.status(HTTP_STATUS_CODE.OK).json(response)
 }

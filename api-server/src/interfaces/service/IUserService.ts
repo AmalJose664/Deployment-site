@@ -11,4 +11,6 @@ export interface IUserSerivce {
 
 	getUser(userId: string): Promise<IUser | null>
 	getUserDetailed(userId: string): Promise<{ user: IUser | null; bandwidth: number; }>
+	userCanDeploy(userId: string): Promise<{ user: IUser | null, limit: number, allowed: boolean, remaining: number }>
+
 }

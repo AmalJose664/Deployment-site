@@ -14,15 +14,25 @@ import { QueryDeploymentDTO } from "../dtos/deployment.dto.js";
 import { BUILD_SERVER_PATH, BUILD_SERVER_RUN_SCRIPT, LOCAL_TEST_SERVER_USER_FILES, S3_OUTPUTS_DIR } from "../constants/paths.js";
 import { _Object, DeleteObjectCommand, DeleteObjectsCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import getNessesaryEnvs from "../utils/getNessesaryEnvs.js";
+import { IUserSerivce } from "../interfaces/service/IUserService.js";
 
 class DeploymentService implements IDeploymentService {
 	private deploymentRepository: IDeploymentRepository;
 	private projectRepository: IProjectRepository;
-	constructor(deploymentRepo: IDeploymentRepository, projectRepo: IProjectRepository) {
+	private userService: IUserSerivce;
+	constructor(deploymentRepo: IDeploymentRepository, projectRepo: IProjectRepository, userService: IUserSerivce) {
 		this.deploymentRepository = deploymentRepo;
 		this.projectRepository = projectRepo;
+		this.userService = userService
+
 	}
 	async newDeployment(deploymentData: Partial<IDeployment>, userId: string, projectId: string): Promise<IDeployment | null> {
+
+		const canDeploy = await this.userService.userCanDeploy(userId);
+		if (!canDeploy.allowed) {
+			throw new AppError("Daily deployment limit exceeded", 400);
+		}
+
 		const correspondindProject = await this.projectRepository.findProject(projectId, userId);
 		if (!correspondindProject) {
 			throw new AppError("Project not found", 404);
@@ -36,7 +46,7 @@ class DeploymentService implements IDeploymentService {
 
 		deploymentData.status = DeploymentStatus.QUEUED;
 		deploymentData.overWrite = false;
-		deploymentData.commit_hash = "-----------";
+		deploymentData.commit_hash = "------||------";
 		deploymentData.s3Path = correspondindProject._id.toString();
 		deploymentData.project = new Types.ObjectId(correspondindProject._id);
 		deploymentData.user = correspondindProject.user;

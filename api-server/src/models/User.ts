@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema, Types } from "mongoose";
-import { IPlans, PLANS } from "../constants/plan.js";
+import { IPlans, } from "../constants/plan.js";
 
 export interface IUser extends Document {
 	_id: string;
@@ -9,6 +9,8 @@ export interface IUser extends Document {
 	googleId: string;
 	plan: keyof IPlans;
 	projects: number;
+	deploymentsToday: number
+	currentDate: string;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -21,6 +23,8 @@ const userSchema = new Schema<IUser>(
 		googleId: { type: String, required: true, unique: true },
 		plan: { type: String, required: true, default: "FREE" },
 		projects: { type: Number, required: true, default: 0 },
+		deploymentsToday: { type: Number, required: true, default: 0 },
+		currentDate: { type: String, required: true, default: () => new Date().toISOString().slice(0, 10) }
 	},
 	{ timestamps: true },
 );

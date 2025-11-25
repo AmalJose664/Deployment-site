@@ -69,11 +69,11 @@ class ProjectBandwidthRepository extends BaseRepository<IProjectBandwiths> imple
 		});
 	}
 	async getUserTotalBandwidth(userId: string): Promise<number> {
-		return this.sumMonthlyBandwidth({ user: new Types.ObjectId(userId) });
+		return this.sumTotalBandwidth({ user: new Types.ObjectId(userId) });
 	}
 
 	async getProjectTotalBandwidth(projectId: string, userId: string): Promise<number> {
-		return this.sumMonthlyBandwidth({
+		return this.sumTotalBandwidth({
 			user: new Types.ObjectId(userId),
 			project: new Types.ObjectId(projectId),
 		});

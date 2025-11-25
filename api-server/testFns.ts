@@ -64,7 +64,7 @@ async function mongodbData() {
 		process.exit(0);
 	}
 }
-mongodbData();
+// mongodbData();
 
 async function commitAllMessages() {
 	const kafka = new Kafka({

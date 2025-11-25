@@ -4,6 +4,7 @@ import { IUserSerivce } from "../interfaces/service/IUserService.js";
 import { IUser } from "../models/User.js";
 import AppError from "../utils/AppError.js";
 import { IProjectService } from "../interfaces/service/IProjectService.js";
+import { PLANS } from "../constants/plan.js";
 
 class UserService implements IUserSerivce {
 	private userRepository: IUserRepository;
@@ -46,6 +47,21 @@ class UserService implements IUserSerivce {
 			this.projectService.getUserBandwidthData(userId, true)
 		]);
 		return { user, bandwidth };
+	}
+
+	async userCanDeploy(userId: string): Promise<{ user: IUser | null, limit: number, allowed: boolean, remaining: number }> {
+		const user = await this.userRepository.getOrUpdateDeployments(userId)
+		if (!user) throw new Error("User not found");
+
+		const limit = PLANS[user.plan].maxDailyDeployments;
+		const allowed = user.deploymentsToday < limit;
+		const remaining = Math.max(0, limit - user.deploymentsToday);
+
+		return { user, limit, allowed, remaining }
+	}
+
+	async incrementDeployment(userId: string): Promise<void> {
+		await this.userRepository.incrementDeployment(userId);
 	}
 }
 

@@ -14,4 +14,6 @@ authRouter.post("/logout", userLogout);
 authRouter.get("/me", authenticateToken, getAuthenticatedUser)
 authRouter.get("/me/full", authenticateToken, getAuthenticatedUserDetails)
 
+
+
 export default authRouter;
