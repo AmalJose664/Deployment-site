@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { axiosBaseQuery } from "../axiosBaseQuery";
-import { User } from "@/types/User";
+import { User, UserDetailed } from "@/types/User";
 
 export const authApi = createApi({
 	reducerPath: "authApi",
@@ -10,6 +10,15 @@ export const authApi = createApi({
 	endpoints: (builder) => ({
 		getUser: builder.query<User, void>({
 			query: () => ({ url: "/auth/me", method: 'get' }),
+			keepUnusedDataFor: 7 * 60,
+
+			transformResponse: (data: any) => {
+				return data.user
+			},
+			providesTags: (result, error,) => [{ type: 'Auth', id: result?._id || "" }]
+		}),
+		getDetailed: builder.query<UserDetailed, void>({
+			query: () => ({ url: "/auth/me/full", method: 'get' }),
 			keepUnusedDataFor: 7 * 60,
 
 			transformResponse: (data: any) => {
@@ -27,4 +36,4 @@ export const authApi = createApi({
 	}),
 })
 
-export const { useGetUserQuery, useLogoutMutation } = authApi
+export const { useGetUserQuery, useGetDetailedQuery, useLogoutMutation } = authApi

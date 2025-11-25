@@ -1,16 +1,16 @@
 "use client"
 import { TiArrowLeft } from 'react-icons/ti';
 import { FiUser, FiMail, FiFolder, FiCalendar, FiClock } from 'react-icons/fi';
-import { useGetUserQuery } from "@/store/services/authApi"
+import { useGetDetailedQuery, useGetUserQuery } from "@/store/services/authApi"
 import { useRouter } from "next/navigation"
 import { IoIosCube, IoMdCloudDone } from 'react-icons/io';
-import { formatDate, getElapsedTimeClean } from '@/lib/utils';
+import { formatBytes, formatDate, getElapsedTimeClean } from '@/lib/utils';
 
 
 
 const ProfileContent = () => {
 	const router = useRouter()
-	const { data: user } = useGetUserQuery()
+	const { data: userDetailed } = useGetDetailedQuery()
 
 	return (
 		<div>
@@ -33,8 +33,8 @@ const ProfileContent = () => {
 							<div className="flex flex-col sm:flex-row items-start sm:items-end gap-6">
 								<div className="relative">
 									<img
-										src={user?.profileImage || ""}
-										alt={user?.name}
+										src={userDetailed?.profileImage}
+										alt={userDetailed?.name || "User Avatar"}
 										className="w-16 h-16 rounded-full border-4 shadow-xl bg-transparent"
 									/>
 									<div className="absolute bottom-2 right-2 w-4 h-4 bg-green-500 rounded-full border-2 "></div>
@@ -42,11 +42,11 @@ const ProfileContent = () => {
 
 								<div className="flex-1 pt-16 sm:pt-0">
 									<h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-										{user?.name}
+										{userDetailed?.name}
 									</h1>
 									<p className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
 										<FiMail className="w-4 h-4" />
-										{user?.email}
+										{userDetailed?.email || ""}
 									</p>
 								</div>
 							</div>
@@ -58,7 +58,7 @@ const ProfileContent = () => {
 							<div className="flex items-center justify-between">
 								<div>
 									<p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Projects</p>
-									<p className="text-3xl font-bold text-gray-900 dark:text-white">{user?.projects}</p>
+									<p className="text-3xl font-bold text-gray-900 dark:text-white">{userDetailed?.projects || 0}</p>
 								</div>
 								<div className="w-14 h-14  rounded-xl flex items-center justify-center">
 									<IoIosCube className="w-7 h-7 " />
@@ -70,7 +70,7 @@ const ProfileContent = () => {
 							<div className="flex items-center justify-between">
 								<div>
 									<p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Daily Deployments</p>
-									<p className="text-3xl font-bold text-gray-900 dark:text-white">{user?.projects}</p>
+									<p className="text-3xl font-bold text-gray-900 dark:text-white">{userDetailed?.projects || 0}</p>
 								</div>
 								<div className="w-14 h-14  rounded-xl flex items-center justify-center">
 									<IoMdCloudDone className="w-7 h-7 " />
@@ -82,7 +82,9 @@ const ProfileContent = () => {
 							<div className="flex items-center justify-between">
 								<div>
 									<p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total BandWidth</p>
-									<p className="text-xl font-bold text-gray-900 dark:text-white">101GB/250 </p>
+									<p className="text-xl font-bold text-gray-900 dark:text-white">
+										{formatBytes(userDetailed?.bandwidthMonthly || 0)}/250
+									</p>
 								</div>
 								<div className="w-14 h-14  rounded-xl flex items-center justify-center">
 									<IoMdCloudDone className="w-7 h-7 " />
@@ -105,7 +107,7 @@ const ProfileContent = () => {
 									</span>
 									<div className="">
 										<p className="text-xs text-less mb-1">Full Name</p>
-										<p className="text-base font-medium text-primary">{user?.name}</p>
+										<p className="text-base font-medium text-primary">{userDetailed?.name}</p>
 									</div>
 								</div>
 							</div>
@@ -116,7 +118,7 @@ const ProfileContent = () => {
 									</span>
 									<div className="">
 										<p className="text-xs text-less mb-1">Email Address</p>
-										<p className="text-base font-medium text-primary">{user?.email}</p>
+										<p className="text-base font-medium text-primary">{userDetailed?.email}</p>
 									</div>
 								</div>
 							</div>
@@ -127,7 +129,7 @@ const ProfileContent = () => {
 									</span>
 									<div className="">
 										<p className="text-xs text-less mb-1">Joined Date</p>
-										<p className="text-base font-medium text-primary">{formatDate(user?.createdAt)}</p>
+										<p className="text-base font-medium text-primary">{formatDate(userDetailed?.createdAt)}</p>
 									</div>
 								</div>
 							</div>
@@ -138,7 +140,7 @@ const ProfileContent = () => {
 									</span>
 									<div className="">
 										<p className="text-xs text-less mb-1">Member Since</p>
-										<p className="text-base font-medium text-primary">{getElapsedTimeClean(user?.createdAt)}</p>
+										<p className="text-base font-medium text-primary">{getElapsedTimeClean(userDetailed?.createdAt)}</p>
 									</div>
 								</div>
 							</div>

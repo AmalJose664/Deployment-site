@@ -12,9 +12,13 @@ import {
 import { Button } from "./ui/button"
 import { useGetUserQuery, useLogoutMutation } from "@/store/services/authApi"
 import { RxExternalLink } from "react-icons/rx"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { LINKS } from "@/config/constants"
 const NavbarUser = () => {
 	const { data: user } = useGetUserQuery()
 	const [logout] = useLogoutMutation()
+	const router = useRouter()
 	return (
 		<div className="">
 			<DropdownMenu>
@@ -30,9 +34,8 @@ const NavbarUser = () => {
 				<DropdownMenuContent className="w-56 mr-6" align="start">
 					<DropdownMenuLabel>My Account</DropdownMenuLabel>
 					<DropdownMenuGroup>
-						<DropdownMenuItem>
+						<DropdownMenuItem className="cursor-pointer" onClick={() => router.push("/user")}>
 							Profile
-							<DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
 						</DropdownMenuItem>
 						<DropdownMenuItem>
 							Billing
@@ -44,9 +47,11 @@ const NavbarUser = () => {
 						</DropdownMenuItem>
 					</DropdownMenuGroup>
 					<DropdownMenuSeparator />
-					<DropdownMenuItem className="flex gap-2">
-						GitHub
-						<RxExternalLink />
+					<DropdownMenuItem >
+						<Link target="_blank" className="flex gap-2 items-center no-underline" href={LINKS.REPO} >
+							GitHub
+							<RxExternalLink />
+						</Link>
 					</DropdownMenuItem>
 					<DropdownMenuItem>Support</DropdownMenuItem>
 					<DropdownMenuItem disabled>API</DropdownMenuItem>
