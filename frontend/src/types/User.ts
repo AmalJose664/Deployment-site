@@ -1,3 +1,5 @@
+import { IPlans } from "@/config/plan"
+
 export interface User {
 	name: string
 	profileImage: string
@@ -9,6 +11,8 @@ export interface UserDetailed {
 	email: string
 	projects: number
 	bandwidthMonthly: number
+	plan: keyof IPlans
+	deploymentsToday: number
 	createdAt: Date
 	_id: string
 }

@@ -11,6 +11,7 @@ interface UserResponseDetailedDTO {
 	projects: number
 	bandwidthMonthly: number
 	deploymentsToday: number
+	plan: string
 	createdAt: Date
 	_id: string
 }
@@ -34,6 +35,7 @@ export class UserMapper {
 				email: user.email,
 				projects: Number(user.projects),
 				deploymentsToday: Number(user.deploymentsToday),
+				plan: user.plan,
 				createdAt: user.createdAt,
 				bandwidthMonthly: data.bandwidth
 			}
