@@ -104,7 +104,7 @@ const TabProject = ({ project, deployment, tempDeployment, lastDeployment, onCre
 				/>
 			)}
 
-			{project.lastDeployment && project.deployments && project.deployments?.length > 0 && lastDeployment && (
+			{project.lastDeployment && project.deployments && project.deployments?.length > 0 && lastDeployment && !deployment && (
 				<ProjectDeploymentBox
 					deployment={lastDeployment}
 					projectBranch={project.branch}

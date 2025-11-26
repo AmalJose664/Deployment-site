@@ -1,3 +1,4 @@
+
 import TestSSe from "@/components/TestSSe";
 
 export default function Home() {
@@ -8,7 +9,14 @@ export default function Home() {
 			<br />
 			<br />
 			<div className="border rounded-2xl">
-				<TestSSe />
+				<div
+					style={{ height: 300, overflowY: "scroll" }}
+				>
+					{/* Long content */}
+					<div style={{ height: 2000, padding: 20 }}>
+						Scroll me
+					</div>
+				</div>
 			</div>
 		</div>
 	);

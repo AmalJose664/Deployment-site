@@ -14,10 +14,9 @@ import Link from "next/link";
 import { useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FiGitCommit } from "react-icons/fi";
-import { MdAccessTime, MdKeyboardArrowRight } from "react-icons/md";
+import { MdKeyboardArrowRight } from "react-icons/md";
 import { IoIosCube, IoMdGitBranch, IoMdGlobe } from "react-icons/io";
-import { TiArrowLeft } from "react-icons/ti";
-import { useRouter } from 'next/navigation'
+import BackButton from "@/components/BackButton";
 
 
 const DeploymentPageContainer = ({ deploymentId }: { deploymentId: string }) => {
@@ -27,7 +26,7 @@ const DeploymentPageContainer = ({ deploymentId }: { deploymentId: string }) => 
 		{ deploymentId: deployment?._id ?? "" },
 		{ skip: !showLogs || !deployment?._id }
 	)
-	const router = useRouter()
+
 	if (error || isError) {
 		return <ErrorComponent error={error} id={deploymentId} field="Deployment" />
 	}
@@ -40,12 +39,7 @@ const DeploymentPageContainer = ({ deploymentId }: { deploymentId: string }) => 
 			<div className="min-h-screen bg-gradient-to-br from-background to-slate-100 dark:from-background dark:to-neutral-900">
 				<div className="sticky top-0 z-10 bg-background dark:border-zinc-800 border-gray-200">
 					<div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3">
-						<button
-							onClick={() => router.back()}
-							className="border p-2 dark:hover:bg-zinc-800 hover:bg-zinc-200 rounded-lg transition-colors group"
-						>
-							<TiArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
-						</button>
+						<BackButton />
 					</div>
 				</div>
 				{isLoading ? (

@@ -1,34 +1,27 @@
 "use client"
-import { TiArrowLeft } from 'react-icons/ti';
-import { FiUser, FiMail, FiFolder, FiCalendar, FiClock } from 'react-icons/fi';
-import { useGetDetailedQuery, useGetUserQuery } from "@/store/services/authApi"
-import { useRouter } from "next/navigation"
+import { FiUser, FiMail, FiCalendar, FiClock } from 'react-icons/fi';
+import { useGetDetailedQuery, } from "@/store/services/authApi"
+
 import { IoIosCube, IoMdCloudDone } from 'react-icons/io';
-import { cn, formatBytes, formatDate, getElapsedTimeClean } from '@/lib/utils';
+import { formatBytes, formatDate, getElapsedTimeClean } from '@/lib/utils';
 import { MdOutlineStorage } from 'react-icons/md';
 import { PLANS } from '@/config/plan';
 import { GrPlan } from 'react-icons/gr';
+import BackButton from '@/components/BackButton';
 
 
 
 const ProfileContent = () => {
-	const router = useRouter()
 	const { data: userDetailed } = useGetDetailedQuery()
 	const plan = userDetailed?.plan || "FREE"
 	const currentPlan = PLANS[plan]
-	const isPro = userDetailed?.plan === "PRO"
 
 	return (
 		<div>
 			<div className="min-h-screen bg-gradient-to-br from-background to-slate-100 dark:from-background dark:to-neutral-900">
 				<div className="sticky top-0 z-10 dark:bg-neutral-950/80 backdrop-blur-md">
 					<div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3">
-						<button
-							onClick={() => router.back()}
-							className="border p-2 dark:hover:bg-zinc-800 hover:bg-slate-200 rounded-lg transition-all duration-200 group shadow-sm hover:shadow-md"
-						>
-							<TiArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
-						</button>
+						<BackButton />
 					</div>
 				</div>
 

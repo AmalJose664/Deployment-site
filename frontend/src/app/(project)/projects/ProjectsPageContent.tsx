@@ -14,6 +14,7 @@ import { Project, ProjectStatus } from '@/types/Project';
 import { useRouter } from "next/navigation"
 import { cn, getStatusBg } from '@/lib/utils';
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 
 export default function ProjectContent() {
@@ -107,10 +108,10 @@ export default function ProjectContent() {
 									/>
 								</nav>
 							</div>
-							<button onClick={() => router.push("/new")} className="px-4 py-2 rounded-md bg-blue-600 text-sm border border-blue-900 font-medium flex items-center gap-2 ">
+							<Button onClick={() => router.push("/new")} className="px-4 py-2 rounded-md  text-sm  font-medium flex items-center gap-2 ">
 								<FaPlus size={16} />
 								Add New
-							</button>
+							</Button>
 						</div>
 					</div>
 				</header>

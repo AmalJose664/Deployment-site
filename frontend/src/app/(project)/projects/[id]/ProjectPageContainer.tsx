@@ -126,7 +126,6 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 			tabFromUrl={tab}
 			refetch={refetch}
 			reDeploy={reDeploy}
-			onBack={() => router.push('/projects')}
 			showBuild={showBuild}
 			setShowBuild={setShowBuild}
 			onCreateDeployment={handleCreateDeployment}

@@ -2,17 +2,18 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
 
-const protectedRoutes = ["/projects", "/login/success"]
+const protectedRoutes = ["/projects", "/login/success", "/deployments", "/user"]
 const exemptAfterAuthRoutes = ["/login", "/signup"]
 
 export async function middleware(req: NextRequest) {
 	const path = req.nextUrl.pathname
 	const cookies = req.cookies
 	const accessToken = cookies.get("access_token")?.value
+	const refreshToken = cookies.get("refresh_token")?.value
 	// return NextResponse.next()
 
 	if (exemptAfterAuthRoutes.includes(path)) {
-		if (accessToken) {
+		if (accessToken && refreshToken) {
 			return NextResponse.redirect(new URL("/", req.url))
 		}
 	}
@@ -28,7 +29,6 @@ export async function middleware(req: NextRequest) {
 				credentials: 'include'
 			})
 			if (verifyResponse.status !== 200) {
-				const refreshToken = cookies.get("refresh_token")?.value
 				if (!refreshToken) {
 					return NextResponse.redirect(new URL("/login", req.url));
 				}
@@ -64,5 +64,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-	matcher: ["/projects/:path*", "/projects", "/login", "/signup", "/auth/:path*"],
+	matcher: ["/projects/:path*", "/projects", "/deployments/:path*", "/deployments", "/login", "/signup", "/auth/:path*"],
 }
