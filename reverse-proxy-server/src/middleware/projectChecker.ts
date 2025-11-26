@@ -23,7 +23,7 @@ export async function checkProject(req: Request, res: Response, next: NextFuncti
 		}
 
 		const project = await projectService.findProjectBySlug(slug);
-
+		console.log(project, " < _ __ _ __ _ __ _ __ __")
 		if (!project || project.isDeleted) {
 			res.status(404).json({
 				error: 'Project not found',
@@ -41,6 +41,13 @@ export async function checkProject(req: Request, res: Response, next: NextFuncti
 		if (!project.currentDeployment) {
 			res.status(404).json({
 				error: 'Project Deployment not found',
+				slug
+			});
+			return
+		}
+		if (!project.currentDeployment && !!project.tempDeployment) {
+			res.status(404).json({
+				error: 'Project is building please wait',
 				slug
 			});
 			return
