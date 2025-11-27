@@ -49,6 +49,9 @@ class ProjectService implements IProjectService {
 		this.projectCache.set(slug, projectRefined)
 		return projectRefined as IProject
 	}
+	invalidateSlug(slug: string): boolean {
+		return Boolean(this.projectCache.del(slug))
+	}
 }
 
 
