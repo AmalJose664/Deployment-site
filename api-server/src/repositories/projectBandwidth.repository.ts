@@ -14,6 +14,7 @@ class ProjectBandwidthRepository extends BaseRepository<IProjectBandwiths> imple
 		this.create({ project: project._id as any, user: project.user })
 	}
 	async addBandwidth(projectWithSize: BandWidthWithProjectType): Promise<void> {
+
 		const currentMonth = new Date().toISOString().slice(0, 7);
 		const bulkUpdates = Object.entries(projectWithSize).map(([projectId, bandwidth]) => ({
 			updateOne: {

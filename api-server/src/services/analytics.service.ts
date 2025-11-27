@@ -65,7 +65,11 @@ class AnalyticsService implements IAnalyticsService {
 			this.analyticsBuffer.splice(0, 1000);
 		}
 		this.analyticsBuffer.push(...event);
-		await this.projectBandwidthRepo.addBandwidth(bandwidthByProjectBatch)
+		try {
+			await this.projectBandwidthRepo.addBandwidth(bandwidthByProjectBatch)
+		} catch (error) {
+			console.log("Error on saving bws ,", error)
+		}
 
 		if (this.analyticsBuffer.length >= this.BATCH_SIZE) {
 			this.saveBatch();
