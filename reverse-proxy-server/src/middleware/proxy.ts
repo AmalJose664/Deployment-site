@@ -39,9 +39,8 @@ export const proxy = createProxyMiddleware({
 			const startTime = (req as any).startTime || endTime;
 			const responseTime = (endTime - startTime).toFixed(2);
 			const ua = parseUA(req.headers['user-agent'] || "")
-
 			const data: IAnalytics = {
-				projectId: req.project?.id || "",
+				projectId: req.project?._id || "",
 				subdomain: req.project?.subdomain || "",
 				timestamp: new Date().getTime(),
 				path: req.url,

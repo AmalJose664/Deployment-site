@@ -1,16 +1,21 @@
 import NodeCache from "node-cache";
 import { IProjectRepo } from "../interfaces/repository/IProjectRepo.js";
 import { IProjectService } from "../interfaces/service/IProjectService.js";
-import { IProject } from "../models/Project.js";
+import { IProject, User } from "../models/Project.js";
 import { projectRepo } from "../repository/project.repo.js";
 import AppError from "../utils/AppError.js";
+import { IProjectBandwidthRepository } from "../interfaces/repository/IProjectBandwidth.js";
+import { projectBandwidthRepo } from "../repository/projectBandwidth.repo.js";
+import { IPlans, PLANS } from "../contants/plan.js";
 
 // ←
 class ProjectService implements IProjectService {
 	private projectRepository: IProjectRepo;
+	private projectBandwidthRepo: IProjectBandwidthRepository
 	private projectCache: NodeCache
-	constructor(projectRepo: IProjectRepo, projectCache: NodeCache) {
+	constructor(projectRepo: IProjectRepo, projectBandwidthRepo: IProjectBandwidthRepository, projectCache: NodeCache) {
 		this.projectRepository = projectRepo;
+		this.projectBandwidthRepo = projectBandwidthRepo
 		this.projectCache = projectCache
 	}
 
@@ -21,18 +26,34 @@ class ProjectService implements IProjectService {
 			console.log("from cache ←←←")
 			return dataFromCache as IProject
 		}
-
 		console.log("db calls ====>")
+		const project = await this.projectRepository.getProjectBySlugWithUser(slug)
+		if (!project) {
+			throw new AppError("project not found", 404)
+		}
+		const bw = await this.projectBandwidthRepo.getUserMonthlyBandwidth(project?.user._id)
+		const userPlan = (project.user as any)?.plan || "FREE"
+		const userPlanBw = PLANS[userPlan as keyof IPlans].totalBandwidthGB * (1024 * 1024 * 1024)
+		if (bw > userPlanBw) {
+			throw new AppError("Limit exceed on bandwidth", 403)
+		}
 
-		const project = await this.projectRepository.getProjectBySlug(slug)
-		this.projectCache.set(slug, project)
-		return project
+		const projectRefined = {
+			_id: project._id.toString(),
+			subdomain: project.subdomain,
+			currentDeployment: project?.currentDeployment,
+			tempDeployment: project?.tempDeployment,
+			isDeleted: project.isDeleted,
+			isDisabled: project.isDisabled,
+		}
+		this.projectCache.set(slug, projectRefined)
+		return projectRefined as IProject
 	}
 }
 
 
-export const projectService = new ProjectService(projectRepo, new NodeCache({
-	stdTTL: 300,
-	checkperiod: 60 * 3
+export const projectService = new ProjectService(projectRepo, projectBandwidthRepo, new NodeCache({
+	stdTTL: 300,          // Node Cache not meant for scalability, use redis for scalability of project
+	checkperiod: 60 * 3   // Node Cache not meant for scalability, use redis for scalability of project
 })
 )

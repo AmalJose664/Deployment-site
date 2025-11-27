@@ -9,7 +9,7 @@ class AnalyticsService implements IAnalyticsService {
 	private projectBandwidthRepo: IProjectBandwidthRepository
 
 	private analyticsBuffer: BufferAnalytics[] = [];
-	private readonly BATCH_SIZE = 170;
+	private readonly BATCH_SIZE = 570;
 	private readonly FLUSH_INTERVAL = 7000 * 10; // 7s
 	private readonly MAX_BUFFER_SIZE = 10000;
 	private flushTimer?: NodeJS.Timeout;

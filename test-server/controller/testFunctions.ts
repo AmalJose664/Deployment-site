@@ -8,7 +8,7 @@ const techArr = ["react", "vite", "angular", "solid", "vuejs", "svelte"]
 const infoAr = ['INFO', 'SUCCESS', 'WARN', 'ERROR']
 
 
-
+// producer.connect()
 
 export async function testSubmit1(req: Request, res: Response) {
 	const number = req.query.number

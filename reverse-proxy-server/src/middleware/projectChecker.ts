@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { IProject } from "../models/Project.js";
 import { projectService } from "../service/project.service.js";
+import AppError from "../utils/AppError.js";
+import { breaker } from "../utils/CircuitBreaker.js";
 
 declare global {
 	namespace Express {
@@ -15,6 +17,10 @@ declare global {
 export async function checkProject(req: Request, res: Response, next: NextFunction) {
 	const ownDomain = process.env.OWN_DOMAIN
 	try {
+		if (breaker.isOpen) {
+			next(new AppError("Service temporarily unavailable", 503));
+			return
+		}
 		const slug = req.hostname.split('.')[0];
 		if (!slug || slug === ownDomain || slug === 'www') {
 			console.log(slug)
@@ -23,7 +29,6 @@ export async function checkProject(req: Request, res: Response, next: NextFuncti
 		}
 
 		const project = await projectService.findProjectBySlug(slug);
-		console.log(project, " < _ __ _ __ _ __ _ __ __")
 		if (!project || project.isDeleted) {
 			res.status(404).json({
 				error: 'Project not found',
@@ -54,9 +59,13 @@ export async function checkProject(req: Request, res: Response, next: NextFuncti
 		}
 
 		req.project = project;
+		breaker.recordSuccess()
 		next();
 
 	} catch (error) {
+		if (!(error instanceof AppError)) {
+			breaker.recordFailure();
+		}
 		console.error('Project lookup error:', error);
 		next(error);
 	}

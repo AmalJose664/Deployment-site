@@ -8,7 +8,7 @@ class AnalyticsService implements IAnalyticsService {
 	private kafkaTopic: string
 	private analyticsBuffer: IAnalytics[] = []
 	MAX_QUEUE_SIZE = 1000;
-	BATCH_SIZE = 100;
+	BATCH_SIZE = 300;
 	FLUSH_INTERVAL = 7000;    //    7s 
 	isSending = false;
 	FLUSH_INTERVAL_REF: ReturnType<typeof setInterval>;
