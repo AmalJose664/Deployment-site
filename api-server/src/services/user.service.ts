@@ -1,7 +1,7 @@
 import { Profile } from "passport";
 import { IUserRepository } from "../interfaces/repository/IUserRepository.js";
 import { IUserSerivce } from "../interfaces/service/IUserService.js";
-import { IUser } from "../models/User.js";
+import { AuthProvidersList, IUser } from "../models/User.js";
 import AppError from "../utils/AppError.js";
 import { IProjectService } from "../interfaces/service/IProjectService.js";
 import { PLANS } from "../constants/plan.js";
@@ -20,21 +20,52 @@ class UserService implements IUserSerivce {
 	async createUser(userData: Partial<IUser>): Promise<IUser> {
 		return await this.userRepository.createUser(userData);
 	}
-	async googleLoginStrategy(profile: Profile): Promise<IUser> {
-		const userData = {
-			googleId: profile.id,
-			email: profile.emails?.[0].value || "",
-			name: profile.displayName,
-			profileImage: profile.photos?.[0].value,
-		};
-		let user = await this.findUser(userData.googleId, userData.email);
-		if (!user) {
-			console.log("NO user found , creating new...");
-			user = await this.createUser(userData);
-		} else {
-			console.log("User login success !!!!");
+
+	private async oauthLoginStrategy(
+		profile: Profile,
+		provider: AuthProvidersList
+	): Promise<IUser> {
+		console.log(`${provider} login`);
+
+		const { emails } = profile;
+		if (emails?.length === 0 || !emails) {
+			throw new AppError("User email not found", 400);
 		}
-		return user;
+
+		let user = await this.userRepository.findByUserEmail(emails[0].value);
+
+		if (!user) {
+			const newUser: Partial<IUser> = {
+				name: profile.displayName,
+				email: emails[0].value,
+				profileImage: profile.photos?.[0].value || "",
+				authProviders: [{ provider, id: profile.id }],
+			};
+			user = await this.createUser(newUser);
+			console.log("No user found, created new...");
+			return user;
+		}
+
+		const hasProvider = user.authProviders.some(p => p.provider === provider);
+
+		if (!hasProvider) {
+			user = await this.userRepository.updateUser(user._id, {
+				authProviders: [
+					...user.authProviders,
+					{ provider, id: profile.id }
+				]
+			});
+		}
+
+		return user as IUser;
+	}
+
+	async googleLoginStrategy(profile: Profile): Promise<IUser> {
+		return this.oauthLoginStrategy(profile, AuthProvidersList.GOOGLE);
+	}
+
+	async githubLoginStrategy(profile: Profile): Promise<IUser> {
+		return this.oauthLoginStrategy(profile, AuthProvidersList.GITHUB);
 	}
 
 	async getUser(userId: string): Promise<IUser | null> {

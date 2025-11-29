@@ -52,7 +52,7 @@ const projectSchema = new Schema<IProject>(
 		currentDeployment: { type: String, default: null },
 		tempDeployment: { type: String, default: null },
 		lastDeployment: { type: String, default: null },
-		env: [{ name: String, value: String }],
+		env: [{ name: String, value: String, _id: false }],
 		lastDeployedAt: { type: Date, default: Date.now() },
 		isDeleted: { type: Boolean, default: false },
 		isDisabled: { type: Boolean, default: false },

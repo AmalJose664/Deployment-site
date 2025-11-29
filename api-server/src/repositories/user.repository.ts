@@ -2,13 +2,13 @@ import { IUserRepository } from "../interfaces/repository/IUserRepository.js";
 import { IUser, User } from "../models/User.js";
 import { BaseRepository } from "./base/base.repository.js";
 import { IPlans } from "../constants/plan.js";
-import { Types } from "mongoose";
+import { Document, Types } from "mongoose";
 
 class UserRepository extends BaseRepository<IUser> implements IUserRepository {
 	constructor() {
 		super(User);
 	}
-	async createUser(data: Partial<IUser>): Promise<IUser> {
+	async createUser(data: Partial<Omit<IUser, keyof Document>>): Promise<IUser> {
 		return await super.create(data);
 	}
 	async findByUserId(id: string): Promise<IUser | null> {

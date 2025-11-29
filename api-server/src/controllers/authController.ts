@@ -8,7 +8,7 @@ import { userService } from "../instances.js";
 import { UserMapper } from "../mappers/userMapper.js";
 import AppError from "../utils/AppError.js";
 
-export const googleLoginCallback = (req: Request, res: Response, next: NextFunction) => {
+export const oAuthLoginCallback = (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const accessToken = generateAccessToken(req.user);
 		const refreshToken = generateRefreshToken(req.user);
@@ -33,11 +33,27 @@ export const googleLoginCallback = (req: Request, res: Response, next: NextFunct
 	}
 };
 
+
 export const googleLoginStrategy = async (accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) => {
+	console.log("strategy google")
 	try {
 		const user = await userService.googleLoginStrategy(profile);
 		const doneUser = {
-			id: user.id,
+			id: user._id,
+			email: user.email,
+		};
+		done(null, doneUser);
+	} catch (error) {
+		done(error, false);
+	}
+};
+
+export const githubLoginStrategy = async (accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) => {
+	try {
+		console.log("strategy github")
+		const user = await userService.githubLoginStrategy(profile);
+		const doneUser = {
+			id: user._id,
 			email: user.email,
 		};
 		done(null, doneUser);

@@ -36,7 +36,7 @@ Deployment-site
 
 -   **[api-server](./api-server)**
 -   **[build-server](./build-server)**
--   **[frontend-server](./frontend-server)**
+-   **[frontend-server](./frontend)**
 -   **[reverse-proxy-server](./reverse-proxy-server)**
 -   **[test-server](./test-server)**
 -   **[nginx configs](./nginx-1.28.0)**

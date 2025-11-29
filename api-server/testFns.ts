@@ -39,6 +39,8 @@ console.log("-------------------------------------------------------------------
 async function mongodbData() {
 	try {
 		await connectDb();
+		console.log(await User.updateOne({ _id: "692ab8f18a4e4f824581b33e" }, { $set: { _id: new Types.ObjectId("68e4a04f1e57fa3fe5b1a81e") } }))
+		return
 		const p = new P_repo();
 		const de = new D_repo();
 		console.log(await Project.deleteMany(),)
@@ -46,7 +48,7 @@ async function mongodbData() {
 		return
 		const project = await Project.findById("691e1c418cb08e07e28986dc").populate("deployments", "commit_hash");
 
-		const userId = "68e4a04f1e57fa3fe5b1a81e";
+		const userId = "68e4a04f1e57fa3fe5b1a81e"; //
 		const user = await User.findById(userId);
 
 		// await p.createProject({ name: "TEST_PROJECT_1", repoURL: "TEST_PROJECT_1_REPO", status: "READY", user: user._id, subdomain: "testable-subdomain", })
@@ -64,7 +66,7 @@ async function mongodbData() {
 		process.exit(0);
 	}
 }
-// mongodbData();
+mongodbData();
 
 async function commitAllMessages() {
 	const kafka = new Kafka({

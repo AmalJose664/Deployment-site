@@ -6,6 +6,7 @@ export interface IUserSerivce {
 	createUser(userData: Partial<IUser>): Promise<IUser>;
 
 	googleLoginStrategy(Profile: Profile): Promise<IUser>;
+	githubLoginStrategy(profile: Profile): Promise<IUser>
 	updateUser?(userId: string, updateData: Partial<IUser>): Promise<IUser | null>;
 	updateUserProfile?(userId: string): Promise<IUser | null>;
 
