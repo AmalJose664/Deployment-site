@@ -13,12 +13,14 @@ test-grounds/
 test-grounds/*
 
 
-nginx-1.28.0/conf/fastcgi*
-nginx-1.28.0/conf/koi-*
-nginx-1.28.0/conf/mime.types
+nginx-1.28.0/conf/fastcgi_params
+nginx-1.28.0/conf/fastcgi.conf
+nginx-1.28.0/conf/koi-win
+nginx-1.28.0/conf/koi-utf
+nginx-1.28.0/conf/fastcgi.conf
 nginx-1.28.0/conf/scgi_params
-nginx-1.28.0/conf/uwsgi_params
 nginx-1.28.0/conf/win-utf
+nginx-1.28.0/conf/uwsgi_params
 
 nginx-1.28.0/logs/
 nginx-1.28.0/temp/
