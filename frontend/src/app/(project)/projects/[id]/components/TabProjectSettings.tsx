@@ -342,7 +342,7 @@ const EnvVariables = ({ project, form }: { project: Project, form: UseFormReturn
 										onClick={() => append(
 											{ name: "", value: "" }
 										)}
-										className="flex float-end mb-4 mr-4 items-center gap-2 text-sm  px-4 py-2 rounded-md transition-all border border-gray-700/50"
+										className="flex float-end mb-4 mt-2 mr-4 items-center gap-2 text-sm  px-4 py-2 rounded-md transition-all border border-gray-700/50"
 									>
 										<FaPlus size={16} />
 										Add Variable
