@@ -8,14 +8,17 @@ import { MdOutlineStorage } from 'react-icons/md';
 import { PLANS } from '@/config/plan';
 import { GrPlan } from 'react-icons/gr';
 import BackButton from '@/components/BackButton';
+import ErrorComponent from '@/components/ErrorComponent';
 
 
 
 const ProfileContent = () => {
-	const { data: userDetailed } = useGetDetailedQuery()
+	const { data: userDetailed, error, isError } = useGetDetailedQuery()
 	const plan = userDetailed?.plan || "FREE"
 	const currentPlan = PLANS[plan]
-
+	if (error || isError) {
+		return <ErrorComponent error={error} id={""} field="User" />
+	}
 	return (
 		<div>
 			<div className="min-h-screen bg-gradient-to-br from-background to-slate-100 dark:from-background dark:to-neutral-900">
