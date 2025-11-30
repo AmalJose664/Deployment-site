@@ -1,25 +1,53 @@
 import { Router } from "express";
 import { authenticateToken } from "../middlewares/authMiddleware.js";
 import { validateBody, validateQuery } from "../middlewares/validateRequest.js";
-import { CreateProjectSchema, ProjectQueryScheme, UpdateProjectScheme } from "../dtos/project.dto.js";
+import { CreateProjectSchema, ProjectQuerySchema, ProjectSubdomainSchema, SubdomainQuerySchema, UpdateProjectSchema } from "../dtos/project.dto.js";
 import { deploymentController, logsController, projectController } from "../instances.js";
 import { validateObjectId } from "../middlewares/validateObjectId.js";
 import { DeploymentQueryScheme } from "../dtos/deployment.dto.js";
 
 const projectRouter = Router();
 
-projectRouter.get("/", authenticateToken, validateQuery(ProjectQueryScheme), projectController.getAllProjects.bind(projectController));
-projectRouter.post("/", authenticateToken, validateBody(CreateProjectSchema), projectController.createProject.bind(projectController));
+projectRouter.get("/",
+	authenticateToken,
+	validateQuery(ProjectQuerySchema),
+	projectController.getAllProjects.bind(projectController)
+);
+projectRouter.post("/",
+	authenticateToken,
+	validateBody(CreateProjectSchema),
+	projectController.createProject.bind(projectController)
+);
 
-projectRouter.get("/:projectId", authenticateToken, validateObjectId("projectId"), projectController.getProject.bind(projectController));
+projectRouter.get("/subdomain/check",
+	authenticateToken,
+	validateQuery(SubdomainQuerySchema),
+	projectController.checkSubdomainAvailable.bind(projectController)
+);
+projectRouter.get("/:projectId",
+	authenticateToken,
+	validateObjectId("projectId"),
+	projectController.getProject.bind(projectController)
+);
 projectRouter.patch(
 	"/:projectId",
 	authenticateToken,
 	validateObjectId("projectId"),
-	validateBody(UpdateProjectScheme),
+	validateBody(UpdateProjectSchema),
 	projectController.updateProject.bind(projectController),
 );
-projectRouter.delete("/:projectId", authenticateToken, validateObjectId("projectId"), projectController.deleteProject.bind(projectController));
+projectRouter.patch(
+	"/:projectId/subdomain",
+	authenticateToken,
+	validateObjectId("projectId"),
+	validateBody(ProjectSubdomainSchema),
+	projectController.updateSubdomain.bind(projectController),
+);
+projectRouter.delete("/:projectId",
+	authenticateToken,
+	validateObjectId("projectId"),
+	projectController.deleteProject.bind(projectController)
+);
 
 
 projectRouter.get(

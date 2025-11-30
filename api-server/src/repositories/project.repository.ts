@@ -21,6 +21,9 @@ class ProjectRepository extends BaseRepository<IProject> implements IProjectRepo
 		}
 		return await Project.findOne({ _id: projectId, user: userId, isDeleted: false }); //
 	}
+	async findProjectsBySubdomain(subdomain: string): Promise<IProject[]> {
+		return await Project.find({ subdomain, isDeleted: false }); //
+	}
 
 	async getAllProjects(userId: string, query: QueryProjectDTO): Promise<{ projects: IProject[]; total: number }> {
 		const dbQuery: FilterQuery<IProject> = { user: userId, isDeleted: false };

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { IProjectController } from "../interfaces/controller/IProjectController.js";
 import ProjectService from "../services/project.service.js";
 import { HTTP_STATUS_CODE } from "../utils/statusCodes.js";
-import { CreateProjectDTO, QueryProjectDTO, UpdateProjectDTO } from "../dtos/project.dto.js";
+import { checkSubdomainDTO, CreateProjectDTO, QueryProjectDTO, UpdateProjectDTO, UpdateSubdomainDTO } from "../dtos/project.dto.js";
 import { ProjectMapper } from "../mappers/ProjectMapper.js";
 import AppError from "../utils/AppError.js";
 
@@ -73,6 +73,31 @@ class ProjectController implements IProjectController {
 		} catch (err) {
 			next(err);
 		}
+	}
+	async updateSubdomain(req: Request, res: Response, next: NextFunction): Promise<void> {
+		try {
+			const userId = req.user?.id as string;
+			const dto = req.validatedBody as UpdateSubdomainDTO;
+			const updatedProject = await this.projectService.changeProjectSubdomain(userId, dto.projectId, dto.newSubdomain)
+			if (!updatedProject) {
+				res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ project: null });
+				return;
+			}
+			const response = ProjectMapper.toProjectResponse(updatedProject);
+			res.status(HTTP_STATUS_CODE.OK).json(response);
+		} catch (error) {
+			next(error);
+		}
+	}
+	async checkSubdomainAvailable(req: Request, res: Response, next: NextFunction): Promise<void> {
+		try {
+			const dto = req.validatedQuery as checkSubdomainDTO
+			const result = await this.projectService.checkSubdomainAvaiable(dto.value)
+			res.json({ available: result })
+		} catch (error) {
+			next(error);
+		}
+
 	}
 	async deleteProject(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {

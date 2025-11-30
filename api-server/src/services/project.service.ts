@@ -109,6 +109,25 @@ class ProjectService implements IProjectService {
 		}
 		return await this.projectBandwidthRepo.getUserTotalBandwidth(userId)
 	}
+	async checkSubdomainAvaiable(newSubdomain: string): Promise<boolean> {
+		const projects = await this.projectRepository.findProjectsBySubdomain(newSubdomain)
+		if (projects.length > 0) {
+			return false
+		}
+		return true
+	}
+	async changeProjectSubdomain(userId: string, projectId: string, newSubdomain: string): Promise<IProject | null> {
+		const project = await this.projectRepository.findProject(projectId, userId,)
+		if (!project) {
+			throw new AppError("Project not found", 404)
+		}
+		const isAvailable = await this.checkSubdomainAvaiable(newSubdomain);
+		if (!isAvailable) {
+			throw new AppError("Subdomain already taken", 409);
+		}
+		return await this.projectRepository.updateProject(project._id, userId, { subdomain: newSubdomain })
+
+	}
 
 
 	async __getProjectById(id: string): Promise<IProject | null> {

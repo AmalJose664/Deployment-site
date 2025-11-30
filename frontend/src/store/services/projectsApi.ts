@@ -71,6 +71,21 @@ export const projectApis = createApi({
 				{ type: "Projects", id: project._id },
 				{ type: "Projects", id: "LIST" },
 			])
+		}),
+		changeProjectSubdomain: builder.mutation<Project, { projectId: string, newSubdomain: string }>({
+			query: (project) => ({
+				url: "/projects/" + project.projectId + "/subdomain",
+				method: "PATCH",
+				data: project,
+			}
+			),
+			transformResponse: (data: any) => {
+				return data.project as Project
+			},
+			invalidatesTags: (result, error, project) => ([
+				{ type: "Projects", id: project.projectId },
+				{ type: "Projects", id: "LIST" },
+			])
 		})
 	})
 })
@@ -81,6 +96,7 @@ export const {
 	useCreateProjectMutation,
 	useGetProjectByIdQuery,
 	useDeleteProjectMutation,
-	useUpdateProjectMutation
+	useUpdateProjectMutation,
+	useChangeProjectSubdomainMutation
 } = projectApis;
 

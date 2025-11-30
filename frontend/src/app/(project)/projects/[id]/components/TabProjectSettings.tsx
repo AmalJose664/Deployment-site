@@ -20,6 +20,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getBranches } from "@/lib/form";
 import { useUpdateProjectMutation } from "@/store/services/projectsApi";
+import { ChangeProjectSubdomainDialog } from "@/components/project/ChangeSubdomain";
 
 
 
@@ -523,6 +524,23 @@ const ProjectSettings = ({ project, reDeploy, setTabs }: { project: Project, reD
 
 
 
+					<div
+						id="danger"
+						className="dark:bg-neutral-900 bg-white rounded-md py-3 px-5 border mb-3"
+					>
+						<h2 className="text-xl mb-3 font-semibold text-primary">Domain</h2>
+						<div className="flex border items-center justify-between p-4 rounded-md">
+							<div>
+								<p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+									Change Subdomain
+								</p>
+								<p className="text-xs text-gray-500">
+									Change the subdomain.
+								</p>
+							</div>
+							<ChangeProjectSubdomainDialog projectId={project._id} projectName={project.name} />
+						</div>
+					</div>
 					<div
 						id="danger"
 						className="dark:bg-neutral-900 bg-white rounded-md py-3 px-5 border mb-3"

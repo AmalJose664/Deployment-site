@@ -14,7 +14,8 @@ export interface IProjectService {
 	deleteProject(projectId: string, userId: string): Promise<boolean>;
 	getProjectBandwidthData(projectId: string, userId: string, isMonthly: boolean): Promise<number>
 	getUserBandwidthData(userId: string, isMonthly: boolean): Promise<number>
-
+	changeProjectSubdomain(userId: string, projectId: string, newSubdomain: string): Promise<IProject | null>
+	checkSubdomainAvaiable(newSubdomain: string): Promise<boolean>
 
 	__getProjectById(id: string): Promise<IProject | null>;
 	__updateProjectById(projectId: string, updateData: Partial<IProject>, options?: options): Promise<IProject | null>
