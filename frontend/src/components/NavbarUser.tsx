@@ -37,14 +37,6 @@ const NavbarUser = () => {
 						<DropdownMenuItem className="cursor-pointer" onClick={() => router.push("/user")}>
 							Profile
 						</DropdownMenuItem>
-						<DropdownMenuItem>
-							Billing
-							<DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-						</DropdownMenuItem>
-						<DropdownMenuItem>
-							Settings
-							<DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-						</DropdownMenuItem>
 					</DropdownMenuGroup>
 					<DropdownMenuSeparator />
 					<DropdownMenuItem >
@@ -53,7 +45,6 @@ const NavbarUser = () => {
 							<RxExternalLink />
 						</Link>
 					</DropdownMenuItem>
-					<DropdownMenuItem>Support</DropdownMenuItem>
 					<DropdownMenuItem disabled>API</DropdownMenuItem>
 					<DropdownMenuSeparator />
 					<DropdownMenuItem onClick={() => logout()}>

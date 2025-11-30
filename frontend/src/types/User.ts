@@ -15,4 +15,5 @@ export interface UserDetailed {
 	deploymentsToday: number
 	createdAt: Date
 	_id: string
+	connectedAccounts: string[]
 }

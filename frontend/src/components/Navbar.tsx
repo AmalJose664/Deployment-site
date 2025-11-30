@@ -26,7 +26,7 @@ export default function Navbar({ className }: { className: string }) {
 					href="/"
 					className="flex items-center space-x-2 hover:no-underline transition"
 				>
-					<TitleWithLogo />
+					<TitleWithLogo useSvg />
 				</Link>
 				<svg
 					className="h-4 w-4 text-gray-400"

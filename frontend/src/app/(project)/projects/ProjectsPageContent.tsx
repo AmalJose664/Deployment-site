@@ -147,7 +147,7 @@ export default function ProjectContent() {
 							{filteredProjects && filteredProjects.map((project) => (
 								<div onClick={() => router.push("/projects/" + project._id)}
 									key={project._id}
-									className={cn("dark:bg-zinc-900 bg-[#fdfdfd] border dark:border-gray-800 border-gray-300 shadow-gray-200 shadow dark:shadow-none  rounded-md p-5 hover:border-blue-500 dark:hover:border-blue-900 transition-all duration-200 group cursor-pointer leading-5", project.isDisabled && "dark:hover:border-red-300 hover:border-red-300")}
+									className={cn("dark:bg-neutral-900 bg-white border dark:border-gray-800 border-gray-300 shadow-gray-200 shadow dark:shadow-none  rounded-md p-5 hover:border-blue-500 dark:hover:border-blue-900 transition-all duration-200 group cursor-pointer leading-5", project.isDisabled && "dark:hover:border-red-300 hover:border-red-300")}
 								>
 									<div className="flex items-start justify-between mb-4">
 

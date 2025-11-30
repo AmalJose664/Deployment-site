@@ -9,6 +9,8 @@ import { PLANS } from '@/config/plan';
 import { GrPlan } from 'react-icons/gr';
 import BackButton from '@/components/BackButton';
 import ErrorComponent from '@/components/ErrorComponent';
+import { VscAccount } from 'react-icons/vsc';
+import { FaGithub, FaGoogle } from 'react-icons/fa';
 
 
 
@@ -184,6 +186,20 @@ const ProfileContent = () => {
 									<div className="">
 										<p className="text-xs text-less mb-1">Member Since</p>
 										<p className="text-base font-medium text-primary">{getElapsedTimeClean(userDetailed?.createdAt)}</p>
+									</div>
+								</div>
+							</div>
+							<div className='mb-4 border-b pb-2'>
+								<div className="flex gap-6 items-center">
+									<span>
+										<VscAccount className="size-4" />
+									</span>
+									<div className="mb-1">
+										<p className="text-xs text-less mb-1">Connected Accounts</p>
+										<span className="flex gap-2 items-center">
+											{userDetailed?.connectedAccounts.includes("google") && <FaGoogle />}
+											{userDetailed?.connectedAccounts.includes("github") && <FaGithub />}
+										</span>
 									</div>
 								</div>
 							</div>

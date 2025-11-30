@@ -14,6 +14,7 @@ interface UserResponseDetailedDTO {
 	plan: string
 	createdAt: Date
 	_id: string
+	connectedAccounts: string[]
 }
 export class UserMapper {
 	static toUserResponse(user: IUser): { user: UserResponseDTO } {
@@ -37,7 +38,8 @@ export class UserMapper {
 				deploymentsToday: Number(user.deploymentsToday),
 				plan: user.plan,
 				createdAt: user.createdAt,
-				bandwidthMonthly: data.bandwidth
+				bandwidthMonthly: data.bandwidth,
+				connectedAccounts: user.authProviders.map((p) => p.provider)
 			}
 		}
 	}

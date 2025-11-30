@@ -122,7 +122,7 @@ function ProjectForm() {
 							<button
 								type="submit"
 								disabled={isSubmitting || isSubmitSuccessful}
-								className="w-full dark:bg-background bg-white  py-2 hover:bg-neutral-800 hover:text-white hover:dark:bg-neutral-200 hover:dark:text-black rounded font-semibold border   transition"
+								className="w-full dark:bg-background bg-white  py-2 hover:bg-neutral-800 hover:text-white hover:dark:bg-neutral-200 hover:dark:text-black rounded font-semibold border !duration-100 transition"
 							>
 								{(isSubmitting || isLoading) ? "Loading..." : "Deploy"}
 							</button>

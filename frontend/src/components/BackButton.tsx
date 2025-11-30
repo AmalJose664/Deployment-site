@@ -6,7 +6,7 @@ const BackButton = () => {
 	return (
 		<button
 			onClick={() => router.back()}
-			className="border p-2 dark:hover:bg-zinc-800 hover:bg-zinc-200 rounded-lg transition-colors group"
+			className="border dark:bg-transparent bg-white p-2 dark:hover:bg-zinc-800 hover:bg-zinc-200 rounded-lg transition-colors group"
 		>
 			<TiArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
 		</button>
