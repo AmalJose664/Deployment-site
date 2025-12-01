@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import path from "path";
 import { generateSlug } from "random-word-slugs";
-import { producer } from "../config/kafka";
+import { producer } from "../config/kafka.js";
 import { existsSync, lstatSync, readdirSync } from "fs";
 const statusAr = ["NOT_STARTED", "BUILDING", "QUEUED", "READY", "FAILED", "CANCELLED"]
 const techArr = ["react", "vite", "angular", "solid", "vuejs", "svelte"]

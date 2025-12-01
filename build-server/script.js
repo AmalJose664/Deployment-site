@@ -2,6 +2,7 @@ import { spawn } from "child_process"
 
 import { existsSync, } from "fs"
 import { readdir, stat, rename, mkdir, rm, readFile } from 'fs/promises';
+import { createWriteStream, createReadStream } from "fs"
 import path from "path"
 import mime from "mime-types"
 import { Kafka } from "kafkajs"
@@ -9,9 +10,12 @@ import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
 import { fileURLToPath } from "url";
 import { randomUUID } from "crypto"
 import simpleGit from "simple-git";
+import archiver from "archiver";
+import FormData from "form-data";
+import axios from 'axios';
 
-let DEPLOYMENT_ID = process.env.DEPLOYMENT_ID || "692461eecfa1bb98cf35b16f"   // Received from env by apiserver or use backup for local testing
-let PROJECT_ID = process.env.PROJECT_ID || "692461b6cfa1bb98cf35b166"   // Received from env by apiserver or use backup for local testing
+let DEPLOYMENT_ID = process.env.DEPLOYMENT_ID || "6924664b869c614a34901605"   // Received from env by apiserver or use backup for local testing
+let PROJECT_ID = process.env.PROJECT_ID || "69246647869c614a349015fc"   // Received from env by apiserver or use backup for local testing
 
 const kafka = new Kafka({
 	clientId: `docker-build-server-${PROJECT_ID}`,
@@ -64,11 +68,12 @@ const deploymentStatus = {
 
 const settings = {
 	customBuildPath: true,
-	sendKafkaMessage: true,
-	deleteSourcesAfter: true,
+	sendKafkaMessage: !true,
+	deleteSourcesAfter: !true,
+	sendLocalDeploy: !true,
 	localDeploy: true,
-	runCommands: true,            // for testing only 
-	cloneRepo: true            // for testing only 
+	runCommands: !true,            // for testing only 
+	cloneRepo: !true            // for testing only 
 }
 
 console.log(DEPLOYMENT_ID, PROJECT_ID, "<<<<<")
@@ -196,26 +201,26 @@ async function loadProjectData(deploymentId = "") {
 	const API_ENDPOINT = process.env.API_ENDPOINT
 	const baseUrl = `${API_ENDPOINT}/api/internal`
 
-	const deploymentResponse = await fetch(`${baseUrl}/deployments/${deploymentId}`, {
+	const deploymentResponse = await axios.get(`${baseUrl}/deployments/${deploymentId}`, {
 		headers: {
 			Authorization: `Bearer ${API_SERVER_CONTAINER_API_TOKEN}`
 		}
 	})
 
-	const deploymentData = await deploymentResponse.json()
+	const deploymentData = deploymentResponse.data
 	if (!deploymentData.deployment) {
 
 		throw new ContainerError("Deployment data not found", "data fetching", "Invalid project or deployment Id")
 	}
 
 	const projectId = deploymentData.deployment.project
-	const projectResponse = await fetch(`${baseUrl}/projects/${projectId}`, {
+	const projectResponse = await axios.get(`${baseUrl}/projects/${projectId}`, {
 		headers: {
 			Authorization: `Bearer ${API_SERVER_CONTAINER_API_TOKEN}`
 		}
 	})
 
-	const projectData = await projectResponse.json()
+	const projectData = projectResponse.data
 	if (!projectData.project) {
 
 		throw new ContainerError("Project data not found", "data fetching", "Invalid project or deployment Id")
@@ -464,9 +469,41 @@ async function runCommand(command, args, cwd, env = []) {
 	})
 }
 
+async function uploadNonAws(dir, fileName) {
 
-async function uploadOrMoveFiles(sourceDir, targetDir) {
+	if (!settings.sendLocalDeploy) return
+	const url = process.env.STORAGE_SERVER_ENDPOINT || ""
+	if (!url && settings.localDeploy) {
+		throw new ContainerError("No url found for storage server", "upload")
+	}
+	const zipStream = createReadStream(path.join(dir, fileName));
+	const form = new FormData();
+	form.append("file", zipStream, {
+		filename: "build.zip",
+		contentType: "application/zip"
+	})
+	const res = await axios.post(url + `/new/${PROJECT_ID}/${DEPLOYMENT_ID}`, form,
+		{
+			headers: form.getHeaders(),
+			maxContentLength: Infinity,
+			maxBodyLength: Infinity
+		}
+	)
+	const result = res.data
+	console.log(result, " <<< <<",)
+	return
+}
+async function validateAnduploadFiles(sourceDir, targetDir) {
 	console.log("trying to move", sourceDir, targetDir)
+	const zipFileName = "output__" + Math.floor(Math.random() * 100) + ".zip"
+	console.log("Creating as ", zipFileName)
+	const output = createWriteStream(path.join(sourceDir, zipFileName));
+	const archive = archiver('zip', {
+		zlib: { level: 9 }
+	});
+
+	archive.pipe(output);
+
 	const fileStructure = []
 	let totalSize = 0;
 	async function processDirectory(currentDir, relativePath = "") {
@@ -476,10 +513,6 @@ async function uploadOrMoveFiles(sourceDir, targetDir) {
 			const relPath = path.join(relativePath, entry.name)
 
 			if (entry.isDirectory()) {
-				if (settings.localDeploy) {
-					await mkdir(path.join(targetDir, relPath), { recursive: true });
-					console.log("moving")
-				}
 				await processDirectory(fullPath, relPath);
 
 			} else if (entry.isFile()) {
@@ -505,7 +538,8 @@ async function uploadOrMoveFiles(sourceDir, targetDir) {
 				});
 				if (settings.localDeploy) {
 					const targetPath = path.join(targetDir, relPath);
-					await rename(fullPath, targetPath);
+					archive.file(fullPath, { name: relPath });
+					// await rename(fullPath, targetPath);
 					console.log("Moved " + relPath)
 				} else {
 					console.log("Uploading " + relPath);
@@ -520,8 +554,22 @@ async function uploadOrMoveFiles(sourceDir, targetDir) {
 				}
 			}
 		}
+
 	}
 	await processDirectory(sourceDir);
+	await archive.finalize();
+	return new Promise((resolve, reject) => {
+		output.on("finish", async () => {
+			try {
+				await uploadNonAws(sourceDir, zipFileName)
+				resolve({ fileStructure, totalSize })
+			} catch (err) {
+				reject(err)
+			}
+		});
+		output.on("error", reject);
+		archive.on("error", reject);
+	});
 	return { fileStructure, totalSize };
 }
 
@@ -639,7 +687,7 @@ async function init() {
 		console.log("done.....");
 		console.log("Post build configurations running....")
 
-		const { fileStructure, totalSize } = await uploadOrMoveFiles(distFolderPath,
+		const { fileStructure, totalSize } = await validateAnduploadFiles(distFolderPath,
 			path.join(`../test-server/public/user-projects/${PROJECT_ID}/${DEPLOYMENT_ID}/`)
 		)
 		if (settings.localDeploy && settings.deleteSourcesAfter) {

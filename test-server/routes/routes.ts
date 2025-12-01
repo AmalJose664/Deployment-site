@@ -1,9 +1,10 @@
 import { Router } from "express";
-import { downloadFile, provideProjectFiles, provideProjectIndex, } from "../controller/controller";
-import { testSubmit1, testSubmit2, testSubmit3 } from "../controller/testFunctions";
-import { validateObjectId } from "../middleware/validate";
+import { downloadFile, newDeployment, provideProjectFiles, provideProjectIndex, } from "../controller/controller.js";
+import { testSubmit1, testSubmit2, testSubmit3 } from "../controller/testFunctions.js";
+import { validateObjectId } from "../middleware/validate.js";
+import multer from "multer"
 
-
+const upload = multer({ dest: 'public/temp/' });
 const router = Router({})
 
 router.get(
@@ -27,7 +28,13 @@ router.use(
 );
 
 
-
+router.post(
+	"/new/:projectId/:deploymentId",
+	upload.single("file"),
+	validateObjectId('projectId'),
+	validateObjectId('deploymentId'),
+	newDeployment
+);
 
 router.post('/submit', testSubmit1)
 router.post('/submit2', testSubmit2);

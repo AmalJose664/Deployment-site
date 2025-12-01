@@ -1,7 +1,10 @@
 import express, { Request, Response, NextFunction } from "express";
 import path from "path";
 import { existsSync } from "fs";
+
 import { fileURLToPath } from "url";
+import AdmZip from 'adm-zip';
+import { mkdir, unlink } from "fs/promises";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -69,12 +72,37 @@ export async function downloadFile(req: Request, res: Response) {
 
 	} catch (error) {
 		console.log(error)
-		res.status(500).json({ error: 'Download failed' });
+		res.status(500).json({ error: 'Internal server error' });
 	}
 }
 
 
-
+export async function newDeployment(req: Request, res: Response) {
+	try {
+		const { deploymentId, projectId } = req.params;
+		if (!req.file) {
+			return res.status(400).json({ error: 'No file uploaded' });
+		}
+		const extractPath = path.join(__dirname, '../public', 'user-projects', projectId, deploymentId);
+		if (!existsSync(extractPath)) {
+			await mkdir(extractPath, { recursive: true });
+		}
+		const zip = new AdmZip(req.file.path);
+		zip.extractAllTo(extractPath, true);
+		await unlink(req.file.path);
+		console.log(`Files extracted to: ${extractPath}`);
+		res.json({
+			success: true,
+			extractPath
+		});
+	} catch (error) {
+		console.log(error)
+		if (req.file?.path && existsSync(req.file.path)) {
+			await unlink(req.file.path);
+		}
+		res.status(500).json({ error: 'Internal server error' });
+	}
+}
 
 
 

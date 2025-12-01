@@ -15,12 +15,16 @@
 	"license": "ISC",
 	"type": "module",
 	"dependencies": {
+		"adm-zip": "^0.5.16",
 		"cookie-parser": "^1.4.7",
 		"express": "^5.1.0",
 		"kafkajs": "^2.2.4",
+		"multer": "^2.0.2",
 		"random-word-slugs": "^0.1.7"
 	},
 	"devDependencies": {
-		"@types/express": "^5.0.5"
+		"@types/adm-zip": "^0.5.7",
+		"@types/express": "^5.0.5",
+		"@types/multer": "^2.0.0"
 	}
 }
