@@ -56,8 +56,8 @@ export default function Navbar({ className }: { className: string }) {
 						</Link>
 					</li>
 					<li>
-						<Link href="/feedback" className="hover:text-blue-400">
-							Feedback
+						<Link href="/pricing" className="hover:text-blue-400">
+							Pricing
 						</Link>
 					</li>
 				</ul>

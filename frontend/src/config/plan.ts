@@ -1,3 +1,14 @@
+import {
+	FiServer,
+	FiSlash,
+	FiStar,
+	FiLink,
+	FiPackage,
+	FiHardDrive,
+} from "react-icons/fi";
+import { IconType } from "react-icons";
+import { IoIosCube, IoMdCloudDone } from "react-icons/io";
+
 export interface IPlans {
 	FREE: {
 		name: string;
@@ -23,7 +34,7 @@ export interface IPlans {
 export const PLANS: IPlans = {
 	FREE: {
 		name: "FREE",
-		slug: "free",
+		slug: "Starter",
 		pricePerMonth: 0,
 		maxProjects: 4,
 		maxDailyDeployments: 12,
@@ -39,7 +50,7 @@ export const PLANS: IPlans = {
 	},
 	PRO: {
 		name: "PRO",
-		slug: "pro",
+		slug: "Pro",
 		pricePerMonth: 20,
 		maxProjects: 20,
 		maxDailyDeployments: 100,
@@ -55,3 +66,33 @@ export const PLANS: IPlans = {
 		],
 	},
 } as const;
+export interface IPlanIcons {
+	FREE: {
+		features: { text: string, Icon: IconType }[];
+	};
+	PRO: {
+		features: { text: string, Icon: IconType }[];
+	};
+}
+export const PlanIcons: IPlanIcons = {
+
+	FREE: {
+		features: [
+			{ text: "Basic hosting", Icon: FiServer },
+			{ text: "Up to 4 projects", Icon: IoIosCube },
+			{ text: "Max 12 deployments daily", Icon: IoMdCloudDone },
+			{ text: "200GB Total Bandwidth", Icon: FiHardDrive },
+			{ text: "No custom sub domains", Icon: FiSlash },
+		],
+	},
+	PRO: {
+		features: [
+			{ text: "Priority builds", Icon: FiStar },
+			{ text: "Custom sub domains", Icon: FiLink },
+			{ text: "Up to 20 projects", Icon: IoIosCube },
+			{ text: "Max 100 deployments daily", Icon: IoMdCloudDone },
+			{ text: "1TB Total Bandwidth", Icon: FiHardDrive },
+			{ text: "More resources", Icon: FiPackage },
+		],
+	},
+}
