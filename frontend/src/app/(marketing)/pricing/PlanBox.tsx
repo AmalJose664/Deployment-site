@@ -56,6 +56,7 @@ const PlanBox = () => {
 									{currentPlan.pricePerMonth > 0 ?
 										<>
 											<h2>
+
 												{currentPlan.pricePerMonth + "$"}
 											</h2>
 											<span className="text-xs">/Month</span>
