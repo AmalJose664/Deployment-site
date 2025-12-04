@@ -18,7 +18,7 @@ export async function middleware(req: NextRequest) {
 		}
 	}
 	if (protectedRoutes.some((route) => path.startsWith(route))) {
-		if (!accessToken && !refreshToken || !refreshToken) {
+		if ((!accessToken && !refreshToken) || !refreshToken) {
 			return NextResponse.redirect(new URL("/login", req.url));
 		}
 		try {

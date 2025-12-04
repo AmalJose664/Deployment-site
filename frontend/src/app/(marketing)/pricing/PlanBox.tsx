@@ -5,12 +5,16 @@ import { cn } from "@/lib/utils"
 import { IoCubeSharp } from "react-icons/io5"
 import { useGetDetailedQuery } from "@/store/services/authApi"
 import { useRouter } from "next/navigation"
+import axiosInstance from "@/lib/axios"
 const PlanBox = () => {
 	const { data: user } = useGetDetailedQuery()
 	const userPlan = PLANS[user?.plan as keyof IPlans] || PLANS.FREE
 	const router = useRouter()
 
 	const handleClick = (clickedPlan: string) => {
+		if (!user) {
+			return router.push("/login")
+		}
 		console.log(clickedPlan)
 		if (clickedPlan === "PRO" && userPlan.name === PLANS.FREE.name) {
 			return upgrade()
@@ -19,8 +23,14 @@ const PlanBox = () => {
 
 
 	}
-	const upgrade = () => {
-		alert("hey upgrading")
+	const upgrade = async () => {
+		try {
+			const response = await axiosInstance.post("/billing/checkout")
+			const url = response.data.url
+			window.location.href = url;
+		} catch (error) {
+			console.log(error)
+		}
 	}
 	return (
 		<div className="flex items-center justify-center gap-6">
@@ -38,7 +48,7 @@ const PlanBox = () => {
 						)
 					}>
 						<div className={cn(!isFree && "hover:border-yellow-500/70 transition-colors duration-300",
-							"border rounded-md bg-zinc-900 px-4 py-5 h-[500px] w-80")}>
+							"border rounded-md dark:bg-zinc-900 bg-white px-4 py-5 h-[500px] w-80")}>
 							<div className="mb-4 p-x3 flex justify-between items-center">
 								<IoCubeSharp size={20} className={cn("rotate-z-180", !isFree && "text-yellow-300")} />
 								{userPlan.slug === currentPlan.slug &&
@@ -56,7 +66,6 @@ const PlanBox = () => {
 									{currentPlan.pricePerMonth > 0 ?
 										<>
 											<h2>
-
 												{currentPlan.pricePerMonth + "$"}
 											</h2>
 											<span className="text-xs">/Month</span>
@@ -71,7 +80,7 @@ const PlanBox = () => {
 								<hr />
 							</div>
 							<div className="w-full mb-3 mt-8">
-								<Button variant={"default"} className="w-full" onClick={() => handleClick(plan)}>
+								<Button variant={"default"} className="w-full font-semibold" onClick={() => handleClick(plan)}>
 									{isFree ? "Get Started" : (isUserFreePlan ? "Buy" : "Explore")}
 								</Button>
 							</div>

@@ -18,6 +18,8 @@ import LogsController from "./controllers/logsController.js";
 import AnalyticsController from "./controllers/analyticsController.js";
 
 import { client } from "./config/clickhouse.js";
+import PaymentService from "./services/payment.service.js";
+import PaymentController from "./controllers/paymentController.js";
 
 export const userRepo = new UserRepo();
 export const projectRepo = new ProjectRepo();
@@ -32,8 +34,11 @@ export const logsService = new LogsService(logRepo, deploymentRepo);
 export const analyticsService = new AnalyticsService(analyticsRepo, projectBandwidthRepo);
 export const userService = new UserService(userRepo, projectService);
 export const deploymentService = new DeploymentService(deploymentRepo, projectRepo, userService);
+export const paymentService = new PaymentService(userRepo)
 
 export const projectController = new ProjectController(projectService);
 export const deploymentController = new DeploymentController(deploymentService);
 export const logsController = new LogsController(logsService);
 export const analyticsController = new AnalyticsController(analyticsService);
+export const paymentController = new PaymentController(paymentService)
+
