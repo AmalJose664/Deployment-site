@@ -4,6 +4,11 @@ export enum AuthProvidersList {
 	GOOGLE = "google",
 	GITHUB = "github",
 }
+export enum SubscriptionStatus {
+	active = 'active',
+	cancelled = 'cancelled',
+	none = 'none'
+}
 export interface IUser extends Document {
 	_id: string;
 	name: string;
@@ -13,7 +18,13 @@ export interface IUser extends Document {
 	plan: keyof IPlans;
 	projects: number;
 	deploymentsToday: number
+
 	currentDate: string;
+	stripeCustomerId?: string
+	payment: {
+		subscriptionId: string | null
+		subscriptionStatus: SubscriptionStatus
+	} | null;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -31,6 +42,16 @@ const userSchema = new Schema<IUser>(
 		plan: { type: String, required: true, default: "FREE" },
 		projects: { type: Number, required: true, default: 0 },
 		deploymentsToday: { type: Number, required: true, default: 0 },
+		stripeCustomerId: { type: String, default: null },
+		payment: {
+			_id: false,
+			subscriptionId: { type: String, default: null },
+			subscriptionStatus: {
+				type: String,
+				enum: Object.values(SubscriptionStatus),
+				default: 'none'
+			},
+		},
 		currentDate: { type: String, required: true, default: () => new Date().toISOString().slice(0, 10) }
 	},
 	{ timestamps: true },

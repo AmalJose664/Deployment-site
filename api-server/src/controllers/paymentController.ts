@@ -24,6 +24,16 @@ class PaymentController implements IPaymentController {
 			next(error)
 		}
 	}
+	async cancelSubscription(req: Request, res: Response, next: NextFunction): Promise<void> {
+		try {
+			const userId = req.user?.id as string
+			await this.paymentService.handleCancelSubscription(userId)
+
+			res.json({ hai: "hey", });
+		} catch (error) {
+			next(error)
+		}
+	}
 	async webhook(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
 			const sig = req.headers['stripe-signature']

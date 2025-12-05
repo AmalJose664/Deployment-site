@@ -7,6 +7,7 @@ const paymentRouter = Router();
 
 
 paymentRouter.post("/checkout", authenticateToken, paymentController.checkout.bind(paymentController))
+paymentRouter.post("/cancel", authenticateToken, paymentController.cancelSubscription.bind(paymentController))
 paymentRouter.post(
 	"/stripe-webhook",
 	paymentController.webhook.bind(paymentController)

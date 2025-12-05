@@ -14,9 +14,7 @@ class UserRepository extends BaseRepository<IUser> implements IUserRepository {
 	async findByUserId(id: string): Promise<IUser | null> {
 		return await User.findById(id);
 	}
-	async findByEmailOrGoogleId(email: string, googleId: string): Promise<IUser | null> {
-		return await User.findOne({ $or: [{ googleId }, { email }] });
-	}
+
 	async findByUserEmail(email: string): Promise<IUser | null> {
 		return await this.findOne({ email });
 	}
@@ -62,8 +60,14 @@ class UserRepository extends BaseRepository<IUser> implements IUserRepository {
 			{ $inc: { deploymentsToday: 1 } }
 		);
 	}
+	async findUserByCustomerId(id: string): Promise<IUser | null> {
+		return await User.findOne({ stripeCustomerId: id })
+	}
 	async updateUserPlans(userId: string, planData: keyof IPlans): Promise<IUser | null> {
 		return await User.findOneAndUpdate({ _id: userId }, { $set: { plan: planData } }, { new: true });
+	}
+	async updateUserPlansWithStripe(stripeId: string, planData: keyof IPlans, paymentData: IUser['payment']): Promise<IUser | null> {
+		return await User.findOneAndUpdate({ stripeCustomerId: stripeId }, { $set: { plan: planData, payment: paymentData } }, { new: true })
 	}
 
 }
