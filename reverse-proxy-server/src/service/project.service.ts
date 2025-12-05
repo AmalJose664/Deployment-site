@@ -6,7 +6,7 @@ import { projectRepo } from "../repository/project.repo.js";
 import AppError from "../utils/AppError.js";
 import { IProjectBandwidthRepository } from "../interfaces/repository/IProjectBandwidth.js";
 import { projectBandwidthRepo } from "../repository/projectBandwidth.repo.js";
-import { IPlans, PLANS } from "../contants/plan.js";
+import { IPlans, PLANS } from "../constants/plan.js";
 
 // ←
 class ProjectService implements IProjectService {

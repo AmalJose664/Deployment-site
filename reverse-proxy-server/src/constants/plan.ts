@@ -23,7 +23,7 @@ export interface IPlans {
 export const PLANS: IPlans = {
 	FREE: {
 		name: "FREE",
-		slug: "free",
+		slug: "Starter",
 		pricePerMonth: 0,
 		maxProjects: 4,
 		maxDailyDeployments: 12,
@@ -39,8 +39,8 @@ export const PLANS: IPlans = {
 	},
 	PRO: {
 		name: "PRO",
-		slug: "pro",
-		pricePerMonth: 20,
+		slug: "Pro",
+		pricePerMonth: 15,
 		maxProjects: 20,
 		maxDailyDeployments: 100,
 		totalBandwidthGB: 1000,
