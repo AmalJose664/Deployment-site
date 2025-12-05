@@ -1,8 +1,8 @@
 "use client"
 import { FiUser, FiMail, FiCalendar, FiClock } from 'react-icons/fi';
-import { useGetDetailedQuery, } from "@/store/services/authApi"
+import { useGetUserDetailedQuery, } from "@/store/services/authApi"
 
-import { IoIosCube, IoMdCloudDone } from 'react-icons/io';
+import { IoIosCube, IoMdArrowRoundForward, IoMdCloudDone } from 'react-icons/io';
 import { formatBytes, formatDate, getElapsedTimeClean } from '@/lib/utils';
 import { MdOutlineStorage } from 'react-icons/md';
 import { PLANS } from '@/config/plan';
@@ -11,11 +11,13 @@ import BackButton from '@/components/BackButton';
 import ErrorComponent from '@/components/ErrorComponent';
 import { VscAccount } from 'react-icons/vsc';
 import { FaGithub, FaGoogle } from 'react-icons/fa';
+import { useRouter } from 'next/navigation';
 
 
 
 const ProfileContent = () => {
-	const { data: userDetailed, error, isError } = useGetDetailedQuery()
+	const { data: userDetailed, error, isError } = useGetUserDetailedQuery()
+	const router = useRouter()
 	const plan = userDetailed?.plan || "FREE"
 	const currentPlan = PLANS[plan]
 	if (error || isError) {
@@ -40,27 +42,27 @@ const ProfileContent = () => {
 										alt={userDetailed?.name || "User Avatar"}
 										className="w-16 h-16 rounded-full border-4 shadow-xl bg-transparent"
 									/>
-									<div className="absolute bottom-2 right-2 w-4 h-4 bg-green-500 rounded-full border-2 "></div>
+									<div className="absolute bottom-2 right-2 w-2 h-2 bg-green-500 rounded-full border-2 "></div>
 								</div>
 
-								<div className="flex-1 pt-16 sm:pt-0">
+								<div className="flex-1 sm:pt-0">
 									<h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
 										{userDetailed?.name}
 									</h1>
-									<p className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
-										<FiMail className="w-4 h-4" />
-										{userDetailed?.email || ""}
-									</p>
 								</div>
 							</div>
-							<div>
+							<button onClick={() => router.push("/user/plan")} className='rounded-md border px-3 py-2 flex gap-2 items-center'>
+								<div >
+									Manage Plan
+								</div>
+								<IoMdArrowRoundForward />
 								<span
 									className={`px-2 py-0.5 rounded-md text-xs font-medium 
-      ${plan === "PRO" ? "bg-blue-400 text-white" : "bg-gray-300 text-gray-800"}`}
+										${plan === "PRO" ? "bg-blue-400 text-white" : "bg-gray-300 text-gray-800"}`}
 								>
 									{plan}
 								</span>
-							</div>
+							</button>
 						</div>
 					</div>
 

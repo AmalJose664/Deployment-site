@@ -51,7 +51,7 @@ export const PLANS: IPlans = {
 	PRO: {
 		name: "PRO",
 		slug: "Pro",
-		pricePerMonth: 20,
+		pricePerMonth: 15,
 		maxProjects: 20,
 		maxDailyDeployments: 100,
 		totalBandwidthGB: 1000,

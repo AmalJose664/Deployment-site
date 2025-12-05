@@ -17,7 +17,7 @@ export const authApi = createApi({
 			},
 			providesTags: (result, error,) => [{ type: 'Auth', id: result?._id || "" }]
 		}),
-		getDetailed: builder.query<UserDetailed, void>({
+		getUserDetailed: builder.query<UserDetailed, void>({
 			query: () => ({ url: "/auth/me/full", method: 'get' }),
 			keepUnusedDataFor: 7 * 60,
 
@@ -36,4 +36,4 @@ export const authApi = createApi({
 	}),
 })
 
-export const { useGetUserQuery, useGetDetailedQuery, useLogoutMutation } = authApi
+export const { useGetUserQuery, useGetUserDetailedQuery, useLogoutMutation } = authApi

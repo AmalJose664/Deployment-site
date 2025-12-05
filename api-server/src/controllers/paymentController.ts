@@ -28,8 +28,10 @@ class PaymentController implements IPaymentController {
 		try {
 			const userId = req.user?.id as string
 			await this.paymentService.handleCancelSubscription(userId)
-
-			res.json({ hai: "hey", });
+			res.json({
+				message: "Subscription cancelled successfully",
+				status: true
+			});
 		} catch (error) {
 			next(error)
 		}
