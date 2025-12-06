@@ -7,6 +7,7 @@ const REQUIRED_ENVS = [
 	"AWS_S3_BUCKET",
 	"KAFKA_USERNAME",
 	"KAFKA_PASSWORD",
+	"STORAGE_SERVER_ENDPOINT"
 ] as const;
 
 const getNessesaryEnvs = (): envsArrayType => {
