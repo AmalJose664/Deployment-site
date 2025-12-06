@@ -1,6 +1,6 @@
 import { Request } from "express";
 import { createProxyMiddleware } from "http-proxy-middleware";
-import { STORAGE_SERVER_URL } from "../contants/paths.js";
+import { STORAGE_SERVER_URL } from "../constants/paths.js";
 
 
 export const extraProxy = createProxyMiddleware({

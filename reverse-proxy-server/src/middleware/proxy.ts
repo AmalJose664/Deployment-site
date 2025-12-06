@@ -4,7 +4,7 @@ import { isbot } from 'isbot';
 import { IAnalytics } from "../models/Analytics.js";
 import { analyticsService } from "../service/analytics.service.js";
 import parseUA from "../utils/uaParser.js";
-import { STORAGE_SERVER_FILES } from "../contants/paths.js";
+import { STORAGE_SERVER_FILES } from "../constants/paths.js";
 
 
 
