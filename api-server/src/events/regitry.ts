@@ -103,7 +103,6 @@ export async function processConumerLogs({ batch, heartbeat, commitOffsetsIfNece
 	await Promise.all(
 		batch.messages.map(async (msg) => {
 			try {
-				console.log("from batch -----", batch.messages.length)
 				const data = JSON.parse(msg.value?.toString() as any);
 				processFn(data, batch.topic, "logs");
 

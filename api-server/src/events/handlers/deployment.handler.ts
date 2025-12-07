@@ -19,7 +19,7 @@ class DeploymentEventHandler {
 			});
 		}
 		console.log("logs inserted...", log.message);
-		return
+
 		await logsService.__insertLog(log.message, projectId, deploymentId, new Date(log.timestamp), log.level);
 		//stream
 	}

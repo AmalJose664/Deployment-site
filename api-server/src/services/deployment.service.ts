@@ -141,7 +141,7 @@ class DeploymentService implements IDeploymentService {
 			});
 
 			command.stdout?.on("data", (data) => {
-				console.log(`[stdout]: -----data-----from----deployLocal`, data.toString());
+				console.log(`[stdout]: -----data-----from----deployLocal`,);
 			});
 
 			command.stderr?.on("data", (data) => {
