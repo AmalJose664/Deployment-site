@@ -85,7 +85,7 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 		}
 		return () => { dispatch(clearLogs()) }
 	}, [initialLogs, dispatch])
-	useDeploymentSSE(project, refetch, sseActive, setSseActive, lastDeployment)
+	useDeploymentSSE(project, refetch, sseActive, setSseActive, tempDeployment)
 
 	const reDeploy = async () => {
 		if (!project || (!deployment && !lastDeployment)) return
