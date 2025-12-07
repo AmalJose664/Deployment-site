@@ -13,8 +13,8 @@ const infoAr = ['INFO', 'SUCCESS', 'WARN', 'ERROR']
 export async function testSubmit1(req: Request, res: Response) {
 	const number = req.query.number
 	const randomValue = infoAr[Math.floor(Math.random() * infoAr.length)];
-	const DEPLOYMENT_ID = "6921a9af999a11682f69f697"
-	const PROJECT_ID = "691e1a1babe973c943c5cf7d"
+	const DEPLOYMENT_ID = "693456873c9358558f6464a3"
+	const PROJECT_ID = "6934502adfa2d8c1c254aabc"
 	for (let i = 0; i < Number(number || 1); i++) {
 		const value = JSON.stringify({
 			eventId: '38a86d69-a1b8-4f12-a488-5ff2bf61a489',
