@@ -64,7 +64,7 @@ export async function processLogEvent(data: unknown, topic: string, type: "logs"
 	while (!processed && attempt < KAFKA_MESSAGE_SAVE_RETRIES) {
 		try {
 			const parsedData = config.schema.parse(data);
-			await config.handler(parsedData);
+			await config.handler(parsedData, attempt != 0);
 			processed = true;
 		} catch (error: any) {
 			if (error instanceof ZodError) {
@@ -95,7 +95,7 @@ export async function processAnalyticsEvent(data: { events: {}[], calculatedBand
 		throw new Error(`No handler registered for topic: ${topic}`);
 	}
 
-	await config.handler(data);
+	await config.handler(data, false);
 }
 
 export async function processConumerLogs({ batch, heartbeat, commitOffsetsIfNecessary, resolveOffset }: EachBatchPayload) {
@@ -103,6 +103,7 @@ export async function processConumerLogs({ batch, heartbeat, commitOffsetsIfNece
 	await Promise.all(
 		batch.messages.map(async (msg) => {
 			try {
+				console.log("from batch -----", batch.messages.length)
 				const data = JSON.parse(msg.value?.toString() as any);
 				processFn(data, batch.topic, "logs");
 

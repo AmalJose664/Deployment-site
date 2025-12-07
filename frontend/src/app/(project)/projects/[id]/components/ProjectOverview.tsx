@@ -68,7 +68,7 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, goToSett
 									<IoMdGlobe className='size-4 text-less' />
 								</div>
 								<div>
-									<Link
+									<Link target="_blank"
 										href={
 											project.status === ProjectStatus.READY
 												? `${window.location.protocol}//${project.subdomain}.${process.env.NEXT_PUBLIC_PROXY_SERVER}`

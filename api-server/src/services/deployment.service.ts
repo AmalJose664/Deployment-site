@@ -53,7 +53,12 @@ class DeploymentService implements IDeploymentService {
 
 		const deployment = await this.deploymentRepository.createDeployment(deploymentData);
 
-		await this.projectRepository.pushToDeployments(correspondindProject.id, userId, deployment?.id);
+		await Promise.all(
+			[
+				this.projectRepository.pushToDeployments(correspondindProject.id, userId, deployment?.id),
+				this.userService.incrementDeployment(correspondindProject.user.toString())
+			]
+		)
 		if (deployment?._id) {
 			this.deployLocal(deployment?._id, projectId)
 		}
@@ -136,7 +141,7 @@ class DeploymentService implements IDeploymentService {
 			});
 
 			command.stdout?.on("data", (data) => {
-				console.log(`[stdout]: -----data-----from----deployLocal`);
+				console.log(`[stdout]: -----data-----from----deployLocal`, data.toString());
 			});
 
 			command.stderr?.on("data", (data) => {

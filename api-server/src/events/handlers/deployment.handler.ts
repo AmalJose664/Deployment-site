@@ -5,33 +5,37 @@ import { DeploymentLogEvent, DeploymentUpdatesEvent } from "../schemas/deploymen
 import { UpdateTypes } from "../types/event.js";
 
 class DeploymentEventHandler {
-	static async handleLogs(event: DeploymentLogEvent): Promise<void> {
+	static async handleLogs(event: DeploymentLogEvent, isRetry: boolean): Promise<void> {
 		//service call
 		const { data } = event;
 
 		const { log, deploymentId, projectId } = data;
-		deploymentEmitter.emitLog(deploymentId, {
-			event_id: event.eventId,
-			deployment_id: deploymentId,
-			project_id: projectId,
-			...log,
-		});
+		if (!isRetry) {
+			deploymentEmitter.emitLog(deploymentId, {
+				event_id: event.eventId,
+				deployment_id: deploymentId,
+				project_id: projectId,
+				...log,
+			});
+		}
 		console.log("logs inserted...", log.message);
-
+		return
 		await logsService.__insertLog(log.message, projectId, deploymentId, new Date(log.timestamp), log.level);
 		//stream
 	}
 
-	static async handleUpdates(event: DeploymentUpdatesEvent): Promise<void> {
+	static async handleUpdates(event: DeploymentUpdatesEvent, isRetry: boolean): Promise<void> {
 		//service call
 		const { data } = event;
 		const { updates, deploymentId, projectId } = data;
 		console.log("Updates >>>>", data.updateType);
-		deploymentEmitter.emitUpdates(deploymentId, {
-			...updates,
-			deploymentId,
-			projectId,
-		});
+		if (!isRetry) {
+			deploymentEmitter.emitUpdates(deploymentId, {
+				...updates,
+				deploymentId,
+				projectId,
+			});
+		}
 
 		switch (data.updateType) {
 			case UpdateTypes.START: {

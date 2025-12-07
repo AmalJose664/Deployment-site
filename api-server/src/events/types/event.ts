@@ -1,6 +1,6 @@
 import { ZodObject } from "zod";
 
-export type EventHandler<T = any> = (event: T) => Promise<void>;
+export type EventHandler<T = any> = (event: T, isRetry: boolean) => Promise<void>;
 
 export enum EventTypes {
 	DEPLOYMENT_LOG = "DEPLOYMENT_LOG",

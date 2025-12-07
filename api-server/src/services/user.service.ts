@@ -14,9 +14,7 @@ class UserService implements IUserSerivce {
 		this.projectService = projectServce
 	}
 
-	async findUser(googleId: string, email: string): Promise<IUser | null> {
-		return await this.userRepository.findByEmailOrGoogleId(email, googleId);
-	}
+
 	async createUser(userData: Partial<IUser>): Promise<IUser> {
 		return await this.userRepository.createUser(userData);
 	}

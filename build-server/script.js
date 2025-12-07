@@ -14,8 +14,8 @@ import archiver from "archiver";
 import FormData from "form-data";
 import axios from 'axios';
 
-let DEPLOYMENT_ID = process.env.DEPLOYMENT_ID || "6924664b869c614a34901605"   // Received from env by apiserver or use backup for local testing
-let PROJECT_ID = process.env.PROJECT_ID || "69246647869c614a349015fc"   // Received from env by apiserver or use backup for local testing
+let DEPLOYMENT_ID = process.env.DEPLOYMENT_ID || "69347c6d6031f8e069ce7c9d"   // Received from env by apiserver or use backup for local testing
+let PROJECT_ID = process.env.PROJECT_ID || "6934502adfa2d8c1c254aabc"   // Received from env by apiserver or use backup for local testing
 
 const kafka = new Kafka({
 	clientId: `docker-build-server-${PROJECT_ID}`,
@@ -68,9 +68,9 @@ const deploymentStatus = {
 
 const settings = {
 	customBuildPath: true,
-	sendKafkaMessage: !true,
-	deleteSourcesAfter: !true,
-	sendLocalDeploy: !true,
+	sendKafkaMessage: true,
+	deleteSourcesAfter: true,
+	sendLocalDeploy: true,
 	localDeploy: true,
 	runCommands: !true,            // for testing only 
 	cloneRepo: !true            // for testing only 
@@ -88,27 +88,29 @@ let flushTimer = null;
 // ----------------------------------------------------FUNCTIONS--------------------------------------------------
 
 const sendLogsAsBatch = async () => {
+
 	if (flushTimer) {
 		clearTimeout(flushTimer);
 		flushTimer = null;
 	}
 	if (logBuffer.length === 0) return;
+	const logsToSend = [...logBuffer];
+	logBuffer.length = 0;
 	try {
 		await producer.send({
 			topic: "deployment.logs",
-			messages: logBuffer.map(log => ({
+			messages: logsToSend.map(log => ({
 				key: "log",
 				value: JSON.stringify(log)
 			}))
 		});
-		console.log(`Sent ${logBuffer.length} logs`);
-		logBuffer = [];
+		console.log(`Sent ${logsToSend.length} logs`);
+
 	} catch (error) {
 		console.error("Kafka batch send failed:", error);
-		logBuffer = [];
 	}
 }
-const publishLogs = (logData = {}) => {
+const publishLogs = async (logData = {}) => {
 	logsNumber++
 	if (!settings.sendKafkaMessage) return
 	logBuffer.push({
@@ -125,16 +127,15 @@ const publishLogs = (logData = {}) => {
 			}
 		}
 	});
-	if (!flushTimer) {
-		flushTimer = setTimeout(sendLogsAsBatch, 300);
+	if (flushTimer) {
+		clearTimeout(flushTimer);
+		flushTimer = null;
 	}
-	if (logBuffer.length >= 50) {
-		if (flushTimer) {
-			clearTimeout(flushTimer);
-			flushTimer = null;
-		}
-		sendLogsAsBatch();
 
+	if (logBuffer.length >= 50) {
+		sendLogsAsBatch();
+	} else {
+		flushTimer = setTimeout(sendLogsAsBatch, 300);
 	}
 }
 
@@ -197,7 +198,7 @@ async function getGitCommitData(taskDir) {
 	return logss.all[0].hash + "||" + logss.all[0].message
 }
 
-async function loadProjectData(deploymentId = "") {
+async function fetchProjectData(deploymentId = "") {
 	const API_ENDPOINT = process.env.API_ENDPOINT
 	const baseUrl = `${API_ENDPOINT}/api/internal`
 
@@ -495,7 +496,7 @@ async function uploadNonAws(dir, fileName) {
 }
 async function validateAnduploadFiles(sourceDir, targetDir) {
 	console.log("trying to move", sourceDir, targetDir)
-	const zipFileName = "output__" + Math.floor(Math.random() * 100) + ".zip"
+	const zipFileName = "output__" + Math.random().toString(36).slice(2, 12).replaceAll(".", "") + ".zip"
 	console.log("Creating as ", zipFileName)
 	const output = createWriteStream(path.join(sourceDir, zipFileName));
 	const archive = archiver('zip', {
@@ -597,7 +598,7 @@ async function init() {
 		console.log("Executing script.js")
 		console.log("fetching project data")
 		const taskDir = path.join(__dirname, "../test-grounds/")             // UPDATE THIS ON DEPLOYMENT !!!!!!!!!!!!!!!!!
-		const [projectData, deploymentData] = await loadProjectData(DEPLOYMENT_ID)
+		const [projectData, deploymentData] = await fetchProjectData(DEPLOYMENT_ID)
 		DEPLOYMENT_ID = deploymentData._id
 		PROJECT_ID = projectData._id
 
@@ -616,8 +617,9 @@ async function init() {
 			message: `cloning repo..`, stream: "system"
 		})
 
-		gitCommitData = await getGitCommitData(taskDir) || gitCommitData
 		await cloneGitRepoAndValidate(taskDir, runDir, projectData)
+		gitCommitData = await getGitCommitData(taskDir).catch((e) => console.log("Error getting commit", e)) || gitCommitData
+
 
 		publishLogs({
 			DEPLOYMENT_ID, PROJECT_ID,
@@ -629,7 +631,11 @@ async function init() {
 		const buildOptions = getDynamicBuildRoot(framweworkIdentified.tool)
 		console.log(framweworkIdentified, buildOptions)
 
-
+		publishLogs({
+			DEPLOYMENT_ID, PROJECT_ID,
+			level: "INFO",
+			message: `Installing packages...`, stream: "system"
+		})
 		const installTimer = performance.now()
 		let installTries = 0
 		while (installTries < 3) {
@@ -679,7 +685,6 @@ async function init() {
 			message: `Build complete    in ${(buildEndTimer - buildTimer).toFixed(2)} ms`, stream: "system"
 		})
 
-
 		const distFolderPath = path.join(runDir, outputFilesDir);
 		if (!existsSync(distFolderPath)) {
 			throw new ContainerError(outputFilesDir + ' folder not found after build', "system");
@@ -690,6 +695,7 @@ async function init() {
 		const { fileStructure, totalSize } = await validateAnduploadFiles(distFolderPath,
 			path.join(`../test-server/public/user-projects/${PROJECT_ID}/${DEPLOYMENT_ID}/`)
 		)
+
 		if (settings.localDeploy && settings.deleteSourcesAfter) {
 			await rm(taskDir, { recursive: true, force: true });
 			await mkdir(taskDir, { recursive: true });
