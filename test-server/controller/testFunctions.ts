@@ -55,8 +55,8 @@ export async function testSubmit2(req: Request, res: Response) {
 
 	console.log(`Received topic: ${topic}`);
 	console.log(`Received message: ${message}`);
-	const DEPLOYMENT_ID = "68ff74fc0c735bac01ff7347"
-	const PROJECT_ID = "68fb1ccb10b93de245fa9f55"
+	const DEPLOYMENT_ID = "6924664b869c614a34901605"
+	const PROJECT_ID = "69246647869c614a349015fc"
 	const distFolderPath = path.join("../reverse-proxy-server/src/");
 	if (!existsSync(distFolderPath)) {
 		throw new Error(' folder not found after build');
@@ -80,7 +80,7 @@ export async function testSubmit2(req: Request, res: Response) {
 		data: {
 			deploymentId: DEPLOYMENT_ID,
 			projectId: PROJECT_ID,
-			updateType: "CUSTOM",
+			updateType: "ERROR",
 			updates: {
 				status: randomValue,
 				techStack: randomValue2,

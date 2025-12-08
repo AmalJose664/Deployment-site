@@ -80,7 +80,7 @@ export function ChangeProjectSubdomainDialog({ projectName, projectId }: { proje
 				<DialogHeader>
 					<DialogTitle>Update Project</DialogTitle>
 					<DialogDescription>
-						To confirm, type the project name below:
+						To confirm, type the project name and new subdomain slug below:
 						<br />
 						{projectName}
 					</DialogDescription>

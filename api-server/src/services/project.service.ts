@@ -136,10 +136,11 @@ class ProjectService implements IProjectService {
 	}
 	async __updateProjectById(projectId: string, updateData: Partial<IProject>, options?: options): Promise<IProject | null> {
 		//container   or internal only
+
 		if (options?.updateStatusOnlyIfNoCurrentDeployment) {
 			const project = await this.__getProjectById(projectId);
-			if (project?.currentDeployment && project.status === ProjectStatus.READY) {
-				delete updateData.status;
+			if (project?.currentDeployment) {
+				updateData.status = ProjectStatus.READY;
 			}
 		}
 		return await this.projectRepository.__updateProject(projectId, updateData);

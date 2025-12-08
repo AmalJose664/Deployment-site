@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { IProject, ProjectStatus } from "../../models/Projects.js";
 import { IUser } from "../../models/User.js";
 import { QueryProjectDTO } from "../../dtos/project.dto.js";
+import { IDeployment } from "../../models/Deployment.js";
 
 export interface IProjectRepository {
 	createProject(project: Partial<IProject>): Promise<IProject | null>;

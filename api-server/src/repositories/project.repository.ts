@@ -4,6 +4,7 @@ import { IProject, Project, ProjectStatus } from "../models/Projects.js";
 import { IUser, User } from "../models/User.js";
 import { BaseRepository } from "./base/base.repository.js";
 import { QueryProjectDTO } from "../dtos/project.dto.js";
+import { IDeployment } from "../models/Deployment.js";
 
 class ProjectRepository extends BaseRepository<IProject> implements IProjectRepository {
 	constructor() {
@@ -79,6 +80,7 @@ class ProjectRepository extends BaseRepository<IProject> implements IProjectRepo
 			{ new: true },
 		);
 	}
+
 	async __findProject(projectId: string): Promise<IProject | null> {
 		// container
 		return await Project.findOne({ _id: projectId });
@@ -87,5 +89,6 @@ class ProjectRepository extends BaseRepository<IProject> implements IProjectRepo
 		// container
 		return await Project.findOneAndUpdate({ _id: projectId }, { $set: { ...updateData } }, { new: true });
 	}
+
 }
 export default ProjectRepository;

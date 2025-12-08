@@ -69,7 +69,7 @@ const deploymentStatus = {
 const settings = {
 	customBuildPath: true,
 	sendKafkaMessage: true,
-	deleteSourcesAfter: true,
+	deleteSourcesAfter: !true,
 	sendLocalDeploy: true,
 	localDeploy: true,
 	runCommands: !true,            // for testing only 
@@ -483,16 +483,28 @@ async function uploadNonAws(dir, fileName) {
 		filename: "build.zip",
 		contentType: "application/zip"
 	})
-	const res = await axios.post(url + `/new/${PROJECT_ID}/${DEPLOYMENT_ID}`, form,
-		{
-			headers: form.getHeaders(),
-			maxContentLength: Infinity,
-			maxBodyLength: Infinity
-		}
-	)
-	const result = res.data
-	console.log(result, " <<< <<",)
-	return
+	try {
+		const res = await axios.post(url + `/new/${PROJECT_ID}/${DEPLOYMENT_ID}`, form,
+			{
+				headers: form.getHeaders(),
+				maxContentLength: Infinity,
+				maxBodyLength: Infinity
+			}
+		)
+		const result = res.data
+		console.log(result, " <<< <<",)
+		return
+	} catch (error) {
+		console.log("Error on uploading files")
+		publishLogs({
+			DEPLOYMENT_ID, PROJECT_ID,
+			level: "ERROR",
+			message: `Error on uploading files, ${error.message}`,
+			stream: "upload"
+		});
+		throw new ContainerError(error.message, "upload", "Storage server not reachable")
+	}
+
 }
 async function validateAnduploadFiles(sourceDir, targetDir) {
 	console.log("trying to move", sourceDir, targetDir)

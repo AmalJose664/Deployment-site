@@ -5,7 +5,10 @@ import { useAppDispatch } from "@/store/store";
 import { Deployment, DeploymentUpdates } from "@/types/Deployment";
 import { Log } from "@/types/Log";
 import { Project, ProjectStatus } from "@/types/Project";
+import Link from "next/link";
 import { useEffect, useRef } from "react";
+import { IoIosArrowRoundForward } from "react-icons/io";
+import { MdOutlineError } from "react-icons/md";
 import { toast } from "sonner";
 
 
@@ -98,7 +101,40 @@ export function useDeploymentSSE(project: Project | undefined, refetch: () => vo
 							console.log("refeching...........")
 							update.status === ProjectStatus.READY
 								? toast.success("New Deployment resulted in Success 🎉🎉")
-								: toast.error("New Deployment resulted in Failure")
+								: toast.custom((t) => (
+									<div className="border-red-400 bg-background border px-4 py-3 rounded-md shadow flex justify-between items-center gap-12 w-80">
+										<div>
+											<div className="flex items-center gap-4">
+												<h4 className="font-semibold text-primary">Deployment Failed</h4>
+												<MdOutlineError className="size-5 text-red-500" />
+											</div>
+											<div className="">
+												<Link
+													href={`/deployments/${update.deploymentId || ""}`}
+													className="flex items-center gap-1"
+												>
+													<p className="text-sm text-blue-400 hover:text-blue-600 no-underline hover:underline">
+														View error logs
+													</p>
+													<IoIosArrowRoundForward className="size-5" />
+												</Link>
+											</div>
+										</div>
+
+										<button
+											onClick={() => { toast.dismiss(t); toast.info("Current deployment unchanged — no update was applied") }}
+											className="text-gray-400 hover:text-gray-600 transition"
+										>
+											✕
+										</button>
+									</div>
+								), {
+									duration: 1000 * 10,
+									richColors: true,
+									onAutoClose(t) {
+										toast.info("Current deployment unchanged — no update was applied")
+									},
+								});
 							refetch()
 							eventSource.close()
 							setSseActive(false)
