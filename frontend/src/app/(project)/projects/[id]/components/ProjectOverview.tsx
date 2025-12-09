@@ -1,15 +1,13 @@
 
 import { IoMdGlobe, IoMdGitBranch } from "react-icons/io";
-
+import { BsActivity } from "react-icons/bs";
+import { VscLibrary } from "react-icons/vsc";
 import { FiGithub, FiGitCommit, } from "react-icons/fi";
-import { CiCalendarDate } from "react-icons/ci";
 import { GrRotateRight } from "react-icons/gr";
 import { CgUnavailable } from "react-icons/cg";
 import { IoSettingsOutline } from "react-icons/io5";
-import { MdAccessTime } from "react-icons/md";
-import { MdOutlineLineStyle } from "react-icons/md";
+import { MdAccessTime, MdCreate } from "react-icons/md";
 import { RxExternalLink } from "react-icons/rx";
-
 import { User } from "@/types/User";
 import { Project, ProjectStatus } from "@/types/Project";
 import Link from "next/link";
@@ -25,145 +23,191 @@ interface ProjectOverviewProps {
 	deployment?: Deployment
 	reDeploy: () => void
 	setShowBuild: (state: boolean) => void;
-	goToSettings: () => void
+	setTabs: (state: string) => void;
 }
-
-const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, goToSettings }: ProjectOverviewProps) => {
+const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, setTabs }: ProjectOverviewProps) => {
 	const isprojectError = project.status === ProjectStatus.CANCELED || project.status === ProjectStatus.FAILED
 	const isDeplymentError = project.deployments?.length !== 0
 		&& deployment
 		&& (deployment.status === ProjectStatus.CANCELED
 			|| deployment?.status === ProjectStatus.FAILED)
 	const repoValues = parseGitHubRepo(project.repoURL)
-
+	const projectLink = `${window.location.protocol}//${project.subdomain}.${process.env.NEXT_PUBLIC_PROXY_SERVER}`
 	return (
 		<>
-			<div className="flex flex-col items-stretch mt-4 sm:flex-row md:flex-row gap-2 sm:gap-4 lg:gap-6 p-1 sm:p-1 lg:p-1 w-full h-full">
-
-				<div className='flex flex-col justify-between w-3/5 border  rounded-xl p-6 shadow-sm'>
-
-					<div className='flex justify-between items-start mb-6'>
-						<h3 className='text-2xl font-bold'>{project.name}</h3>
-
-						<div className='flex items-center gap-3'>
-							<span className="flex gap-2 text-sm">
-								<img className="size-4 rounded-full" src={project ? ((project.user as User).profileImage) : ""} alt="User image" />
-								{(project.user as User).name}
-							</span>
-							<span className='flex gap-2 items-center text-sm'>
-								<CiCalendarDate /><span>{new Date(project.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
-							</span>
-							<Link href={project.repoURL} target="_blank">
-								<Button variant={"outline"} className='p-2 border flex gap-1 text-xs items-center rounded-lg group'>
-									<FiGithub className='size-3 text-primary group-hover:rotate-y-180 transition-all duration-300' /> {repoValues[0] + "/" + repoValues[1]}
-								</Button>
-							</Link>
-						</div>
-					</div>
-					<div className='flex flex-col gap-1 flex-1'>
-						<div className='border-b mb-1'>
-							<p className='text-sm mb-1'>Domain</p>
-							<div className='flex items-center gap-2'>
-								<div className='p-2  rounded-lg'>
-									<IoMdGlobe className='size-4 text-less' />
-								</div>
+			<div>
+				<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+					<div className="lg:col-span-2 space-y-6">
+						<div className="border   rounded-lg dark:bg-neutral-900  bg-white overflow-hidden">
+							<div className="px-4 py-3 border-b   flex justify-between items-start">
 								<div>
-									<Link target="_blank"
-										href={
-											project.status === ProjectStatus.READY
-												? `${window.location.protocol}//${project.subdomain}.${process.env.NEXT_PUBLIC_PROXY_SERVER}`
-												: ""
-										}
-										className='flex gap-2 items-center text-sm font-medium '>
-										{`${window.location.protocol}//${project.subdomain}`}
-										<RxExternalLink />
-									</Link>
+									<h3 className="text-lg font-medium  text-primary">Production Deployment</h3>
 								</div>
-								<div>
-									{project.status !== ProjectStatus.READY && <CgUnavailable className="text-red-400" />}
+								<div className="flex items-center gap-2">
+									<Link href={projectLink} target="_blank" className="p-2 hover:bg-secondary rounded-md text-primary"><RxExternalLink size={16} /></Link>
+								</div>
+							</div>
+							<div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+								<TechStack link={projectLink} stack={project.techStack.toLowerCase()} />
+								<div className="space-y-4">
+									<div>
+										<span className="text-xs uppercase tracking-wider text-gray-500 font-semibold">Status</span>
+										<div className="mt-1  flex items-center gap-2">
+											<StatusIcon status={project.status} />
+											<p className={`text-sm font-bold rounded-xs px-1 ${getStatusColor(project.status)}`}>{project.status}</p>
+											{(project.status === ProjectStatus.BUILDING || project.status === ProjectStatus.QUEUED) &&
+												<AnimationBuild />
+											}
+										</div>
+									</div>
+									{isprojectError && (
+										<div>
+											<span className="text-xs uppercase tracking-wider text-gray-500 font-semibold">Reason</span>
+											<div className="flex items-center gap-2">
+												<StatusIcon status={project.status} />
+												<p className="text-sm font-bold rounded-xs px-1 text-red-400 w-fit bg-red-800/30">{deployment?.errorMessage || " hey message"}</p>
+											</div>
+										</div>
+									)}
+									<div>
+										<span className="text-xs uppercase tracking-wider text-gray-500 font-semibold">Domains</span>
+										<div className="mt-1 flex items-center gap-2">
+											<IoMdGlobe className='size-4 text-less' />
+											<Link target="_blank"
+												href={
+													project.status === ProjectStatus.READY
+														? projectLink
+														: ""
+												}
+												className='flex gap-2 items-center text-sm font-medium '>
+												{`${window.location.protocol}//${project.subdomain}`}
+												<RxExternalLink />
+											</Link>
+											<div>
+												{project.status !== ProjectStatus.READY && <CgUnavailable className="text-red-400" />}
+											</div>
+										</div>
+									</div>
+
+									<div>
+										<span className="text-xs uppercase tracking-wider text-gray-500 font-semibold">Source</span>
+										<div className="mt-1 flex items-start gap-2">
+											<FiGitCommit size={16} className="text-gray-500 mt-0.5" />
+											<div>
+												<p className="text-sm  text-primary font-mono">{deployment?.commit.id.slice(0, 10) || "" + "..."}</p>
+												<p className="text-sm text-gray-400 line-clamp-1">{deployment?.commit.msg}</p>
+											</div>
+										</div>
+									</div>
+
+									<div className="pt-2">
+										<p className="text-xs text-gray-500">Deployed by <span className=" text-less">{(project.user as User).name}</span></p>
+									</div>
 								</div>
 							</div>
 						</div>
-
-						<div className='border-b mb-1'>
-							<p className='text-sm mb-1'>Source</p>
-							<div className='flex items-center gap-2'>
-								<div className='p-2 rounded-lg'>
-									<IoMdGitBranch className='size-4 text-less' />
-								</div>
-								<div>
-									<Link target="_blank" href={getGithubBranchUrl(project.repoURL, project.branch)} className='text-sm hover:underline font-medium '>{project.branch}</Link>
-								</div>
-							</div>
-							<div className='flex items-center gap-2'>
-								<div className='p-2 rounded-lg'>
-									<FiGitCommit className='size-4 text-less' />
-								</div>
-								<div>
-									<Link target="_blank" href={getGithubCommitUrl(project.repoURL, deployment?.commit.id || "")} className='text-sm flex gap-2 items-center font-medium hover:underline'>
-										{deployment?.commit.id.slice(0, 10) || "" + "..."}
-										<p className="text-xl">/</p>
-										{deployment?.commit.msg}
-									</Link>
-								</div>
-							</div>
-						</div>
-						<div className='flex items-center gap-2'>
-							<div className='p-2  rounded-lg'>
-								<StatusIcon status={project.status} />
-							</div>
-							<div className='flex gap-2 items-center'>
-								<p className='text-xs text-less font-medium'>Status</p>
-
-								<p className={`text-sm font-bold rounded-xs px-1 ${getStatusColor(project.status)}`}>{project.status}</p>
-								{(project.status === ProjectStatus.BUILDING || project.status === ProjectStatus.QUEUED) &&
-									<AnimationBuild />
+						<div className="border   rounded-lg dark:bg-neutral-900  bg-white px-3 py-2">
+							<h4 className="text-sm font-medium  text-primary mb-4">Options</h4>
+							<div className="rounded-lg dark:bg-neutral-900  bg-white px-4 py-2 flex items-center gap-3">
+								{(isprojectError)
+									&&
+									(isDeplymentError) &&
+									<Button variant={"secondary"} onClick={reDeploy} className='hover:!bg-primary hover:!text-secondary !duration-200
+								 border rounded-lg text-sm font-medium  transition-colors  flex justify-start gap-3 px-4 py-3'>
+										Re Deploy < GrRotateRight className="text-green-400 group-hover:rotate-z-90 transition-all duration-300" />
+									</Button>
 								}
-							</div>
-						</div>
-						{isprojectError && (
-							<div className='flex items-center gap-2'>
-								<div className='p-2  rounded-lg'>
-									<StatusIcon status={project.status} />
-								</div>
-								<div className='flex gap-2 items-center'>
-									<p className='text-xs text-less font-medium'>Reason</p>
-									<p className="text-sm font-bold rounded-xs px-1 text-red-400 bg-red-800/30">{deployment?.errorMessage}</p>
-								</div>
-							</div>
-						)}
-						<div className='flex items-center gap-2'>
-							<div className='p-2 rounded-lg'>
-								<MdAccessTime className='size-4 text-less' />
-							</div>
-							<div>
-								<p className='text-sm font-medium '>
-									<span className="text-less">
-										Duration{" "}</span>
-									{timeToSeconds(deployment?.performance.totalDuration) || "- - - -"}
-								</p>
+								<Button variant={"secondary"} onClick={() => setTabs("settings")}
+									className='hover:!bg-primary hover:!text-secondary !duration-200 group
+								 border rounded-lg text-sm font-medium  transition-colors  flex justify-start gap-3 px-4 py-3'>
+									Settings <IoSettingsOutline className="group-hover:!translate-x-1.5 group-hover:!rotate-z-45 !transition-all !duration-300" />
+								</Button>
+								<Button variant={"secondary"} onClick={() => setTabs("analytics")}
+									className='hover:!bg-primary hover:!text-secondary !duration-200
+								 border rounded-lg text-sm font-medium  transition-colors  flex justify-start gap-3 px-4 py-3'>
+									Usage & Analytics <BsActivity size={16} className="text-gray-500" />
+								</Button>
 							</div>
 						</div>
 					</div>
 
-					<div className='flex gap-2 mt-2 pt-4 border-t '>
-						<Button variant={"secondary"} onClick={() => setShowBuild(true)} className='border px-4 py-2 rounded-lg text-sm font-medium  transition-colors'>
-							View Logs <MdOutlineLineStyle />
-						</Button>
-						{(isprojectError)
-							&&
-							(isDeplymentError) &&
-							<Button variant={"secondary"} onClick={reDeploy} className='border  group px-4 py-2 rounded-lg text-sm font-medium  transition-colors'>
-								Re Deploy < GrRotateRight className="text-green-400 group-hover:rotate-z-90 transition-all duration-300" />
-							</Button>
-						}
-						<Button variant={"secondary"} onClick={goToSettings} className='border group px-4 py-2  rounded-lg text-sm font-medium  transition-colors'>
-							Settings <IoSettingsOutline className="group-hover:translate-x-1.5 group-hover:rotate-z-45 transition-all duration-300" />
-						</Button>
-
+					<div className="space-y-6">
+						<div className="border   rounded-lg dark:bg-neutral-900  bg-white p-5">
+							<h4 className="text-sm font-medium  text-primary mb-4">Repository</h4>
+							<div className="space-y-4">
+								<div className="flex justify-between items-center py-2 border-b  /50 last:border-0">
+									<div className="flex items-center gap-2">
+										<FiGithub size={14} />
+										<span className="text-xs text-gray-500">Git Repo</span>
+									</div>
+									<div className="flex items-center gap-2">
+										<Link href={project.repoURL} target="_blank">
+											<Button variant={"outline"} className='p-2 border flex gap-1 text-xs items-center rounded-lg group'>
+												<FiGithub className='size-3 text-primary group-hover:rotate-y-180 transition-all duration-300' /> {repoValues[0] + "/" + repoValues[1]}
+											</Button>
+										</Link>
+									</div>
+								</div>
+								<div className="flex justify-between items-center py-2 border-b  /50 last:border-0">
+									<div className="flex items-center gap-2">
+										<FiGitCommit size={14} />
+										<span className="text-xs text-gray-500">Commit</span>
+									</div>
+									<div className="flex items-center gap-2">
+										<span className="text-xs  text-less">
+											<Link target="_blank" href={getGithubCommitUrl(project.repoURL, deployment?.commit.id || "")} className='flex gap-2 items-center font-medium hover:underline'>
+												{deployment?.commit.id.slice(0, 10) || "" + "..."}
+												<p className="text-xl">/</p>
+												{deployment?.commit.msg}
+											</Link>
+										</span>
+									</div>
+								</div>
+								<div className="flex justify-between items-center py-2 border-b  /50 last:border-0">
+									<div className="flex items-center gap-2">
+										<IoMdGitBranch size={14} />
+										<span className="text-xs text-gray-500">Branch</span>
+									</div>
+									<span className="text-sm  text-less"><Link target="_blank" href={getGithubBranchUrl(project.repoURL, project.branch)} className='text-sm hover:underline font-medium '>{project.branch}</Link>
+									</span>
+								</div>
+							</div>
+						</div>
+						<div className="border   rounded-lg dark:bg-neutral-900  bg-white p-5">
+							<h4 className="text-sm font-medium  text-primary mb-4">Project Details</h4>
+							<div className="space-y-4">
+								<div className="flex justify-between items-center py-2 border-b  /50 last:border-0">
+									<div className="flex items-center gap-2">
+										<VscLibrary size={14} />
+										<span className="text-xs text-gray-500">Framework</span>
+									</div>
+									<div className="flex items-center gap-2">
+										<div className="w-5 h-5 bg-background border uppercase rounded-full text-primary flex items-center justify-center text-[10px] font-bold">
+											{project.techStack.slice(0, 1)}
+										</div>
+										<span className="text-sm  text-less">{project.techStack}</span>
+									</div>
+								</div>
+								<div className="flex justify-between items-center py-2 border-b  /50 last:border-0">
+									<div className="flex items-center gap-2">
+										<MdCreate size={14} />
+										<span className="text-xs text-gray-500">Created</span>
+									</div>
+									<div className="flex items-center gap-2">
+										<span className="text-sm  text-less">{new Date(project.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+									</div>
+								</div>
+								<div className="flex justify-between items-center py-2 border-b  /50 last:border-0">
+									<div className="flex items-center gap-2">
+										<MdAccessTime size={14} />
+										<span className="text-xs text-gray-500">Duration</span>
+									</div>
+									<span className="text-sm  text-less">{timeToSeconds(deployment?.performance.totalDuration) || "- - - -"}</span>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
-				<TechStack stack={project.techStack.toLowerCase()} />
 			</div>
 
 		</>

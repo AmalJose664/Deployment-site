@@ -62,7 +62,7 @@ const DeploymentPageContainer = ({ deploymentId }: { deploymentId: string }) => 
 								<p className="text-sm text-gray-500 mt-1 font-mono">{deployment._id}</p>
 							</div>
 							<div className='p-2 flex gap-2 items-center rounded-md border border-transparent hover:border-neutral-800'>
-								<StatusIcon status={"READY"} />
+								<StatusIcon status={deployment.status} />
 								<span
 									className={`text-sm flex flex-col font-medium px-2 py-1 rounded ${getStatusColor(
 										deployment?.status as ProjectStatus

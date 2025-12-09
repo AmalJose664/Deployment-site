@@ -1,21 +1,24 @@
+import { Box } from "lucide-react"
+import Link from "next/link"
 import { JSX } from "react"
 import { FaAngular, FaReact, FaVuejs } from "react-icons/fa"
 import { SiSolid, SiSvelte, SiVite } from "react-icons/si"
 
-const TechStack = ({ stack }: { stack: string }) => {
+const TechStack = ({ stack, link }: { stack: string, link: string }) => {
 
 	const stacks: Record<string, JSX.Element> = {
-		react: (<><div className='flex flex-col items-center justify-center w-2/5 bg-linear-to-br from-[#20232a] to-[#282c34] rounded-xl border border-[#61dafb]/30 shadow-lg p-8'>
-			<div className='mb-4 p-4 bg-[#61dafb]/10 rounded-2xl backdrop-blur-sm'>
-				<FaReact className='size-16 text-[#61dafb]' />
-			</div>
-			<h4 className='text-2xl font-bold text-white mb-2'>React</h4>
-			<p className='text-gray-400 text-sm'>JavaScript Library</p>
-			<div className='mt-4 px-4 py-1.5 bg-[#61dafb]/10 rounded-full border border-[#61dafb]/30'>
-				<p className='text-xs text-[#61dafb] font-medium'>v18.2.0</p>
-			</div>
-		</div></>),
-		vite: (<><div className='flex flex-col items-center justify-center w-2/5 bg-linear-to-br from-[#1a1a2e] to-[#2d2d44] rounded-xl border border-[#646cff]/30 shadow-lg p-8'>
+		react: (
+			<>
+				<div className='mb-4 p-2 bg-[#61dafb]/10 rounded-2xl backdrop-blur-sm'>
+					<FaReact className='size-5 text-[#61dafb]' />
+				</div>
+				<h4 className='text-2xl font-bold text-white mb-2'>React</h4>
+				<p className='text-gray-400 text-sm'>JavaScript Library</p>
+				<div className='mt-4 px-4 py-1.5 bg-[#61dafb]/10 rounded-full border border-[#61dafb]/30'>
+					<p className='text-xs text-[#61dafb] font-medium'>v18.2.0</p>
+				</div>
+			</>),
+		vite: (<>
 			<div className='mb-4 p-4 bg-linear-to-br from-[#646cff]/10 to-[#747bff]/10 rounded-2xl backdrop-blur-sm'>
 				<SiVite className='size-16 text-[#646cff]' />
 			</div>
@@ -24,8 +27,8 @@ const TechStack = ({ stack }: { stack: string }) => {
 			<div className='mt-4 px-4 py-1.5 bg-[#646cff]/10 rounded-full border border-[#646cff]/30'>
 				<p className='text-xs text-[#646cff] font-medium'>v5.0.0</p>
 			</div>
-		</div></>),
-		angular: (<><div className='flex flex-col items-center justify-center w-2/5 bg-linear-to-br from-[#0d1117] to-[#1a1f2e] rounded-xl border border-[#dd0031]/30 shadow-lg p-8'>
+		</>),
+		angular: (<>
 			<div className='mb-4 p-4 bg-[#dd0031]/10 rounded-2xl backdrop-blur-sm'>
 				<FaAngular className='size-16 text-[#dd0031]' />
 			</div>
@@ -34,8 +37,8 @@ const TechStack = ({ stack }: { stack: string }) => {
 			<div className='mt-4 px-4 py-1.5 bg-[#dd0031]/10 rounded-full border border-[#dd0031]/30'>
 				<p className='text-xs text-[#dd0031] font-medium'>v17.0.0</p>
 			</div>
-		</div></>),
-		vuejs: (<><div className='flex flex-col items-center justify-center w-2/5 bg-linear-to-br from-[#2c3e50] to-[#34495e] rounded-xl border border-[#42b883]/30 shadow-lg p-8'>
+		</>),
+		vuejs: (<>
 			<div className='mb-4 p-4 bg-[#42b883]/10 rounded-2xl backdrop-blur-sm'>
 				<FaVuejs className='size-16 text-[#42b883]' />
 			</div>
@@ -44,21 +47,19 @@ const TechStack = ({ stack }: { stack: string }) => {
 			<div className='mt-4 px-4 py-1.5 bg-[#42b883]/10 rounded-full border border-[#42b883]/30'>
 				<p className='text-xs text-[#42b883] font-medium'>v3.4.0</p>
 			</div>
-		</div></>),
+		</>),
 
 		solid: (<>
-			<div className='flex flex-col items-center justify-center w-2/5 bg-linear-to-br from-[#1a1d29] to-[#2a2f3f] rounded-xl border border-[#2c4f7c]/50 shadow-lg p-8'>
-				<div className='mb-4 p-4 bg-[#2c4f7c]/20 rounded-2xl backdrop-blur-sm'>
-					<SiSolid className='size-16 text-[#76b3e8]' />
-				</div>
-				<h4 className='text-2xl font-bold text-white mb-2'>Solid.js</h4>
-				<p className='text-gray-400 text-sm'>Reactive Library</p>
-				<div className='mt-4 px-4 py-1.5 bg-[#2c4f7c]/20 rounded-full border border-[#76b3e8]/30'>
-					<p className='text-xs text-[#76b3e8] font-medium'>v1.8.0</p>
-				</div>
+			<div className='mb-4 p-4 bg-[#2c4f7c]/20 rounded-2xl backdrop-blur-sm'>
+				<SiSolid className='size-16 text-[#76b3e8]' />
+			</div>
+			<h4 className='text-2xl font-bold text-white mb-2'>Solid.js</h4>
+			<p className='text-gray-400 text-sm'>Reactive Library</p>
+			<div className='mt-4 px-4 py-1.5 bg-[#2c4f7c]/20 rounded-full border border-[#76b3e8]/30'>
+				<p className='text-xs text-[#76b3e8] font-medium'>v1.8.0</p>
 			</div>
 		</>),
-		svelte: (<><div className='flex flex-col items-center justify-center w-2/5 bg-linear-to-br from-[#1a1a1a] to-[#2a2a2a] rounded-xl border border-[#ff3e00]/30 shadow-lg p-8'>
+		svelte: (<>
 			<div className='mb-4 p-4 bg-[#ff3e00]/10 rounded-2xl backdrop-blur-sm'>
 				<SiSvelte className='size-16 text-[#ff3e00]' />
 			</div>
@@ -67,11 +68,18 @@ const TechStack = ({ stack }: { stack: string }) => {
 			<div className='mt-4 px-4 py-1.5 bg-[#ff3e00]/10 rounded-full border border-[#ff3e00]/30'>
 				<p className='text-xs text-[#ff3e00] font-medium'>v4.2.0</p>
 			</div>
-		</div></>),
+		</>),
 	}
-
-	return stacks[stack] || <div className='flex flex-col items-center justify-center w-2/5 bg-linear-to-br from-[#1a1d29] to-[#2a2f3f] rounded-xl border border-[#2c4f7c]/50 shadow-lg p-8'>
-
+	return <div className="aspect-video bg-gradient-to-br from-gray-800 to-gray-900 rounded-md border border-gray-700 flex flex-col items-center justify-center group cursor-pointer relative overflow-hidden">
+		{stacks[stack] || (
+			<>
+				<Box className="text-gray-700 mb-2" size={40} />
+				<span className="text-xs text-gray-600">Preview generated</span>
+			</>
+		)}
+		<Link href={link} target="_blank" className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+			<span className="text-sm font-medium text-white">View Output</span>
+		</Link>
 	</div>
 }
 export default TechStack

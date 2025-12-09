@@ -27,7 +27,7 @@ interface TabProjectProps {
 const TabProject = ({ project, deployment, tempDeployment, lastDeployment, onCreateDeployment, setShowBuild, showBuild, setTabs, reDeploy, refetchLogs }: TabProjectProps) => {
 	return (
 		<>
-			<div className="dark:bg-neutral-900 border bg-white w-full rounded-md mb-6 mt-4 p-4">
+			<div className="dark:bg-neutral-950 border bg-neutral-50 w-full rounded-md mb-6 mt-4 p-4">
 
 				{(project.deployments && project.deployments.length === 0 && !lastDeployment) && (
 					<NoDeployment
@@ -46,10 +46,10 @@ const TabProject = ({ project, deployment, tempDeployment, lastDeployment, onCre
 					deployment={deployment || lastDeployment}
 					reDeploy={reDeploy}
 					setShowBuild={setShowBuild}
-					goToSettings={() => setTabs("settings")}
+					setTabs={setTabs}
 				/>
 
-				<div className="border dark:border-neutral-700 mt-2 border-neutral-300 rounded-md">
+				<div className="border dark:border-neutral-700 mt-2 border-neutral-300 rounded-md ">
 					<button
 						className="p-4 w-full"
 						onClick={() => setShowBuild(!showBuild)}
@@ -113,7 +113,7 @@ const TabProject = ({ project, deployment, tempDeployment, lastDeployment, onCre
 					type={"Last"}
 				/>
 			)}
-			{project.deployments && project.deployments?.length > 0 && <ProjectSimpleStats />}
+			{project.deployments && project.deployments?.length > 0 && <ProjectSimpleStats project={project} />}
 		</>
 	)
 }

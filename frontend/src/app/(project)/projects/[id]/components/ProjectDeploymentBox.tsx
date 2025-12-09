@@ -7,6 +7,7 @@ import { Deployment } from "@/types/Deployment";
 import { getElapsedTime, getGithubBranchUrl, getGithubCommitUrl, getStatusColor, shortHash, timeToSeconds } from "@/lib/utils";
 import Link from "next/link";
 import StatusIcon from "@/components/ui/StatusIcon";
+import { useRouter } from "next/navigation";
 
 
 interface ProjectDeploymentProps {
@@ -18,7 +19,7 @@ interface ProjectDeploymentProps {
 }
 
 const ProjectDeploymentBox = ({ deployment, projectBranch, repoURL, showLogs, type }: ProjectDeploymentProps) => {
-
+	const router = useRouter()
 	return (
 		<div className="border  rounded-xl overflow-hidden dark:bg-neutral-900 bg-white mb-4">
 			<div className="px-6 py-4 border-b border-gray-800">
@@ -26,7 +27,7 @@ const ProjectDeploymentBox = ({ deployment, projectBranch, repoURL, showLogs, ty
 			</div>
 
 
-			<div className="divide-y divide-gray-800">
+			<div className="divide-y divide-gray-800" onClick={() => router.push("/deployments/" + deployment._id)}>
 				<div
 					className="px-6 py-4 hover:bg-zinc-800/50 transition-colors cursor-pointer"
 				>
