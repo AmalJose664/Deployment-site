@@ -43,7 +43,7 @@ export function ProjectContent({
 	onCreateDeployment,
 	refetchLogs
 }: ProjectContentProps) {
-	const [tab, setTabs] = useState(tabFromUrl || "project")
+	const [tab, setTabs] = useState(tabFromUrl || "overview")
 	console.log("------------project-------------", (project?.deployments?.length === 0 && !project.currentDeployment))
 	return (
 		<div className="min-h-screen">
@@ -51,7 +51,6 @@ export function ProjectContent({
 
 				<header className="border-b dark:border-neutral-800 border-neutral-200 ">
 					<div className="max-w-[1420px] mx-auto px-6 py-4">
-
 						<div className="flex items-center justify-between">
 							<div className="flex items-center gap-6">
 								<BackButton />
@@ -59,7 +58,7 @@ export function ProjectContent({
 									<h1 className="text-xl flex gap-2 items-center font-semibold">{project.name} <IoIosCube /></h1>
 								</div>
 								<div>
-									<ProjectTabs />
+									<ProjectTabs setTab={setTabs} tab={tab} />
 								</div>
 							</div>
 							<button className="p-2 hover:bg-zinc-800 rounded-lg transition-colors">
@@ -70,7 +69,7 @@ export function ProjectContent({
 				</header>
 
 				<main className="max-w-[1400px] mx-auto px-6 py-4">
-					<TabsContent value="project">
+					<TabsContent value="overview">
 						<TabProject
 							project={project}
 							deployment={deployment}
@@ -85,12 +84,12 @@ export function ProjectContent({
 						/>
 					</TabsContent>
 					<TabsContent value="deployments">
-						<AllDeployments projectId={project._id} currentDeployment={project.currentDeployment || ""} repoURL={project.repoURL} setTab={() => setTabs("project")} />
+						<AllDeployments projectId={project._id} currentDeployment={project.currentDeployment || ""} repoURL={project.repoURL} setTab={() => setTabs("overview")} />
 					</TabsContent>
 					<TabsContent value="settings">
 						<ProjectSettings project={project} reDeploy={reDeploy} setTabs={setTabs} />
 					</TabsContent>
-					<TabsContent value="analytics">
+					<TabsContent value="monitoring">
 						<ProjectAnalytics projectId={project._id} />
 					</TabsContent>
 					<TabsContent value="files">

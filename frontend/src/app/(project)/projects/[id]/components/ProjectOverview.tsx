@@ -17,6 +17,7 @@ import StatusIcon, { AnimationBuild } from "@/components/ui/StatusIcon";
 import { toast } from "sonner"
 import { Deployment } from "@/types/Deployment";
 import { Button } from "@/components/ui/button";
+import RightFadeComponent from "@/components/RightFadeComponent";
 
 interface ProjectOverviewProps {
 	project: Project,
@@ -38,7 +39,7 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, setTabs 
 			<div>
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 					<div className="lg:col-span-2 space-y-6">
-						<div className="border   rounded-lg dark:bg-neutral-900  bg-white overflow-hidden">
+						<RightFadeComponent className="border   rounded-lg dark:bg-neutral-900  bg-white overflow-hidden">
 							<div className="px-4 py-3 border-b   flex justify-between items-start">
 								<div>
 									<h3 className="text-lg font-medium  text-primary">Production Deployment</h3>
@@ -47,7 +48,7 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, setTabs 
 									<Link href={projectLink} target="_blank" className="p-2 hover:bg-secondary rounded-md text-primary"><RxExternalLink size={16} /></Link>
 								</div>
 							</div>
-							<div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+							<div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
 								<TechStack link={projectLink} stack={project.techStack.toLowerCase()} />
 								<div className="space-y-4">
 									<div>
@@ -94,7 +95,7 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, setTabs 
 										<div className="mt-1 flex items-start gap-2">
 											<FiGitCommit size={16} className="text-gray-500 mt-0.5" />
 											<div>
-												<p className="text-sm  text-primary font-mono">{deployment?.commit.id.slice(0, 10) || "" + "..."}</p>
+												<p className="text-xs  text-primary font-mono">{deployment?.commit.id.slice(0, 10) || "" + "..."}</p>
 												<p className="text-sm text-gray-400 line-clamp-1">{deployment?.commit.msg}</p>
 											</div>
 										</div>
@@ -105,8 +106,8 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, setTabs 
 									</div>
 								</div>
 							</div>
-						</div>
-						<div className="border   rounded-lg dark:bg-neutral-900  bg-white px-3 py-2">
+						</RightFadeComponent>
+						<RightFadeComponent delay={.07} className="border   rounded-lg dark:bg-neutral-900  bg-white px-3 py-2">
 							<h4 className="text-sm font-medium  text-primary mb-4">Options</h4>
 							<div className="rounded-lg dark:bg-neutral-900  bg-white px-4 py-2 flex items-center gap-3">
 								{(isprojectError)
@@ -122,17 +123,17 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, setTabs 
 								 border rounded-lg text-sm font-medium  transition-colors  flex justify-start gap-3 px-4 py-3'>
 									Settings <IoSettingsOutline className="group-hover:!translate-x-1.5 group-hover:!rotate-z-45 !transition-all !duration-300" />
 								</Button>
-								<Button variant={"secondary"} onClick={() => setTabs("analytics")}
+								<Button variant={"secondary"} onClick={() => setTabs("monitoring")}
 									className='hover:!bg-primary hover:!text-secondary !duration-200
 								 border rounded-lg text-sm font-medium  transition-colors  flex justify-start gap-3 px-4 py-3'>
 									Usage & Analytics <BsActivity size={16} className="text-gray-500" />
 								</Button>
 							</div>
-						</div>
+						</RightFadeComponent>
 					</div>
 
 					<div className="space-y-6">
-						<div className="border   rounded-lg dark:bg-neutral-900  bg-white p-5">
+						<RightFadeComponent delay={.14} className="border   rounded-lg dark:bg-neutral-900  bg-white p-5">
 							<h4 className="text-sm font-medium  text-primary mb-4">Repository</h4>
 							<div className="space-y-4">
 								<div className="flex justify-between items-center py-2 border-b  /50 last:border-0">
@@ -172,8 +173,8 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, setTabs 
 									</span>
 								</div>
 							</div>
-						</div>
-						<div className="border   rounded-lg dark:bg-neutral-900  bg-white p-5">
+						</RightFadeComponent >
+						<RightFadeComponent delay={.21} className="border   rounded-lg dark:bg-neutral-900  bg-white p-5">
 							<h4 className="text-sm font-medium  text-primary mb-4">Project Details</h4>
 							<div className="space-y-4">
 								<div className="flex justify-between items-center py-2 border-b  /50 last:border-0">
@@ -205,7 +206,7 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, setTabs 
 									<span className="text-sm  text-less">{timeToSeconds(deployment?.performance.totalDuration) || "- - - -"}</span>
 								</div>
 							</div>
-						</div>
+						</RightFadeComponent>
 					</div>
 				</div>
 			</div>

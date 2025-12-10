@@ -6,6 +6,7 @@ import { MdAccessTime } from "react-icons/md";
 import { BsActivity } from "react-icons/bs";
 import { IoIosTrendingUp } from "react-icons/io";
 import { Project } from "@/types/Project";
+import RightFadeComponent from "@/components/RightFadeComponent";
 const ProjectSimpleStats = ({ project }: { project: Project }) => {
 
 
@@ -18,7 +19,7 @@ const ProjectSimpleStats = ({ project }: { project: Project }) => {
 
 
 	return (
-		<div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mt-8 ">
+		<RightFadeComponent delay={.1} inView className="grid grid-cols-1 lg:grid-cols-4 gap-4 mt-8 ">
 			<div className=" border rounded-xl p-5 dark:bg-neutral-900 bg-white">
 				<div className="flex items-center gap-3 mb-2">
 					<div className="p-2 border rounded-lg">
@@ -58,7 +59,7 @@ const ProjectSimpleStats = ({ project }: { project: Project }) => {
 				</div>
 				<p className="font-semibold text-sm mt-3">{mockStats.lastDeployed}</p>
 			</div>
-		</div>
+		</RightFadeComponent >
 	)
 }
 export default ProjectSimpleStats

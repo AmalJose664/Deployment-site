@@ -1,3 +1,7 @@
+import Navbar from '@/components/Navbar';
+import ThemeSwitcher from '@/components/ThemeIcon';
+import TitleWithLogo from '@/components/TitleWithLogo';
+import { SITE_NAME } from '@/config/constants';
 import {
 	Terminal,
 	Zap,
@@ -14,12 +18,13 @@ import {
 	GitBranch,
 	Layers
 } from 'lucide-react';
+import Link from 'next/link';
 
 
 export default function Home() {
 	return (
-		<div className="min-h-screen bg-black text-white font-sans selection:bg-purple-500/30">
-			<Navbar />
+		<div className="min-h-screen bg-background text-primary selection:bg-purple-500/30">
+			<Navbar className="" showOtherLinks />
 			<Hero />
 			<Frameworks />
 			<Features />
@@ -30,61 +35,6 @@ export default function Home() {
 	);
 }
 
-const Navbar = () => {
-	const isOpen = !true
-
-	return (
-		<nav className="fixed w-full z-50 top-0 left-0 border-b border-white/10 bg-black/50 backdrop-blur-lg">
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-				<div className="flex items-center justify-between h-16">
-					<div className="flex items-center gap-2">
-						<div className="w-8 h-8 bg-gradient-to-tr from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-							<span className="text-white font-bold text-lg">O</span>
-						</div>
-						<span className="text-white font-bold text-xl tracking-tight">Orbit</span>
-					</div>
-
-					<div className="hidden md:block">
-						<div className="ml-10 flex items-baseline space-x-8">
-							<a href="#" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Features</a>
-							<a href="#" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Templates</a>
-							<a href="#" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Pricing</a>
-							<a href="#" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Docs</a>
-						</div>
-					</div>
-
-					<div className="hidden md:flex items-center gap-4">
-						<button className="text-gray-300 hover:text-white text-sm font-medium transition-colors">Log in</button>
-						<button className="bg-white text-black px-4 py-2 rounded-md text-sm font-bold hover:bg-gray-200 transition-colors">
-							Start Deploying
-						</button>
-					</div>
-
-					<div className="-mr-2 flex md:hidden">
-						<button className="text-gray-400 hover:text-white p-2">
-							{isOpen ? <X size={24} /> : <Menu size={24} />}
-						</button>
-					</div>
-				</div>
-			</div>
-
-			{/* Mobile menu */}
-			{isOpen && (
-				<div className="md:hidden bg-black/95 backdrop-blur-xl border-b border-white/10">
-					<div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-						<a href="#" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Features</a>
-						<a href="#" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Templates</a>
-						<a href="#" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Pricing</a>
-						<button className="w-full mt-4 bg-white text-black px-4 py-2 rounded-md text-sm font-bold">
-							Start Deploying
-						</button>
-					</div>
-				</div>
-			)}
-		</nav>
-	);
-};
-
 const Hero = () => {
 	return (
 		<div className="relative pt-32 pb-20 sm:pt-40 sm:pb-24 overflow-hidden">
@@ -93,14 +43,6 @@ const Hero = () => {
 			<div className="absolute top-20 right-0 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl -z-10" />
 
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-				<div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 text-sm text-blue-400 mb-8 animate-fade-in-up">
-					<span className="relative flex h-2 w-2">
-						<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-						<span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-					</span>
-					Orbit 2.0 is now live
-				</div>
-
 				<h1 className="text-5xl sm:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 tracking-tight mb-8 max-w-4xl mx-auto leading-tight">
 					Develop. Preview. <br />
 					<span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
@@ -110,7 +52,7 @@ const Hero = () => {
 
 				<p className="text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
 					The frontend cloud for React, Vue, and Svelte.
-					Instant deployments, automatic scaling, and edge networking built for the modern web.
+					Instant deployments, automatic scaling,  built for the modern web.
 				</p>
 
 				<div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
@@ -123,14 +65,13 @@ const Hero = () => {
 					</button>
 				</div>
 
-				{/* Mock Terminal/Dashboard */}
 				<div className="relative max-w-4xl mx-auto rounded-xl border border-white/10 bg-black/50 backdrop-blur-md shadow-2xl shadow-purple-900/20 overflow-hidden">
 					<div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-white/5">
 						<div className="w-3 h-3 rounded-full bg-red-500" />
 						<div className="w-3 h-3 rounded-full bg-yellow-500" />
 						<div className="w-3 h-3 rounded-full bg-green-500" />
 						<div className="ml-4 text-xs text-gray-500 font-mono flex items-center gap-2">
-							<Command size={12} /> orbit-cli — deploy
+							<Command size={12} /> {SITE_NAME} new — deploy
 						</div>
 					</div>
 					<div className="p-6 text-left font-mono text-sm sm:text-base">
@@ -138,7 +79,7 @@ const Hero = () => {
 							<div className="flex gap-2">
 								<span className="text-green-400">➜</span>
 								<span className="text-blue-400">~</span>
-								<span className="text-gray-300">npx orbit deploy</span>
+								<span className="text-gray-300"> {SITE_NAME} new  deploy</span>
 							</div>
 							<div className="text-gray-500">Initialized empty Git repository in .git/</div>
 							<div className="text-gray-300">
@@ -148,12 +89,12 @@ const Hero = () => {
 								<span className="text-purple-400">✔</span> Optimizing assets...
 							</div>
 							<div className="text-gray-300">
-								<span className="text-purple-400">✔</span> Uploading to Edge Network...
+								<span className="text-purple-400">✔</span> Uploading to Servers...
 							</div>
 							<div className="mt-4 p-3 bg-white/5 border border-white/10 rounded border-l-4 border-l-green-500">
 								<div className="text-green-400 font-bold mb-1">Deployment Complete! 🚀</div>
 								<div className="text-gray-400">
-									Preview: <a href="#" className="text-blue-400 hover:underline">https://orbit-app-xi82.orbit.app</a>
+									Preview: <a href="#" className="text-blue-400 hover:underline">https://{SITE_NAME.toLowerCase()}-app-xi82.{SITE_NAME.toLowerCase()}.app</a>
 								</div>
 							</div>
 						</div>
@@ -185,28 +126,25 @@ const Features = () => {
 							scale your frontend
 						</span>
 					</h2>
-					<p className="text-gray-400 text-lg max-w-2xl mx-auto">
-						Focus on writing code. We handle the infrastructure, CI/CD, and global distribution.
-					</p>
 				</div>
 
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 					{/* Bento Grid Layout */}
 					<FeatureCard
 						icon={Globe}
-						title="Global Edge Network"
-						description="Your content is cached and served from 100+ regions worldwide, ensuring low latency for every user."
+						title="Global Storage Network"
+						description="Your content is cached and served to regions worldwide, ensuring low latency for every user."
 						className="md:col-span-2 bg-gradient-to-br from-white/5 to-purple-900/10"
 					/>
 					<FeatureCard
 						icon={GitBranch}
-						title="Git Push to Deploy"
-						description="Connect your repo. Every push triggers a deployment. Every branch gets a preview URL."
+						title="Manual Deploy"
+						description="Unfortunately you have to deploy manully for each git push :( ."
 					/>
 					<FeatureCard
 						icon={Layers}
 						title="Framework Agnostic"
-						description="Zero-config support for Next.js, Vue, Svelte, Remix, and static sites."
+						description="Zero-config support for Vue, Svelte and static sites."
 					/>
 					<FeatureCard
 						icon={Shield}
@@ -227,16 +165,16 @@ const Features = () => {
 
 const Frameworks = () => {
 	const frameworks = [
-		{ name: "Next.js", color: "hover:text-white" },
 		{ name: "React", color: "hover:text-blue-400" },
 		{ name: "Vue", color: "hover:text-green-400" },
 		{ name: "Svelte", color: "hover:text-orange-400" },
 		{ name: "Angular", color: "hover:text-red-500" },
-		{ name: "Nuxt", color: "hover:text-green-500" },
+		{ name: "solid", color: "hover:text-orange-400" },
+		{ name: "vite", color: "hover:text-purple-400" },
 	];
 
 	return (
-		<section className="py-20 border-t border-white/10 bg-black/50">
+		<section className="py-20 border-t border-white/10 bg-black/50 ">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
 				<p className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-8">
 					Works with your favorite tools
@@ -268,7 +206,7 @@ const CodeSection = () => {
 							Collaborate instantly.
 						</h2>
 						<p className="text-gray-400 text-lg mb-8 leading-relaxed">
-							Stop sharing screenshots. Orbit generates a unique preview URL for every pull request,
+							Stop sharing screenshots. {SITE_NAME} generates a unique preview URL for every pull request,
 							so your team can review the real app before it merges.
 						</p>
 
@@ -294,7 +232,7 @@ const CodeSection = () => {
 							<div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-white/5">
 								<div className="flex items-center gap-2">
 									<Github size={16} className="text-gray-400" />
-									<span className="text-sm text-gray-300 font-mono">orbit/website</span>
+									<span className="text-sm text-gray-300 font-mono">{SITE_NAME}/website</span>
 								</div>
 								<div className="text-xs text-gray-500">Pull Request #42</div>
 							</div>
@@ -324,7 +262,7 @@ const CodeSection = () => {
 									<div className="flex-1">
 										<div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
 											<div className="p-3 bg-white/5 border-b border-white/10 flex items-center justify-between">
-												<span className="text-sm font-bold text-white">Orbit Bot</span>
+												<span className="text-sm font-bold text-white">{SITE_NAME} Bot</span>
 												<span className="text-xs text-gray-500">Just now</span>
 											</div>
 											<div className="p-3">
@@ -360,16 +298,14 @@ const CTA = () => {
 					Ready to launch?
 				</h2>
 				<p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
-					Join 100,000+ developers building the future of the web with Orbit.
+					Join 100,000+ developers building the future of the web with {SITE_NAME}.
 					Start for free, scale when you need to.
 				</p>
 				<div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-					<button className="w-full sm:w-auto px-8 py-4 bg-white text-black rounded-full font-bold text-lg hover:bg-gray-200 transition-colors">
+					<Link href="/new" className="w-full sm:w-auto px-8 py-4 bg-white text-black rounded-full font-bold text-lg hover:bg-gray-200 transition-colors">
 						Start Deploying Free
-					</button>
-					<button className="w-full sm:w-auto px-8 py-4 bg-black border border-white/20 text-white rounded-full font-bold text-lg hover:bg-white/10 transition-colors">
-						Contact Sales
-					</button>
+					</Link>
+
 				</div>
 			</div>
 		</section>
@@ -418,14 +354,12 @@ const Footer = () => {
 				</div>
 				<div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
 					<div className="flex items-center gap-2">
-						<div className="w-6 h-6 bg-gradient-to-tr from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-							<span className="text-white font-bold text-xs">O</span>
-						</div>
-						<span className="text-gray-400 text-sm">© 2024 Orbit Inc. All rights reserved.</span>
+						<TitleWithLogo useSvg />
+						<span className="text-gray-400 text-sm">© 2025 Lynfera Inc. All rights reserved.</span>
 					</div>
 					<div className="flex gap-6">
 						<Github className="text-gray-500 hover:text-white cursor-pointer" size={20} />
-						<div className="text-gray-500 hover:text-white cursor-pointer font-bold">𝕏</div>
+						<ThemeSwitcher className="rounded-full" />
 					</div>
 				</div>
 			</div>

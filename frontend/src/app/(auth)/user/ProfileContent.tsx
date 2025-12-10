@@ -12,6 +12,7 @@ import ErrorComponent from '@/components/ErrorComponent';
 import { VscAccount } from 'react-icons/vsc';
 import { FaGithub, FaGoogle } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
+import RightFadeComponent from '@/components/RightFadeComponent';
 
 
 
@@ -33,7 +34,7 @@ const ProfileContent = () => {
 				</div>
 
 				<div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-8">
-					<div className="mb-6 dark:bg-neutral-900 bg-white rounded-md border overflow-hidden shadow-lg">
+					<RightFadeComponent className="mb-6 dark:bg-neutral-900 bg-white rounded-md border overflow-hidden shadow-lg">
 						<div className="px-8 py-6 flex items-center justify-between">
 							<div className="flex flex-col sm:flex-row items-start sm:items-end gap-6">
 								<div className="relative">
@@ -64,10 +65,10 @@ const ProfileContent = () => {
 								</span>
 							</button>
 						</div>
-					</div>
+					</RightFadeComponent >
 
 					<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-						<div className="dark:bg-neutral-900 bg-white rounded-xl border p-6 shadow-md hover:shadow-lg transition-shadow duration-200">
+						<RightFadeComponent className="dark:bg-neutral-900 bg-white rounded-xl border p-6 shadow-md hover:shadow-lg transition-shadow duration-200">
 							<div className="flex items-center justify-between">
 								<div>
 									<p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Projects</p>
@@ -86,9 +87,9 @@ const ProfileContent = () => {
 								</div>
 							</div>
 							}
-						</div>
+						</RightFadeComponent>
 
-						<div className="dark:bg-neutral-900 bg-white rounded-xl border p-6 shadow-md hover:shadow-lg transition-shadow duration-200">
+						<RightFadeComponent delay={.1} className="dark:bg-neutral-900 bg-white rounded-xl border p-6 shadow-md hover:shadow-lg transition-shadow duration-200">
 							<div className="flex items-center justify-between">
 								<div>
 									<p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Daily Deployments</p>
@@ -107,9 +108,9 @@ const ProfileContent = () => {
 								</div>
 							</div>
 							}
-						</div>
+						</RightFadeComponent >
 
-						<div className="dark:bg-neutral-900 bg-white rounded-xl border  p-6 shadow-md hover:shadow-lg transition-shadow duration-200">
+						<RightFadeComponent delay={.18} className="dark:bg-neutral-900 bg-white rounded-xl border  p-6 shadow-md hover:shadow-lg transition-shadow duration-200">
 							<div className="flex items-center justify-between">
 								<div>
 									<p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total BandWidth</p>
@@ -126,12 +127,12 @@ const ProfileContent = () => {
 								</div>
 							</div>
 
-						</div>
+						</RightFadeComponent >
 					</div>
 
 
 
-					<div className="mb-4 px-6 py-4 dark:bg-neutral-900 bg-white rounded-md border">
+					<RightFadeComponent delay={.15} className="mb-4 px-6 py-4 dark:bg-neutral-900 bg-white rounded-md border">
 						<div className="p-3 ">
 							<h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
 								Info
@@ -206,7 +207,7 @@ const ProfileContent = () => {
 								</div>
 							</div>
 						</div>
-					</div>
+					</RightFadeComponent >
 
 				</div>
 			</div>

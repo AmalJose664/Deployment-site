@@ -21,6 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { getBranches } from "@/lib/form";
 import { useUpdateProjectMutation } from "@/store/services/projectsApi";
 import { ChangeProjectSubdomainDialog } from "@/components/project/ChangeSubdomain";
+import RightFadeComponent from "@/components/RightFadeComponent";
 
 
 
@@ -111,7 +112,7 @@ const Details = ({ project, form, branches }: { project: Project, form: UseFormR
 	});
 	return (
 
-		<div className="dark:bg-neutral-900 bg-white rounded-md py-3 px-5 border mb-3">
+		<RightFadeComponent className="dark:bg-neutral-900 bg-white rounded-md py-3 px-5 border mb-3">
 			<h2 className="text-xl mb-2">Project Details</h2>
 			<div className="border pb-4 rounded-md overflow-hidden">
 				<AnimatePresence mode="wait" initial={false}>
@@ -175,7 +176,7 @@ const Details = ({ project, form, branches }: { project: Project, form: UseFormR
 					Update Fields
 				</Button>}
 			</div>
-		</div>
+		</RightFadeComponent >
 	)
 }
 
@@ -215,7 +216,7 @@ const Configurations = ({ project, form }: { project: Project, form: UseFormRetu
 	const outputDirectory = useWatch({ control: form.control, name: 'outputDirectory' })
 
 	return (
-		<div className="dark:bg-neutral-900 bg-white rounded-md py-3 px-5 border mb-3">
+		<RightFadeComponent delay={.1} className="dark:bg-neutral-900 bg-white rounded-md py-3 px-5 border mb-3">
 			<h2 className="text-xl mb-2">Build Settings</h2>
 			<div className="border pb-4 rounded-md overflow-hidden">
 				<AnimatePresence mode="wait" initial={false}>
@@ -288,7 +289,7 @@ const Configurations = ({ project, form }: { project: Project, form: UseFormRetu
 					Update Fields
 				</Button>}
 			</div>
-		</div>
+		</RightFadeComponent >
 	)
 }
 
@@ -323,7 +324,7 @@ const EnvVariables = ({ project, form }: { project: Project, form: UseFormReturn
 
 	return (
 
-		<div className="dark:bg-neutral-900 bg-white rounded-md py-3 px-5 border mb-3">
+		<RightFadeComponent delay={.17} className="dark:bg-neutral-900 bg-white rounded-md py-3 px-5 border mb-3">
 			<h2 className="text-xl mb-2">Environment Vars</h2>
 			<div className="border pb-4 rounded-md overflow-hidden">
 
@@ -419,7 +420,7 @@ const EnvVariables = ({ project, form }: { project: Project, form: UseFormReturn
 					Update Fields
 				</Button>}
 			</div>
-		</div>
+		</RightFadeComponent >
 	)
 }
 
@@ -521,7 +522,6 @@ const ProjectSettings = ({ project, reDeploy, setTabs }: { project: Project, reD
 					<Details project={project} form={form} branches={branches} />
 					<Configurations project={project} form={form} />
 					<EnvVariables project={project} form={form} />
-
 
 
 					<div

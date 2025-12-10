@@ -4,11 +4,9 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { MdOutlineLightMode, MdLaptopChromebook } from "react-icons/md";
 import { CiDark } from "react-icons/ci";
-export default function ThemeSwitcher({ className }: { className?: string }) {
+export default function ThemeSwitcher({ className, withText }: { className?: string, withText?: boolean }) {
 	const { theme, setTheme } = useTheme();
 	const [mounted, setMounted] = useState(false);
-
-	// Avoid hydration mismatch
 	useEffect(() => setMounted(true), []);
 
 	if (!mounted) return null;
@@ -28,7 +26,7 @@ export default function ThemeSwitcher({ className }: { className?: string }) {
 			onClick={handleClick} className={className}
 			title={`Switch to ${nextTheme} mode`}
 		>
-			{icon}
+			{withText && "Switch Theme "}{icon}
 		</button>
 	)
 }

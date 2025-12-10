@@ -5,7 +5,8 @@ import { cn } from "@/lib/utils";
 import { IoIosCube, IoMdCloudDone } from "react-icons/io";
 import NavbarUser from "./NavbarUser";
 import TitleWithLogo from "./TitleWithLogo";
-export default function Navbar({ className }: { className: string }) {
+
+export default function Navbar({ className, showOtherLinks }: { className: string, showOtherLinks?: boolean }) {
 
 	return (
 		<nav className={cn(className, "flex w-full items-center justify-between px-6 py-3 border-b dark:border-gray-800 border-gray-300")}>
@@ -55,11 +56,13 @@ export default function Navbar({ className }: { className: string }) {
 							<IoMdCloudDone />Deployments
 						</Link>
 					</li>
-					<li>
-						<Link href="/pricing" className="hover:text-blue-400">
-							Pricing
-						</Link>
-					</li>
+					{showOtherLinks &&
+						<li>
+							<Link href="/pricing" className="hover:text-blue-400">
+								Pricing
+							</Link>
+						</li>
+					}
 				</ul>
 				<button
 					aria-label="Notifications"

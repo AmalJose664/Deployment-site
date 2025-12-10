@@ -1,30 +1,71 @@
+'use client'
 import { TabsList, TabsTrigger } from "@/components/ui/tabs"
-const ProjectTabs = () => {
-	return (
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
-		<TabsList className="ml-6 flex  bg-background">
-			{["project", "deployments", "analytics", "settings", "files"].map(tab => (
-				<TabsTrigger
-					key={tab}
-					value={tab}
-					className="
-        relative px-4 py-2 text-sm font-medium
-        text-neutral-700 dark:text-neutral-300
-        data-[state=active]:text-primary
-        after:content-['']
-        after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px]
-        after:bg-transparent
-        data-[state=active]:after:bg-primary
-        transition-all
-      "
-				>
-					{tab[0].toUpperCase() + tab.slice(1)}
-				</TabsTrigger>
-			))}
-		</TabsList>
+const ProjectTabs = ({ tab, setTab }: { tab: string, setTab: (state: string) => void }) => {
+	const overviewRef = useRef<HTMLButtonElement>(null);
+	const deploymentsRef = useRef<HTMLButtonElement>(null);
+	const monitoringRef = useRef<HTMLButtonElement>(null);
+	const settingsRef = useRef<HTMLButtonElement>(null);
+	const filesRef = useRef<HTMLButtonElement>(null);
+
+	const tabs = useMemo(() => [
+		{ title: "overview", ref: overviewRef },
+		{ title: "deployments", ref: deploymentsRef },
+		{ title: "monitoring", ref: monitoringRef },
+		{ title: "settings", ref: settingsRef },
+		{ title: "files", ref: filesRef }
+	], []);
+	const [distance, setDistance] = useState(0)
+	const [width, setWidth] = useState(70)
+	const updateIndicator = useCallback((tabTitle: string) => {
+		const index = tabs.findIndex(t => t.title === tabTitle);
+		if (index === -1) return;
+
+		const button = tabs[index].ref.current;
+		if (button) {
+			const rect = button.getBoundingClientRect();
+			const parentRect = button.parentElement?.getBoundingClientRect();
+			if (parentRect) {
+				setDistance(rect.left - parentRect.left);
+				setWidth(rect.width);
+			}
+		}
+	}, [tabs]);
+	useEffect(() => {
+		updateIndicator(tab);
+	}, [tab, updateIndicator]);
+
+	return (
+		<nav className="ml-6 flex gap-6 duration-300 relative">
+			<TabsList className="flex items-center gap-4 bg-background">
+				{tabs.map((tabVal, index) => (
+					<TabsTrigger
+						key={tabVal.title}
+						value={tabVal.title}
+						ref={tabVal.ref}
+						onClick={() => setTab(tabVal.title)}
+						className={`text-sm border pb-1 transition-all ${tabVal.title === tab ? "text-primary" : "text-gray-500"
+							}`}
+					>
+						{tabVal.title[0].toUpperCase() + tabVal.title.slice(1)}
+					</TabsTrigger>
+				))}
+			</TabsList>
+			<div
+				className="bg-primary h-0.5 absolute -bottom-1 transition-all duration-300 ease-out"
+				style={{
+					transform: `translateX(${distance}px)`,
+					width: `${width}px`,
+					opacity: 1
+				}}
+			/>
+		</nav>
+
 
 
 
 	)
 }
+
 export default ProjectTabs

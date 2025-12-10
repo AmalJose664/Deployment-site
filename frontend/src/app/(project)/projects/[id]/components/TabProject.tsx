@@ -74,7 +74,7 @@ const TabProject = ({ project, deployment, tempDeployment, lastDeployment, onCre
 								initial={{ opacity: 0, y: 20, height: 0 }}
 								animate={{ opacity: 1, y: 0, height: "auto", }}
 								exit={{ opacity: 0, y: -40, height: 0 }}
-								transition={{ duration: 0.4, ease: "easeInOut" }}
+								transition={{ duration: 0.28, ease: "easeInOut" }}
 								className="dark:bg-stone-900 bg-stone-100 h-auto"
 							>
 								<Logs deploymentId={deployment?._id || ""} refetch={refetchLogs} />

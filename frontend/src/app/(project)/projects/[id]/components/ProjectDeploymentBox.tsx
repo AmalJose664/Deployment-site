@@ -8,6 +8,7 @@ import { getElapsedTime, getGithubBranchUrl, getGithubCommitUrl, getStatusColor,
 import Link from "next/link";
 import StatusIcon from "@/components/ui/StatusIcon";
 import { useRouter } from "next/navigation";
+import RightFadeComponent from "@/components/RightFadeComponent";
 
 
 interface ProjectDeploymentProps {
@@ -21,7 +22,7 @@ interface ProjectDeploymentProps {
 const ProjectDeploymentBox = ({ deployment, projectBranch, repoURL, showLogs, type }: ProjectDeploymentProps) => {
 	const router = useRouter()
 	return (
-		<div className="border  rounded-xl overflow-hidden dark:bg-neutral-900 bg-white mb-4">
+		<RightFadeComponent delay={.1} inView className="border  rounded-xl overflow-hidden dark:bg-neutral-900 bg-white mb-4">
 			<div className="px-6 py-4 border-b border-gray-800">
 				<h2 className="text-lg font-semibold">{type} Deployment</h2>
 			</div>
@@ -68,7 +69,7 @@ const ProjectDeploymentBox = ({ deployment, projectBranch, repoURL, showLogs, ty
 					</div>
 				</div>
 			</div>
-		</div>
+		</RightFadeComponent>
 	)
 }
 export default ProjectDeploymentBox

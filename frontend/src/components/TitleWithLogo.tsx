@@ -1,3 +1,4 @@
+import { SITE_NAME } from "@/config/constants"
 import { cn } from "@/lib/utils"
 import { IoCubeSharp } from "react-icons/io5"
 
@@ -11,7 +12,7 @@ const TitleWithLogo = ({ logoClassName, svgClassName, baseClassName, useSvg = fa
 	return (
 		<div className={cn("flex gap-2 items-center border border-transparent px-2 py-1 rounded-md dark:hover:border-neutral-700 hover:border-neutral-500 transition-all duration-300", baseClassName)}>
 			<h2 className={cn("font-semibold tracking-wide  uppercase text-sm text-primary", logoClassName)}>
-				Lynfera
+				{SITE_NAME}
 			</h2>
 			{useSvg ? (
 				<IoCubeSharp size={20} className={cn("rotate-z-180", svgClassName)} />

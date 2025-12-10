@@ -1,4 +1,4 @@
-
+"use client"
 import { List, AutoSizer } from 'react-virtualized';
 import type { List as ListType } from 'react-virtualized';
 import { Log } from "@/types/Log";
@@ -89,7 +89,7 @@ export function Logs({ deploymentId, refetch, deploymentSpecificLogs }: LogsComp
 			<div
 				key={key}
 				style={style}
-				className="px-2 py-0.5 dark:hover:bg-neutral-800 hover:bg-neutral-300    active:bg-blue-950"
+				className="px-2 py-0.5 dark:hover:bg-neutral-800 hover:bg-neutral-300    active:bg-blue-100"
 			>
 				<div className="flex items-start gap-2 dark:text-xs text-sm font-mono">
 					<span className="text-primary shrink-0 mt-[2px]">
@@ -98,7 +98,7 @@ export function Logs({ deploymentId, refetch, deploymentSpecificLogs }: LogsComp
 					<span className={`${getLevelColor(log.level)} uppercase shrink-0 w-16 mt-[2px]`}>
 						{log.level}
 					</span>
-					<span className="dark:text-neutral-200 text-gray-900   flex-1 break-words leading-relaxed whitespace-nowrap overflow-hidden text-ellipsis "
+					<span className="dark:text-neutral-200 text-zinc-900   flex-1 break-words leading-relaxed whitespace-nowrap overflow-hidden text-ellipsis "
 						dangerouslySetInnerHTML={{ __html: htmlMessage }}>
 						{/* {log.message} */}
 					</span>
@@ -108,9 +108,9 @@ export function Logs({ deploymentId, refetch, deploymentSpecificLogs }: LogsComp
 	};
 
 	return (
-		<div className="dark:bg-neutral-950 bg-gray-50 text-gray-100 p-1 rounded-md">
+		<div className="dark:bg-neutral-950 bg-neutral-200 text-zinc-100 p-1 rounded-md">
 			<div className="max-w-full mx-auto">
-				<div className="dark:bg-neutral-950 bg-gray-50 border ">
+				<div className="dark:bg-neutral-950 bg-white border ">
 					{/* Header */}
 					<div className="border-b  px-3 py-2">
 						<div className="flex items-center justify-between mb-2">
@@ -121,21 +121,21 @@ export function Logs({ deploymentId, refetch, deploymentSpecificLogs }: LogsComp
 							<div className="flex gap-1">
 								<button
 									onClick={refetch}
-									className="px-2 py-1 text-xs dark:bg-gray-900  dark:hover:bg-gray-800 hover:bg-gray-200 text-less  flex items-center gap-1"
+									className="px-2 py-1 text-xs dark:bg-zinc-900 !duration-200 border rounded-xs  dark:hover:bg-gray-800 hover:bg-gray-200 text-less  flex items-center gap-1"
 									title="Refetch Logs"
 								>
 									<LuRotateCw className="w-3 h-3" />
 								</button>
 								<button
 									onClick={downloadLogs}
-									className="px-2 py-1 text-xs dark:bg-gray-900  dark:hover:bg-gray-800 hover:bg-gray-200 text-less "
+									className="px-2 py-1 text-xs dark:bg-zinc-900 !duration-200 border rounded-xs  dark:hover:bg-gray-800 hover:bg-gray-200 text-less "
 									title="Download"
 								>
 									<MdFileDownload className="w-3 h-3" />
 								</button>
 								<button
 									onClick={clearLog}
-									className="px-2 py-1 text-xs dark:bg-gray-900  dark:hover:bg-gray-800 hover:bg-gray-200 text-less "
+									className="px-2 py-1 text-xs dark:bg-zinc-900 !duration-200 border rounded-xs  dark:hover:bg-gray-800 hover:bg-gray-200 text-less "
 									title="Clear"
 								>
 									<GoTrash className="w-3 h-3" />

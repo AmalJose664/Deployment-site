@@ -1,235 +1,342 @@
-"use client"
+"use client";
+
+
 
 import FilesComponent from "@/components/FilesComponent";
 import { Logs } from "@/components/LogsComponent";
 import ErrorComponent from "@/components/ErrorComponent";
-import { Button } from "@/components/ui/button";
 import StatusIcon from "@/components/ui/StatusIcon";
-import { formatDuration, getGithubBranchUrl, getGithubCommitUrl, getStatusColor, timeToSeconds } from "@/lib/utils";
-import { useGetDeploymentByIdQuery } from "@/store/services/deploymentApi"
+import BackButton from "@/components/BackButton";
+import {
+	formatDuration,
+	getGithubBranchUrl,
+	getGithubCommitUrl,
+	getStatusColor,
+} from "@/lib/utils";
+import { useGetDeploymentByIdQuery } from "@/store/services/deploymentApi";
 import { useGetDeploymentLogsQuery } from "@/store/services/logsApi";
 import { Project, ProjectStatus } from "@/types/Project";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import { FiGitCommit } from "react-icons/fi";
-import { MdKeyboardArrowRight } from "react-icons/md";
-import { IoIosCube, IoMdGitBranch, IoMdGlobe } from "react-icons/io";
-import BackButton from "@/components/BackButton";
-
+import {
+	FiGitCommit,
+	FiClock,
+} from "react-icons/fi";
+import { IoMdGitBranch } from "react-icons/io";
+import { FiAlertCircle } from "react-icons/fi";
+import { MdKeyboardArrowRight, MdTimer } from "react-icons/md";
+import { IoIosCube, IoMdGlobe } from "react-icons/io";
+import { LuExternalLink } from "react-icons/lu";
+import RightFadeComponent from "@/components/RightFadeComponent";
 
 const DeploymentPageContainer = ({ deploymentId }: { deploymentId: string }) => {
-	const { data: deployment, isLoading, error, isError } = useGetDeploymentByIdQuery({ id: deploymentId, params: { include: "project" } })
-	const [showLogs, setShowLogs] = useState(false)
+
+	const {
+		data: deployment,
+		isLoading,
+		error,
+		isError,
+	} = useGetDeploymentByIdQuery({
+		id: deploymentId,
+		params: { include: "project" },
+	});
+
+	const [showLogs, setShowLogs] = useState(false);
 	const { data: logs, refetch } = useGetDeploymentLogsQuery(
 		{ deploymentId: deployment?._id ?? "" },
 		{ skip: !showLogs || !deployment?._id }
-	)
+	);
 
 	if (error || isError) {
-		return <ErrorComponent error={error} id={deploymentId} field="Deployment" />
+		return (
+			<ErrorComponent error={error} id={deploymentId} field="Deployment" />
+		);
 	}
 
 	if (!deployment && !isLoading) {
-		return <ErrorComponent error={{ message: "Deployment not found" }} id={deploymentId} field="Deployment" />
+		return (
+			<ErrorComponent
+				error={{ message: "Deployment not found" }}
+				id={deploymentId}
+				field="Deployment"
+			/>
+		);
 	}
+
+	const project = deployment?.project as Project;
+	const isFailed =
+		deployment?.status === ProjectStatus.CANCELED ||
+		deployment?.status === ProjectStatus.FAILED;
+
 	return (
-		<div>
-			<div className="min-h-screen bg-gradient-to-br from-background to-slate-100 dark:from-background dark:to-neutral-900">
-				<div className="sticky top-0 z-10 bg-background dark:border-zinc-800 border-gray-200">
-					<div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3">
-						<BackButton />
-					</div>
+		<div className="min-h-screen bg-neutral-50 dark:bg-[#0a0a0a] text-neutral-900 dark:text-neutral-100">
+			{/* Sticky Header */}
+			<div className="sticky top-0 z-20 border-b bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-md border-neutral-200 dark:border-neutral-800">
+				<div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-2">
+					<BackButton />
+					{!isLoading && deployment && (<>
+						<div className="text-xs font-mono text-neutral-500">
+							deployments
+						</div>
+						<div className="text-xs font-mono text-neutral-500">
+							/
+						</div>
+						<div className="text-xs font-mono text-neutral-500">
+							{deployment._id}
+						</div>
+					</>
+					)}
 				</div>
+			</div>
+
+			<div className="max-w-[1350px] mx-auto px-4 sm:px-6 py-8 border mt-4 rounded-md mb-10 dark:bg-zinc-950 bg-zinc-100">
 				{isLoading ? (
 					<motion.div
 						initial={{ y: 20, opacity: 0 }}
 						animate={{ y: 0, opacity: 1 }}
-						transition={{ duration: 0.3, ease: "easeInOut" }}
-						className="flex gap-6 items-center justify-center">
-						<p className="text-gray-500">Loading...</p>
-						<AiOutlineLoading3Quarters className="animate-spin " />
+						className="flex flex-col items-center justify-center h-[50vh] gap-4"
+					>
+						<AiOutlineLoading3Quarters className="animate-spin text-3xl text-neutral-400" />
+						<p className="text-neutral-500 text-sm animate-pulse">
+							Retrieving deployment details...
+						</p>
 					</motion.div>
 				) : (
-
-					<div className="max-w-[1400px] mx-auto px-6  rounded-md py-4">
-						<div className="mb-4 flex items-center justify-between px-6 py-4 dark:bg-neutral-900 bg-white rounded-md border">
+					<motion.div
+						initial={{ opacity: 0, y: 10 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.4 }}
+						className="space-y-6 "
+					>
+						{/* Header Section */}
+						<div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
 							<div>
-								<h1 className="text-xl font-semibold text-primary flex gap-2 items-center">
-									Deployment for {(deployment.project as Project).name} <IoIosCube />
+								<h1 className="text-2xl font-bold flex items-center gap-2">
+									<IoIosCube className="" />
+									{project.name}
+									<span className="text-neutral-400 font-normal mx-2">/</span>
+									<span className="text-lg font-normal text-neutral-500">
+										Deployment
+									</span>
 								</h1>
-								<p className="text-sm text-gray-500 mt-1 font-mono">{deployment._id}</p>
 							</div>
-							<div className='p-2 flex gap-2 items-center rounded-md border border-transparent hover:border-neutral-800'>
-								<StatusIcon status={deployment.status} />
-								<span
-									className={`text-sm flex flex-col font-medium px-2 py-1 rounded ${getStatusColor(
-										deployment?.status as ProjectStatus
-									)}`}
+
+							<div className="flex items-center gap-3">
+								<div
+									className={`flex items-center gap-2 px-3 py-1.5 rounded-md border ${getStatusColor(
+										deployment.status as ProjectStatus
+									)} bg-opacity-10 border-opacity-20`}
 								>
-									{deployment.status}
-								</span>
-							</div>
-						</div>
-
-						<div className="mb-4 px-6 py-4 dark:bg-neutral-900 bg-white rounded-md border">
-							{(deployment.status !== ProjectStatus.CANCELED && deployment.status !== ProjectStatus.FAILED) && (
-								<>
-									<div className="p-3 ">
-										<h3 className="text-xs  font-semibold text-green-500 uppercase tracking-wider mb-3">
-											Live
-										</h3>
-										<div className="flex gap-3 items-center">
-											<span>
-												<IoMdGlobe className='size-4 text-less' />
-											</span>
-											<span className="flex gap-3 text-sm items-center">
-												<Link
-													href={`${window.location.protocol}//${(deployment.project as Project).subdomain}.${process.env.NEXT_PUBLIC_PROXY_SERVER}`}
-												>
-													{`${window.location.protocol}//${(deployment.project as Project).subdomain}`}
-												</Link>
-											</span>
-										</div>
-									</div>
-									<hr />
-								</>
-							)}
-							<div className="p-3 ">
-								<h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-									Branch
-								</h3>
-								<div className="flex gap-3 items-center">
-									<span>
-										<IoMdGitBranch className='size-4 text-less' />
-									</span>
-									<span className="flex gap-3 text-sm items-center">
-										<Link
-											href={getGithubBranchUrl((deployment.project as Project).repoURL, deployment.commit.id)}
-										>
-											{(deployment.project as Project).branch}
-										</Link>
+									<StatusIcon status={deployment.status} />
+									<span className="text-sm font-medium capitalize">
+										{deployment.status.toLowerCase()}
 									</span>
 								</div>
-							</div>
-							<hr />
-							<div className="p-3 ">
-								<h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-									Commit
-								</h3>
-								<div className="flex gap-3 items-center">
-									<span>
-										<FiGitCommit className='size-4 text-less' />
-									</span>
-									<span className="flex gap-3 text-sm items-center">
-										<Link href={getGithubCommitUrl("", deployment.commit.id)}> {deployment.commit.id}</Link>
-										<p className="text-lg">/</p>
-										<Link href={getGithubCommitUrl("", deployment.commit.msg)}> {deployment.commit.msg}</Link>
-									</span>
-								</div>
-							</div>
-							<hr />
-							{(deployment.status === ProjectStatus.CANCELED || deployment.status === ProjectStatus.FAILED) && (
-								<>
-									<div className=" p-3 mt-3">
-										<h3 className="text-xs font-semibold text-red-500 uppercase tracking-wider mb-3">
-											Error
-										</h3>
-										<div>
-											<p className="text-sm text-red-400">{deployment.errorMessage || "Reason Unknown"}</p>
-										</div>
-									</div>
-									<hr />
-								</>
-							)}
-							<div className=" p-3 mt-3">
-								<h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-									Performance
-								</h3>
-								<div className="grid grid-cols-3 gap-6">
-									<div>
-										<div className="text-sm text-gray-500 mb-1">Install</div>
-										<div className="text-xl font-semibold text-primary">
-											{formatDuration(deployment.performance.installTime)}
-										</div>
-									</div>
-									<div>
-										<div className="text-sm text-gray-500 mb-1">Build</div>
-										<div className="text-xl font-semibold text-primary">
-											{formatDuration(deployment.performance.buildTime)}
-										</div>
-									</div>
-									<div>
-										<div className="text-sm text-gray-500 mb-1">Total</div>
-										<div className="text-xl font-semibold text-primary">
-											{formatDuration(deployment.performance.totalDuration)}
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div className="mb-4 px-6 py-4 dark:bg-neutral-900 bg-white rounded-md border">
-							<h4 className="font-semibold text-primary">
-								Deployment Logs
-							</h4>
-
-							<div>
-								<div className="border mt-3 rounded-md">
-									<button
-										className="px-4 py-3 w-full"
-										onClick={() => setShowLogs(!showLogs)}
+								{!isFailed && deployment.status === ProjectStatus.READY && (
+									<Link
+										href={`${window.location.protocol}//${project.subdomain}.${process.env.NEXT_PUBLIC_PROXY_SERVER}`}
+										target="_blank"
+										className="flex items-center gap-2 px-4 py-1.5 bg-neutral-900 dark:bg-white text-white dark:text-black rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
 									>
-										<span className="flex flex-row-reverse gap-2 items-center justify-end text-primary">
-											Build Logs
-											<MdKeyboardArrowRight
-												className="size-6 transition-all duration-200"
-												style={{
-													transform: `rotateZ(${showLogs ? "90deg" : "0deg"})`,
-												}}
-											/>
-										</span>
-									</button>
-									<div className="overflow-hidden">
-										<AnimatePresence mode="sync">
-											{showLogs && (
-												<motion.div
-													initial={{ opacity: 0, y: 20, height: 0 }}
-													animate={{ opacity: 1, y: 0, height: "auto", }}
-													exit={{ opacity: 0, y: -40, height: 0 }}
-													transition={{ duration: 0.4, ease: "easeInOut" }}
-													className="dark:bg-stone-900 bg-stone-100 h-auto"
-												>
-													<Logs
-														deploymentId={deployment?._id || ""}
-														deploymentSpecificLogs={logs}
-														refetch={refetch} />
-												</motion.div>
-											)}
-										</AnimatePresence>
-									</div>
+										Visit <LuExternalLink />
+									</Link>
+								)}
+							</div>
+						</div>
+
+						{isFailed && (
+							<div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900 rounded-lg p-4 flex items-start gap-3">
+								<FiAlertCircle className="text-red-500 mt-0.5 size-5" />
+								<div>
+									<h3 className="text-sm font-semibold text-red-700 dark:text-red-400">
+										Deployment Failed
+									</h3>
+									<p className="text-sm text-red-600 dark:text-red-300 mt-1">
+										{deployment.errorMessage ||
+											"An unknown error occurred during the build process."}
+									</p>
 								</div>
+							</div>
+						)}
+
+						<div>
+							<div className="flex items-center gap-3 justify-around">
+								<RightFadeComponent className="space-y-6 flex-2">
+									<div className="bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden">
+										<div className="px-6 py-4 border-b border-neutral-200 dark:border-neutral-800">
+											<h3 className="font-semibold text-sm text-neutral-900 dark:text-white">
+												Deployment Details
+											</h3>
+										</div>
+										<div className="divide-y divide-neutral-100 dark:divide-neutral-800">
+
+											{!isFailed && (
+												<div className="grid grid-cols-1 sm:grid-cols-3 px-6 py-4 gap-4 items-center hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors">
+													<div className="text-sm text-neutral-500 font-medium flex items-center gap-2">
+														<IoMdGlobe className="size-4" /> Domains
+													</div>
+													<div className="sm:col-span-2">
+														<Link
+															href={`${window.location.protocol}//${project.subdomain}.${process.env.NEXT_PUBLIC_PROXY_SERVER}`}
+															target="_blank"
+															className="text-sm text-blue-600 dark:text-blue-400 hover:underline truncate block font-mono"
+														>
+															{project.subdomain}.
+															{process.env.NEXT_PUBLIC_PROXY_SERVER}
+														</Link>
+													</div>
+												</div>
+											)}
+
+											<div className="grid grid-cols-1 sm:grid-cols-3 px-6 py-4 gap-4 items-center hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors">
+												<div className="text-sm text-neutral-500 font-medium flex items-center gap-2">
+													<IoMdGitBranch className="size-4" /> Branch
+												</div>
+												<div className="sm:col-span-2">
+													<Link
+														href={getGithubBranchUrl(
+															project.repoURL,
+															project.branch
+														)}
+														target="_blank"
+														className="inline-flex items-center px-2.5 py-1 rounded-md bg-neutral-100 dark:bg-neutral-800 text-xs font-mono hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+													>
+														<IoMdGitBranch className="mr-1 size-3" />
+														{project.branch}
+													</Link>
+												</div>
+											</div>
+
+											<div className="grid grid-cols-1 sm:grid-cols-3 px-6 py-4 gap-4 items-center hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors">
+												<div className="text-sm text-neutral-500 font-medium flex items-center gap-2">
+													<FiGitCommit className="size-4" /> Commit
+												</div>
+												<div className="sm:col-span-2 flex flex-col gap-1">
+													<span className="text-sm text-neutral-900 dark:text-neutral-200 truncate">
+														{deployment.commit.msg}
+													</span>
+													<Link
+														href={getGithubCommitUrl("", deployment.commit.id)}
+														target="_blank"
+														className="text-xs font-mono text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300 w-fit"
+													>
+														{deployment.commit.id.substring(0, 7)}
+													</Link>
+												</div>
+											</div>
+										</div>
+									</div>
+								</RightFadeComponent>
+								<RightFadeComponent delay={.1} className="bg-white dark:bg-neutral-900 rounded-md border border-neutral-200 dark:border-neutral-800 shadow-sm p-6 flex-1">
+									<h3 className="font-semibold text-sm text-neutral-900 dark:text-white mb-6 flex items-center gap-2">
+										<FiClock /> Performance Metrics
+									</h3>
+									<div className="space-y-6 relative">
+										<div className="absolute left-[7px] top-2 bottom-2 w-0.5 bg-neutral-100 dark:bg-neutral-800"></div>
+
+										<div className="relative pl-8">
+											<div className="absolute left-0 top-1 w-4 h-4 rounded-full border-2 border-white dark:border-neutral-900 bg-blue-500 shadow-sm z-10"></div>
+											<p className="text-xs uppercase tracking-wider text-neutral-500 font-semibold mb-1">
+												Installation
+											</p>
+											<p className="text-lg font-mono font-medium text-neutral-900 dark:text-white">
+												{formatDuration(deployment.performance.installTime)}
+											</p>
+										</div>
+
+										<div className="relative pl-8">
+											<div className="absolute left-0 top-1 w-4 h-4 rounded-full border-2 border-white dark:border-neutral-900 bg-purple-500 shadow-sm z-10"></div>
+											<p className="text-xs uppercase tracking-wider text-neutral-500 font-semibold mb-1">
+												Build
+											</p>
+											<p className="text-lg font-mono font-medium text-neutral-900 dark:text-white">
+												{formatDuration(deployment.performance.buildTime)}
+											</p>
+										</div>
+
+										<div className="relative pl-8 pt-4 border-t border-neutral-100 dark:border-neutral-800 mt-4">
+											<p className="text-xs uppercase tracking-wider text-neutral-500 font-semibold mb-1">
+												Total Duration
+											</p>
+											<p className="text-xl font-mono font-bold text-neutral-900 dark:text-white">
+												{formatDuration(deployment.performance.totalDuration)}
+											</p>
+										</div>
+									</div>
+								</RightFadeComponent>
+							</div>
+							<div className="mt-10 bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 shadow-sm">
+								<button
+									onClick={() => setShowLogs(!showLogs)}
+									className="w-full flex items-center justify-between px-6 py-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors rounded-t-lg"
+								>
+									<div className="flex items-center gap-2">
+										<span className="relative flex h-2 w-2">
+											{deployment.status === ProjectStatus.BUILDING && (
+												<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+											)}
+											<span
+												className={`relative inline-flex rounded-full h-2 w-2 ${deployment.status === ProjectStatus.BUILDING
+													? "bg-yellow-500"
+													: "bg-neutral-400"
+													}`}
+											></span>
+										</span>
+										<h3 className="font-semibold text-sm text-neutral-900 dark:text-white">
+											Build Logs
+										</h3>
+									</div>
+									<MdKeyboardArrowRight
+										className={`size-5 text-neutral-500 transition-transform duration-200 ${showLogs ? "rotate-90" : ""
+											}`}
+									/>
+								</button>
+								<AnimatePresence>
+									{showLogs && (
+										<motion.div
+											initial={{ height: 0, opacity: 0 }}
+											animate={{ height: "auto", opacity: 1 }}
+											exit={{ height: 0, opacity: 0 }}
+											className="overflow-hidden border-t border-neutral-200 dark:border-neutral-800"
+										>
+											<div className="p-1">
+												<Logs
+													deploymentId={deployment?._id || ""}
+													deploymentSpecificLogs={logs}
+													refetch={refetch}
+												/>
+											</div>
+										</motion.div>
+									)}
+								</AnimatePresence>
+
 							</div>
 						</div>
 
 
-						<div className="mb-16 px-6 py-4 dark:bg-neutral-900 bg-white rounded-md border">
-							<h4 className="font-semibold text-primary mb-4">
-								Deployment Output Files
-							</h4>
-							<FilesComponent projectId={(deployment.project as Project)._id} deploymentId={deployment._id}>
-								<h4 className="font-semibold text-primary">Build Output Files</h4>
-							</FilesComponent>
-						</div>
-					</div>
+						<RightFadeComponent className="bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden flex flex-col">
+							<div className="px-6 py-4 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50">
+								<h3 className="font-semibold text-sm text-neutral-900 dark:text-white">
+									Output Files
+								</h3>
+							</div>
+							<div className="flex-1 overflow-auto p-2">
+								<FilesComponent
+									projectId={project._id}
+									deploymentId={deployment._id}
+								>
+									<h4 className="font-semibold text-primary">Build Output Files</h4>
+								</FilesComponent>
+							</div>
+						</RightFadeComponent>
+					</motion.div>
+
 				)}
 			</div>
 		</div>
-	)
-}
-export default DeploymentPageContainer
+	);
+};
 
-
-
-
+export default DeploymentPageContainer;
