@@ -12,5 +12,10 @@ paymentRouter.post(
 	"/stripe-webhook",
 	paymentController.webhook.bind(paymentController)
 )
+paymentRouter.get(
+	"/retrieve",
+	authenticateToken,
+	paymentController.validate.bind(paymentController)
+)
 
 export default paymentRouter

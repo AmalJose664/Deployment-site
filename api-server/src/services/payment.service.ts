@@ -55,10 +55,25 @@ class PaymentService implements IPaymentService {
 			throw new AppError("No active subscription", 400);
 		}
 		const result = await stripe.subscriptions.cancel(user.payment?.subscriptionId as string)
-
 		console.log(result)
 	}
-
+	async retriveSession(userId: string, sessionId: string): Promise<{
+		valid: boolean
+		customerName: string,
+		currency: string | null,
+		amountPaid?: number,
+		paymentStatus: string
+	}> {
+		const session = await stripe.checkout.sessions.retrieve(sessionId,)
+		console.log(session)
+		return {
+			valid: session.payment_status === "paid",
+			customerName: session.customer_details?.name || "",
+			...(session.amount_total && { amountPaid: session.amount_total / 100 }),
+			currency: session.currency,
+			paymentStatus: session.payment_status
+		}
+	}
 
 
 	async handleWebhookEvent(event: Stripe.Event): Promise<void> {

@@ -50,6 +50,22 @@ class PaymentController implements IPaymentController {
 			next(error)
 		}
 	}
+	async validate(req: Request, res: Response, next: NextFunction): Promise<void> {
+		try {
+			const sessionId = req.query.session_id
+			const userId = req.user?.id as string
+			const result = await this.paymentService.retriveSession(userId, sessionId as string)
+			res.status(200).json({
+				valid: result.valid,
+				customerName: result.customerName,
+				currency: result.currency,
+				amountPaid: result.amountPaid,
+				paymentStatus: result.paymentStatus
+			});
+		} catch (error) {
+			next(error)
+		}
+	}
 }
 
 export default PaymentController

@@ -28,6 +28,7 @@ export class UserMapper {
 	}
 	static toUserDetailedResponse(data: { user: IUser, bandwidth: number; }): { user: UserResponseDetailedDTO } {
 		const { user } = data
+		const currentDate = new Date().toISOString().slice(0, 10);
 		return {
 			user: {
 				_id: user._id.toString(),
@@ -35,7 +36,7 @@ export class UserMapper {
 				profileImage: user.profileImage,
 				email: user.email,
 				projects: Number(user.projects),
-				deploymentsToday: Number(user.deploymentsToday),
+				deploymentsToday: Number(user.currentDate === currentDate ? user.deploymentsToday : 0),
 				plan: user.plan,
 				createdAt: user.createdAt,
 				bandwidthMonthly: data.bandwidth,
