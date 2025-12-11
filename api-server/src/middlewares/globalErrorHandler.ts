@@ -5,7 +5,7 @@ export const errorHandler = (err: any, req: Request, res: Response, next: NextFu
 	let statusCode = err.statusCode || 500;
 	let message = err.message || "Internal server error";
 	console.log("New error 🎉🎉🎉🎉🎉");
-	if (err.cause) console.error("Cause: ", err.cause);
+	if (err.cause) console.error("Cause: ", err.cause, "\n----------------------------------------------------------------");
 	console.log(err);
 	if (!(err instanceof AppError)) {
 		if (err.code === 11000) {

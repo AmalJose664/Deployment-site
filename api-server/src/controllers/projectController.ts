@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { IProjectController } from "../interfaces/controller/IProjectController.js";
 import ProjectService from "../services/project.service.js";
 import { HTTP_STATUS_CODE } from "../utils/statusCodes.js";
-import { checkSubdomainDTO, CreateProjectDTO, QueryProjectDTO, UpdateProjectDTO, UpdateSubdomainDTO } from "../dtos/project.dto.js";
+import { checkSubdomainDTO, CreateProjectDTO, ProjectDeploymentUpdateDTO, QueryProjectDTO, UpdateProjectDTO, UpdateSubdomainDTO } from "../dtos/project.dto.js";
 import { ProjectMapper } from "../mappers/ProjectMapper.js";
 import AppError from "../utils/AppError.js";
 
@@ -98,6 +98,22 @@ class ProjectController implements IProjectController {
 			next(error);
 		}
 
+	}
+	async changeCurrentDeployment(req: Request, res: Response, next: NextFunction): Promise<void> {
+		try {
+			const dto = req.validatedBody as ProjectDeploymentUpdateDTO
+			const userId = req.user?.id as string;
+			const projectId = req.params.projectId;
+			const updatedProject = await this.projectService.changeProjectDeployment(userId, projectId, dto.newCurrentDeployment)
+			if (!updatedProject) {
+				res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ project: null });
+				return;
+			}
+			const response = ProjectMapper.toProjectResponse(updatedProject);
+			res.status(HTTP_STATUS_CODE.OK).json(response);
+		} catch (error) {
+			next(error)
+		}
 	}
 	async deleteProject(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {

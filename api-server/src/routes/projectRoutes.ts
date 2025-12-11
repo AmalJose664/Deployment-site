@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authenticateToken } from "../middlewares/authMiddleware.js";
 import { validateBody, validateQuery } from "../middlewares/validateRequest.js";
-import { CreateProjectSchema, ProjectQuerySchema, ProjectSubdomainSchema, SubdomainQuerySchema, UpdateProjectSchema } from "../dtos/project.dto.js";
+import { CreateProjectSchema, ProjectDeploymentUpdateSchema, ProjectQuerySchema, ProjectSubdomainSchema, SubdomainQuerySchema, UpdateProjectSchema } from "../dtos/project.dto.js";
 import { deploymentController, logsController, projectController } from "../instances.js";
 import { validateObjectId } from "../middlewares/validateObjectId.js";
 import { DeploymentQueryScheme } from "../dtos/deployment.dto.js";
@@ -43,6 +43,15 @@ projectRouter.patch(
 	validateBody(ProjectSubdomainSchema),
 	projectController.updateSubdomain.bind(projectController),
 );
+
+projectRouter.patch(
+	"/:projectId/deployments",
+	authenticateToken,
+	validateObjectId("projectId"),
+	validateBody(ProjectDeploymentUpdateSchema),
+	projectController.changeCurrentDeployment.bind(projectController),
+);
+
 projectRouter.delete("/:projectId",
 	authenticateToken,
 	validateObjectId("projectId"),

@@ -29,7 +29,7 @@ export const projectBandwidthRepo = new ProjectBandwidthRepository();
 export const logRepo = new LogRepo(client);
 export const analyticsRepo = new AnalyticsRepo(client);
 
-export const projectService = new ProjectService(projectRepo, userRepo, projectBandwidthRepo);
+export const projectService = new ProjectService(projectRepo, userRepo, projectBandwidthRepo, deploymentRepo);
 export const logsService = new LogsService(logRepo, deploymentRepo);
 export const analyticsService = new AnalyticsService(analyticsRepo, projectBandwidthRepo);
 export const userService = new UserService(userRepo, projectService);

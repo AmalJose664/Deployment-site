@@ -6,7 +6,7 @@ const startServer = async () => {
 	httpServer.listen(PORT, () => console.log(`🎉🎉 Server running on port ${PORT}`));
 	// await startKafkaConsumer()
 };
-
+// remove test routes, at logs routes, deployment routes 
 startServer().catch((e) => console.log(e));
 process.on("SIGINT", async () => {
 	console.log("Exiting.........");

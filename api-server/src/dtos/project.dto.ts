@@ -113,8 +113,13 @@ export const SubdomainQuerySchema = z.object({
 		.regex(/^[a-z0-9]/, "Must start with a letter or number")
 		.regex(/[a-z0-9]$/, "Must end with a letter or number")
 })
+export const ProjectDeploymentUpdateSchema = z.object({
+	newCurrentDeployment: mongoIdSchema
+})
+
 export type CreateProjectDTO = z.infer<typeof CreateProjectSchema>;
 export type UpdateProjectDTO = z.infer<typeof UpdateProjectSchema>;
 export type QueryProjectDTO = z.infer<typeof ProjectQuerySchema>;
 export type UpdateSubdomainDTO = z.infer<typeof ProjectSubdomainSchema>;
 export type checkSubdomainDTO = z.infer<typeof SubdomainQuerySchema>;
+export type ProjectDeploymentUpdateDTO = z.infer<typeof ProjectDeploymentUpdateSchema>
