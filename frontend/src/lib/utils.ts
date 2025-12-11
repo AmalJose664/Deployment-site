@@ -166,3 +166,8 @@ export function parseGitHubRepo(input: string): string[] {
 export function shortHash(hash: string) {
 	return hash.slice(0, 7);
 }
+
+export function getPercentage(value: number, limit: number) {
+	if (limit === 0) return `0%`;
+	return `${((value / limit) * 100).toFixed(2)}%`;
+}

@@ -50,7 +50,9 @@
 button {
 	cursor: pointer;
 }
-
+html {
+	scroll-behavior: smooth;
+}
 span,
 button,
 p,

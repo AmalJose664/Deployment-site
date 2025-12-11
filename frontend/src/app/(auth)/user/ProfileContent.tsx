@@ -3,7 +3,7 @@ import { FiUser, FiMail, FiCalendar, FiClock } from 'react-icons/fi';
 import { useGetUserDetailedQuery, } from "@/store/services/authApi"
 
 import { IoIosCube, IoMdArrowRoundForward, IoMdCloudDone } from 'react-icons/io';
-import { formatBytes, formatDate, getElapsedTimeClean } from '@/lib/utils';
+import { formatBytes, formatDate, getElapsedTimeClean, getPercentage } from '@/lib/utils';
 import { MdOutlineStorage } from 'react-icons/md';
 import { PLANS } from '@/config/plan';
 import { GrPlan } from 'react-icons/gr';
@@ -208,15 +208,9 @@ const ProfileContent = () => {
 							</div>
 						</div>
 					</RightFadeComponent >
-
 				</div>
 			</div>
 		</div >
 	)
 }
 export default ProfileContent
-
-function getPercentage(value: number, limit: number) {
-	if (limit === 0) return `0%`;
-	return `${((value / limit) * 100).toFixed(2)}%`;
-}

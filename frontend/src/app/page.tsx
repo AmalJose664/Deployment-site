@@ -18,6 +18,13 @@ import {
 	GitBranch,
 	Layers
 } from 'lucide-react';
+import {
+	Activity,
+	ArrowUpRight,
+	Database,
+	Server,
+	TerminalSquare
+} from 'lucide-react';
 import Link from 'next/link';
 
 
@@ -26,9 +33,11 @@ export default function Home() {
 		<div className="min-h-screen bg-background text-primary selection:bg-purple-500/30">
 			<Navbar className="" showOtherLinks />
 			<Hero />
+			<Hero2 />
 			<Frameworks />
 			<Features />
 			<CodeSection />
+			<BottomBoxes />
 			<CTA />
 			<Footer />
 		</div>
@@ -43,30 +52,30 @@ const Hero = () => {
 			<div className="absolute top-20 right-0 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl -z-10" />
 
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-				<h1 className="text-5xl sm:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 tracking-tight mb-8 max-w-4xl mx-auto leading-tight">
+				<h1 className="text-5xl sm:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b dark:from-white from-zinc-950 to-gray-400 tracking-tight mb-8 max-w-4xl mx-auto leading-tight">
 					Develop. Preview. <br />
 					<span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
 						Ship at warp speed.
 					</span>
 				</h1>
 
-				<p className="text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+				<p className="text-xl text-less max-w-2xl mx-auto mb-10 leading-relaxed">
 					The frontend cloud for React, Vue, and Svelte.
 					Instant deployments, automatic scaling,  built for the modern web.
 				</p>
 
 				<div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-					<button className="w-full sm:w-auto px-8 py-3.5 bg-white text-black rounded-full font-bold text-lg hover:bg-gray-100 transition-transform active:scale-95 flex items-center justify-center gap-2">
+					<Link href={"/signup"} className="w-full sm:w-auto px-8 py-3.5 dark:bg-white bg-black dark:text-black text-white  border rounded-full font-bold text-lg hover:bg-white/10 transition-all flex items-center justify-center gap-2">
+						Get Started
+					</Link>
+					<Link href={"/new"} className="w-full sm:w-auto px-8 py-3.5 dark:bg-white bg-black dark:text-black text-white border rounded-full font-bold text-lg transition-all flex items-center justify-center gap-2">
 						<Github size={20} />
 						Import from GitHub
-					</button>
-					<button className="w-full sm:w-auto px-8 py-3.5 bg-white/5 border border-white/10 text-white rounded-full font-bold text-lg hover:bg-white/10 transition-all flex items-center justify-center gap-2">
-						Read Documentation
-					</button>
+					</Link>
 				</div>
 
 				<div className="relative max-w-4xl mx-auto rounded-xl border border-white/10 bg-black/50 backdrop-blur-md shadow-2xl shadow-purple-900/20 overflow-hidden">
-					<div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-white/5">
+					<div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 dark:bg-background bg-white">
 						<div className="w-3 h-3 rounded-full bg-red-500" />
 						<div className="w-3 h-3 rounded-full bg-yellow-500" />
 						<div className="w-3 h-3 rounded-full bg-green-500" />
@@ -74,21 +83,21 @@ const Hero = () => {
 							<Command size={12} /> {SITE_NAME} new — deploy
 						</div>
 					</div>
-					<div className="p-6 text-left font-mono text-sm sm:text-base">
+					<div className="p-6 text-left font-mono text-sm sm:text-base dark:bg-background bg-white border-t border-primary">
 						<div className="space-y-2">
 							<div className="flex gap-2">
 								<span className="text-green-400">➜</span>
 								<span className="text-blue-400">~</span>
-								<span className="text-gray-300"> {SITE_NAME} new  deploy</span>
+								<span className="text-less"> {SITE_NAME} new  deploy</span>
 							</div>
 							<div className="text-gray-500">Initialized empty Git repository in .git/</div>
-							<div className="text-gray-300">
+							<div className="text-less">
 								<span className="text-purple-400">✔</span> Building project...
 							</div>
-							<div className="text-gray-300">
+							<div className="text-less">
 								<span className="text-purple-400">✔</span> Optimizing assets...
 							</div>
-							<div className="text-gray-300">
+							<div className="text-less">
 								<span className="text-purple-400">✔</span> Uploading to Servers...
 							</div>
 							<div className="mt-4 p-3 bg-white/5 border border-white/10 rounded border-l-4 border-l-green-500">
@@ -105,22 +114,67 @@ const Hero = () => {
 	);
 };
 
+const Hero2 = () => {
+	return (
+		<main className="max-w-[1400px] mx-auto pt-24 pb-32 px-6 lg:px-12 relative">
+			<div className="grid lg:grid-cols-12 gap-16 items-center">
+
+				<div className="lg:col-span-7 relative z-10">
+					<h1 className="text-2xl lg:text-5xl font-bold mb-8 leading-tight text-primary">
+						A platform built for <span className="text-sky-500">Frontend Performance.</span>
+					</h1>
+					<p className="text-xl text-less max-w-2xl mb-12 leading-relaxed">
+						Fast hosting, smooth builds, and everything your app needs to run worldwide.
+					</p>
+				</div>
+
+				<div className="lg:col-span-5 relative h-[500px] hidden lg:block">
+					<div className="w-full h-full bg-slate-90/50 border border-secondary relative overflow-hidden p-8 backdrop-blur-sm">
+						<div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:2rem_2rem]"></div>
+
+						<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-slate-950 border-2 border-slate-700 flex items-center justify-center  z-20 shadow-2xl">
+							<div className="absolute inset-2 bg-blue-500/5 border border-blue-500/20 animate-pulse"></div>
+							<Cpu className="w-24 h-24 text-slate-600" strokeWidth={1} />
+							<div className="absolute top-0 left-1/2 w-[2px] h-full bg-gradient-to-b from-transparent via-blue-500/50 to-transparent -z-10"></div>
+							<div className="absolute top-1/2 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent -z-10"></div>
+						</div>
+						<div className="absolute top-16 left-16 w-16 h-16 bg-slate-950 border border-slate-700 flex flex-col items-center justify-center z-10">
+							<Globe className="w-6 h-6 text-slate-500 mb-1" />
+							<span className="text-[10px] font-mono uppercase text-slate-500">Edge</span>
+						</div>
+						<svg className="absolute inset-0 w-full h-full z-0 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+							<line x1="96" y1="96" x2="50%" y2="50%" stroke="#334155" strokeWidth="2" strokeDasharray="4 4" />
+							<line x1="calc(100% - 96px)" y1="calc(100% - 96px)" x2="50%" y2="50%" stroke="#334155" strokeWidth="2" strokeDasharray="4 4" />
+						</svg>
+
+						<div className="absolute bottom-16 right-16 w-16 h-16 bg-slate-950 border border-slate-700 flex flex-col items-center justify-center z-10">
+							<Database className="w-6 h-6 text-slate-500 mb-1" />
+							<span className="text-[10px] font-mono uppercase text-slate-500">Store</span>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</main>
+	)
+}
+
 const FeatureCard = ({ icon: Icon, title, description, className = "" }: any) => (
 	<div className={`p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-purple-500/50 transition-colors group ${className}`}>
 		<div className="w-12 h-12 bg-white/5 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
 			<Icon className="text-purple-400" size={24} />
 		</div>
-		<h3 className="text-xl font-bold text-white mb-2">{title}</h3>
-		<p className="text-gray-400 leading-relaxed">{description}</p>
+		<h3 className="text-xl font-bold text-primary mb-2">{title}</h3>
+		<p className="text-less leading-relaxed">{description}</p>
 	</div>
 );
 
 const Features = () => {
 	return (
-		<section className="py-24 bg-black relative">
+		<section className="py-24 bg-background relative">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="text-center mb-16">
-					<h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+					<h2 className="text-3xl sm:text-4xl font-bold text-primary mb-4">
 						Everything you need to <br />
 						<span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">
 							scale your frontend
@@ -150,7 +204,7 @@ const Features = () => {
 						icon={Shield}
 						title="DDoS Protection"
 						description="Enterprise-grade security baked in. SSL is automatic and free forever."
-						className="md:col-span-2"
+						className="md:col-span-2 from-white/5 to-blue-900/10"
 					/>
 					<FeatureCard
 						icon={Zap}
@@ -174,14 +228,14 @@ const Frameworks = () => {
 	];
 
 	return (
-		<section className="py-20 border-t border-white/10 bg-black/50 ">
+		<section className="py-20 border-t border-b dark:bg-background bg-white ">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-				<p className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-8">
+				<p className="text-sm font-semibold text-less uppercase tracking-wider mb-8">
 					Works with your favorite tools
 				</p>
 				<div className="flex flex-wrap justify-center gap-8 md:gap-16 items-center opacity-70">
 					{frameworks.map((fw) => (
-						<div key={fw.name} className={`text-2xl font-bold text-gray-600 transition-colors cursor-default ${fw.color}`}>
+						<div key={fw.name} className={`text-2xl font-bold rounded-md text-less border hover:border-white border-transparent px-4 py-2 transition-colors cursor-default ${fw.color}`}>
 							{fw.name}
 						</div>
 					))}
@@ -201,11 +255,11 @@ const CodeSection = () => {
 							<Code2 size={16} />
 							<span>Developer Experience</span>
 						</div>
-						<h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+						<h2 className="text-3xl sm:text-4xl font-bold text-primary mb-6">
 							Preview every commit. <br />
 							Collaborate instantly.
 						</h2>
-						<p className="text-gray-400 text-lg mb-8 leading-relaxed">
+						<p className="text-some-less text-lg mb-8 leading-relaxed">
 							Stop sharing screenshots. {SITE_NAME} generates a unique preview URL for every pull request,
 							so your team can review the real app before it merges.
 						</p>
@@ -216,7 +270,7 @@ const CodeSection = () => {
 								"Instant cache invalidation",
 								"Serverless Functions built-in"
 							].map((item, i) => (
-								<li key={i} className="flex items-center gap-3 text-gray-300">
+								<li key={i} className="flex items-center gap-3 text-less">
 									<CheckCircle2 className="text-green-500" size={20} />
 									{item}
 								</li>
@@ -225,7 +279,6 @@ const CodeSection = () => {
 					</div>
 
 					<div className="relative">
-						{/* Decorative blob */}
 						<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl -z-10" />
 
 						<div className="rounded-xl border border-white/10 bg-[#0d1117] overflow-hidden shadow-2xl">
@@ -274,7 +327,7 @@ const CodeSection = () => {
 													<span className="text-sm text-blue-400 font-mono truncate">
 														orbit-website-git-hero-update-orbit.app
 													</span>
-													<ArrowRight size={14} className="ml-auto text-gray-500 group-hover:text-blue-400" />
+													<ArrowRight size={14} className="ml-auto text-less group-hover:text-blue-400" />
 												</div>
 											</div>
 										</div>
@@ -289,20 +342,92 @@ const CodeSection = () => {
 	);
 };
 
+
+const BottomBoxes = () => {
+	return (
+		<section className="border-t h-screen flex items-center border-slate-800 dark:bg-slate-900/30 bg-slate-100 relative">
+			<div className="max-w-[1400px] mx-auto">
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-slate-800 border rounded-md border-slate-800">
+
+
+					<div className="p-8 lg:p-12 bg-slate-950/50 hover:bg-slate-900 transition-colors group">
+						<div className="mb-6">
+							<TerminalSquare className="w-8 h-8 dark:text-slate-500 text-slate-900 group-hover:text-blue-500 transition-colors" strokeWidth={1.5} />
+
+						</div>
+						<h3 className="text-xl font-bold mb-4 text-slate-200">Atomic Builds</h3>
+						<p className="text-slate-400 leading-relaxed mb-8">
+							Immutable deployment artifacts generated from enhanced container environments. Zero-downtime cutovers guaranteed.
+						</p>
+						<div className="h-1 w-full bg-slate-800 relative overflow-hidden">
+							<div className="absolute inset-y-0 left-0 w-1/3 bg-blue-600/50"></div>
+						</div>
+					</div>
+
+					<div className="p-8 lg:p-12 bg-slate-950/50 hover:bg-slate-900 transition-colors group">
+						<div className="mb-6">
+							<Layers className="w-8 h-8 dark:text-slate-500 text-slate-900 group-hover:text-blue-500 transition-colors" strokeWidth={1.5} />
+						</div>
+						<h3 className="text-xl font-bold mb-4 text-slate-200">Seamless Deployment Switching</h3>
+						<p className="text-slate-400 leading-relaxed mb-8">
+							Switch versions effortlessly whenever you need, Instantly switch between deployments with a single click.
+						</p>
+						<div className="h-1 w-full bg-slate-800 relative overflow-hidden">
+							<div className="absolute inset-y-0 left-0 w-2/3 bg-blue-600/50"></div>
+						</div>
+					</div>
+
+					<div className="p-8 lg:p-12 bg-slate-950/50 hover:bg-slate-900 transition-colors group">
+						<div className="mb-6">
+							<Shield className="w-8 h-8 dark:text-slate-500 text-slate-900 group-hover:text-blue-500 transition-colors" strokeWidth={1.5} />
+						</div>
+						<h3 className="text-xl font-bold mb-4 text-slate-200">Deployment-focused</h3>
+						<p className="text-slate-400 leading-relaxed mb-8">
+							Atomic builds across all environments. Ensures consistent outputs and predictable deployment behavior.
+						</p>
+						<div className="h-1 w-full bg-slate-800 relative overflow-hidden">
+							<div className="absolute inset-y-0 left-0 w-full bg-blue-600/50"></div>
+						</div>
+					</div>
+
+					<div className="p-8 lg:p-12 bg-slate-950 relative overflow-hidden">
+						<div className="absolute inset-0 opacity-10 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:16px_16px]"></div>
+						<h3 className="font-mono uppercase text-sm text-blue-500 mb-6 tracking-wider">Live Metrics</h3>
+						<div className="space-y-6 font-mono">
+							<div>
+								<div className="flex justify-between text-sm text-slate-500 mb-1"><span>Uptime</span><span>99.999%</span></div>
+								<div className="h-2 bg-slate-800"><div className="h-full w-[99.99%] bg-blue-500"></div></div>
+							</div>
+							<div>
+								<div className="flex justify-between text-sm text-slate-500 mb-1"><span>Avg Latency</span><span>42ms</span></div>
+								<div className="h-2 bg-slate-800"><div className="h-full w-[30%] bg-slate-400"></div></div>
+							</div>
+							<div>
+								<div className="flex justify-between text-sm text-slate-500 mb-1"><span>Requests/sec</span><span>2.1M</span></div>
+								<div className="h-2 bg-slate-800"><div className="h-full w-[80%] bg-slate-400"></div></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	)
+}
+
 const CTA = () => {
 	return (
 		<section className="py-24 relative overflow-hidden">
 			<div className="absolute inset-0 bg-gradient-to-b from-transparent to-purple-900/20 pointer-events-none" />
 			<div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-				<h2 className="text-4xl sm:text-5xl font-bold text-white mb-8 tracking-tight">
+				<h2 className="text-4xl sm:text-5xl font-bold text-primary mb-8 tracking-tight">
 					Ready to launch?
 				</h2>
-				<p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
+				<p className="text-xl text-less mb-10 max-w-2xl mx-auto">
 					Join 100,000+ developers building the future of the web with {SITE_NAME}.
 					Start for free, scale when you need to.
 				</p>
 				<div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-					<Link href="/new" className="w-full sm:w-auto px-8 py-4 bg-white text-black rounded-full font-bold text-lg hover:bg-gray-200 transition-colors">
+					<Link href="/new" className="w-full border sm:w-auto px-8 py-4 bg-background text-primary rounded-full font-bold text-lg hover:bg-secondary transition-colors">
 						Start Deploying Free
 					</Link>
 
@@ -314,51 +439,51 @@ const CTA = () => {
 
 const Footer = () => {
 	return (
-		<footer className="border-t border-white/10 bg-black pt-16 pb-8">
+		<footer className="border bg-background pt-16 pb-8">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
 					<div>
-						<h3 className="text-white font-bold mb-4">Product</h3>
+						<h3 className="text-primary font-bold mb-4">Product</h3>
 						<ul className="space-y-2">
-							<li><a href="#" className="text-gray-500 hover:text-white text-sm">Infrastructure</a></li>
-							<li><a href="#" className="text-gray-500 hover:text-white text-sm">Previews</a></li>
-							<li><a href="#" className="text-gray-500 hover:text-white text-sm">Edge Functions</a></li>
-							<li><a href="#" className="text-gray-500 hover:text-white text-sm">Analytics</a></li>
+							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Infrastructure</a></li>
+							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Previews</a></li>
+							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Edge Functions</a></li>
+							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Analytics</a></li>
 						</ul>
 					</div>
 					<div>
-						<h3 className="text-white font-bold mb-4">Resources</h3>
+						<h3 className="text-primary font-bold mb-4">Resources</h3>
 						<ul className="space-y-2">
-							<li><a href="#" className="text-gray-500 hover:text-white text-sm">Documentation</a></li>
-							<li><a href="#" className="text-gray-500 hover:text-white text-sm">Guides</a></li>
-							<li><a href="#" className="text-gray-500 hover:text-white text-sm">Help Center</a></li>
-							<li><a href="#" className="text-gray-500 hover:text-white text-sm">Changelog</a></li>
+							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Documentation</a></li>
+							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Guides</a></li>
+							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Help Center</a></li>
+							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Changelog</a></li>
 						</ul>
 					</div>
 					<div>
-						<h3 className="text-white font-bold mb-4">Company</h3>
+						<h3 className="text-primary font-bold mb-4">Company</h3>
 						<ul className="space-y-2">
-							<li><a href="#" className="text-gray-500 hover:text-white text-sm">About</a></li>
-							<li><a href="#" className="text-gray-500 hover:text-white text-sm">Blog</a></li>
-							<li><a href="#" className="text-gray-500 hover:text-white text-sm">Careers</a></li>
-							<li><a href="#" className="text-gray-500 hover:text-white text-sm">Contact</a></li>
+							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">About</a></li>
+							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Blog</a></li>
+							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Careers</a></li>
+							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Contact</a></li>
 						</ul>
 					</div>
 					<div>
-						<h3 className="text-white font-bold mb-4">Legal</h3>
+						<h3 className="text-primary font-bold mb-4">Legal</h3>
 						<ul className="space-y-2">
-							<li><a href="#" className="text-gray-500 hover:text-white text-sm">Privacy Policy</a></li>
-							<li><a href="#" className="text-gray-500 hover:text-white text-sm">Terms of Service</a></li>
+							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Privacy Policy</a></li>
+							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Terms of Service</a></li>
 						</ul>
 					</div>
 				</div>
 				<div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
 					<div className="flex items-center gap-2">
 						<TitleWithLogo useSvg />
-						<span className="text-gray-400 text-sm">© 2025 Lynfera Inc. All rights reserved.</span>
+						<span className="text-less text-sm">© 2025 Lynfera Inc. All rights reserved.</span>
 					</div>
 					<div className="flex gap-6">
-						<Github className="text-gray-500 hover:text-white cursor-pointer" size={20} />
+						<Github className="text-gray-500 hover:text-some-less cursor-pointer" size={20} />
 						<ThemeSwitcher className="rounded-full" />
 					</div>
 				</div>

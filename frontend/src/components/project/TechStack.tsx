@@ -1,11 +1,13 @@
+import { cn } from "@/lib/utils"
+import { ProjectStatus } from "@/types/Project"
 import { Box } from "lucide-react"
 import Link from "next/link"
 import { JSX } from "react"
 import { FaAngular, FaReact, FaVuejs } from "react-icons/fa"
 import { SiSolid, SiSvelte, SiVite } from "react-icons/si"
 
-const TechStack = ({ stack, link }: { stack: string, link: string }) => {
-
+const TechStack = ({ stack, link, status }: { stack: string, link: string, status: string }) => {
+	const projectNA = status === ProjectStatus.FAILED || status === ProjectStatus.CANCELED
 	const stacks: Record<string, JSX.Element> = {
 		react: (
 			<>
@@ -70,7 +72,8 @@ const TechStack = ({ stack, link }: { stack: string, link: string }) => {
 			</div>
 		</>),
 	}
-	return <div className="aspect-video bg-gradient-to-br from-gray-800 to-gray-900 rounded-md border border-gray-700 flex flex-col items-center justify-center group cursor-pointer relative overflow-hidden">
+	return <div className={cn(projectNA ? "border-red-500 border-2" : "border",
+		"aspect-video bg-gradient-to-br from-gray-800 to-gray-900 rounded-md flex flex-col items-center justify-center group cursor-pointer relative overflow-hidden")}>
 		{stacks[stack] || (
 			<>
 				<Box className="text-gray-700 mb-2" size={40} />

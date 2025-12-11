@@ -8,13 +8,18 @@ import { Project } from "@/types/Project"
 import { Deployment } from "@/types/Deployment"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import AllDeployments from "./TabAllDeployments"
-import { useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import ProjectSettings from "./TabProjectSettings"
 import ProjectAnalytics from "./TabProjectAnalytics"
 import TabProject from "./TabProject"
 import TabFiles from "./TabFiles"
 import { IoIosCube } from "react-icons/io"
 import BackButton from "@/components/BackButton"
+import OptionsComponent from "@/components/OptionsComponent"
+import { IoCloudUpload, IoTrashOutline } from "react-icons/io5"
+import { GrStatusDisabled } from "react-icons/gr"
+import NewDeploymentConfirmBox from "@/components/project/NewDeploymentConfirmBox"
+
 
 interface ProjectContentProps {
 	project: Project
@@ -44,26 +49,80 @@ export function ProjectContent({
 	refetchLogs
 }: ProjectContentProps) {
 	const [tab, setTabs] = useState(tabFromUrl || "overview")
+	const [showConfirm, setShowConfirm] = useState(false)
+	const scrollRef = useRef<HTMLDivElement>(null)
+	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+	const scrollFn = useCallback(() => {
+		if (timerRef.current) {
+			clearTimeout(timerRef.current)
+		}
+		setTabs("settings")
+		timerRef.current = setTimeout(() => {
+			scrollRef.current?.scrollIntoView({ behavior: "smooth" })
+		}, 600)
+	}, [])
+	useEffect(() => {
+		return () => {
+			if (timerRef.current) {
+				clearTimeout(timerRef.current)
+			}
+		}
+	}, [])
 	console.log("------------project-------------", (project?.deployments?.length === 0 && !project.currentDeployment))
 	return (
 		<div className="min-h-screen">
-			<Tabs defaultValue="project" value={tab} onValueChange={setTabs} className="w-full ">
-
+			<NewDeploymentConfirmBox
+				project={project}
+				showConfirm={showConfirm}
+				setShowConfirm={setShowConfirm}
+				handleClick={() => {
+					setTabs("overview")
+					reDeploy()
+				}}
+				setTabs={setTabs}
+			/>
+			<Tabs defaultValue="overview" value={tab} onValueChange={setTabs} className="w-full">
 				<header className="border-b dark:border-neutral-800 border-neutral-200 ">
 					<div className="max-w-[1420px] mx-auto px-6 py-4">
 						<div className="flex items-center justify-between">
 							<div className="flex items-center gap-6">
 								<BackButton />
 								<div>
-									<h1 className="text-xl flex gap-2 items-center font-semibold">{project.name} <IoIosCube /></h1>
+									<h1 className="text-xl flex gap-2 items-center font-semibold">
+										{project.name} <IoIosCube />
+									</h1>
 								</div>
 								<div>
 									<ProjectTabs setTab={setTabs} tab={tab} />
 								</div>
 							</div>
-							<button className="p-2 hover:bg-zinc-800 rounded-lg transition-colors">
-								<FiMoreHorizontal size={20} />
-							</button>
+							<OptionsComponent parentClassName="" options={[
+								{
+									title: "Create New Deployment",
+									actionFn: () => {
+										setShowConfirm(true)
+									},
+									className: "mx-3",
+									Svg: IoCloudUpload
+								},
+								{
+									title: "Manage Subdomain",
+									actionFn: scrollFn,
+									className: "mx-3",
+								},
+								{
+									title: "Disable project",
+									actionFn: scrollFn,
+									className: "text-red-400 hover:text-red-500 mx-3",
+									Svg: GrStatusDisabled
+								},
+								{
+									title: "Delete Project",
+									actionFn: scrollFn,
+									className: "text-red-400 hover:text-red-500 mx-3",
+									Svg: IoTrashOutline
+								},
+							]} />
 						</div>
 					</div>
 				</header>
@@ -95,9 +154,8 @@ export function ProjectContent({
 					<TabsContent value="files">
 						<TabFiles projectId={project._id} deploymentId={deployment?._id} />
 					</TabsContent>
-
-
 				</main>
+				<div ref={scrollRef}></div>
 			</Tabs>
 
 		</div >

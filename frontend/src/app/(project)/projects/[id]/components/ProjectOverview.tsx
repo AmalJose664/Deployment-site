@@ -49,7 +49,7 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, setTabs 
 								</div>
 							</div>
 							<div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-								<TechStack link={projectLink} stack={project.techStack.toLowerCase()} />
+								<TechStack link={projectLink} stack={project.techStack.toLowerCase()} status={project.status} />
 								<div className="space-y-4">
 									<div>
 										<span className="text-xs uppercase tracking-wider text-gray-500 font-semibold">Status</span>
@@ -66,7 +66,7 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, setTabs 
 											<span className="text-xs uppercase tracking-wider text-gray-500 font-semibold">Reason</span>
 											<div className="flex items-center gap-2">
 												<StatusIcon status={project.status} />
-												<p className="text-sm font-bold rounded-xs px-1 text-red-400 w-fit bg-red-800/30">{deployment?.errorMessage || " hey message"}</p>
+												<p className="text-sm font-bold rounded-xs px-1 text-red-400 w-fit bg-red-800/30">{deployment?.errorMessage || "Unknown error"}</p>
 											</div>
 										</div>
 									)}

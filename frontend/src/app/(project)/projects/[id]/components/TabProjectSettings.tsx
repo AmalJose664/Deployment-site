@@ -7,7 +7,7 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { Input } from "@/components/ui/input"
 import { Project, ProjectFormInput } from "@/types/Project"
 import { User } from "@/types/User"
-import { JSX, memo, useMemo, useState } from "react"
+import { JSX, memo, useEffect, useMemo, useState } from "react"
 
 import DisableProject from "@/components/project/DisableProject";
 import { DeleteProjectDialog } from "@/components/project/DeleteProject";
@@ -448,7 +448,9 @@ const SaveBar = memo(({ control, handleSubmit, saveAndDeploy }: { control: any, 
 const ProjectSettings = ({ project, reDeploy, setTabs }: { project: Project, reDeploy: () => Promise<void>, setTabs: (state: string) => void }) => {
 
 	const [branches, setBranches] = useState<string[] | null>(null)
-	useMemo(() => getBranches(project.repoURL, setBranches), [project.repoURL])
+	useEffect(() => {
+		getBranches(project.repoURL, setBranches)
+	}, [project.repoURL])
 	const form = useForm<Omit<ProjectFormInput, "repoURL">>({
 		defaultValues: {
 			name: project.name,
@@ -525,7 +527,7 @@ const ProjectSettings = ({ project, reDeploy, setTabs }: { project: Project, reD
 
 
 					<div
-						id="danger"
+						id="subdomain"
 						className="dark:bg-neutral-900 bg-white rounded-md py-3 px-5 border mb-3"
 					>
 						<h2 className="text-xl mb-3 font-semibold text-primary">Domain</h2>
@@ -547,7 +549,7 @@ const ProjectSettings = ({ project, reDeploy, setTabs }: { project: Project, reD
 					>
 						<h2 className="text-xl mb-3 font-semibold text-red-500">Danger</h2>
 						<div className="border rounded-md p-4 space-y-4">
-							<div className="flex items-center justify-between">
+							<div className="flex items-center justify-between" id="disable">
 								<div>
 									<p className="text-sm font-medium text-gray-900 dark:text-gray-100">
 										Disable Project
@@ -558,7 +560,7 @@ const ProjectSettings = ({ project, reDeploy, setTabs }: { project: Project, reD
 								</div>
 								<DisableProject projectId={project._id} isDisabled={project.isDisabled} />
 							</div>
-							<div className="flex items-center justify-between">
+							<div className="flex items-center justify-between" id="delete">
 								<div>
 									<p className="text-sm font-medium text-gray-900 dark:text-gray-100">
 										Delete Project

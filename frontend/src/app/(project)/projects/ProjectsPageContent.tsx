@@ -4,7 +4,6 @@ import { CiClock1, CiSearch } from "react-icons/ci";
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { IoMdGlobe, IoMdGitBranch } from "react-icons/io";
 import { FaPlus } from "react-icons/fa";
-import { FiMoreHorizontal } from "react-icons/fi";
 import { AnimatePresence, motion } from "motion/react"
 import { useRef, useState } from 'react';
 import { useGetProjectsQuery } from '@/store/services/projectsApi';
@@ -15,6 +14,9 @@ import { useRouter } from "next/navigation"
 import { cn, getStatusBg } from '@/lib/utils';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import OptionsComponent from "@/components/OptionsComponent";
+import { IoSettingsOutline, IoTrashOutline } from "react-icons/io5";
+import { FiGithub } from "react-icons/fi";
 
 
 export default function ProjectContent() {
@@ -164,9 +166,29 @@ export default function ProjectContent() {
 											Disabled
 										</div>
 										}
-										<button className="p-2 dark:hover:bg-zinc-800 hover:bg-zinc-300 rounded-md transition-colors opacity-0 group-hover:opacity-100">
-											<FiMoreHorizontal size={18} className="" />
-										</button>
+										<div onClick={(e) => e.stopPropagation()}>
+											<OptionsComponent parentClassName="" options={[
+												{
+													title: "Settings",
+													actionFn: () => router.push(`/projects/${project._id}?tab=settings`),
+													className: "my-2 mx-3",
+													Svg: IoSettingsOutline
+												},
+												{
+													title: "View Repository",
+													actionFn: () => window.open(project.repoURL),
+													className: "my-2 mx-3",
+													Svg: FiGithub
+												},
+												{
+													title: "Delete Project",
+													actionFn: () => router.push(`/projects/${project._id}?tab=settings#danger`),
+													className: "text-red-400 my-2 mx-3",
+													Svg: IoTrashOutline
+												},
+
+											]} />
+										</div>
 									</div>
 
 									<div className="flex items-center gap-4 text-sm text-less mb-4">

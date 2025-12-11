@@ -26,7 +26,6 @@ const NavbarUser = () => {
 				<DropdownMenuTrigger asChild>
 					<Button variant="ghost" className="rounded-full size-10 p-0">
 						{user?.profileImage ? (
-
 							<img
 								src={user.profileImage}
 								alt="User Avatar"
@@ -35,12 +34,12 @@ const NavbarUser = () => {
 								className="rounded-full"
 							/>
 						) : (
-							<div className="user_avtr_alt rounded-full border" />
+							<div className="size-6 bg-gradient-to-tr from-blue-500 via-background to-yellow-500 rounded-full border" />
 						)}
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className="w-56 mr-6" align="start">
-					<DropdownMenuLabel>My Account</DropdownMenuLabel>
+					<DropdownMenuLabel>Account</DropdownMenuLabel>
 					<DropdownMenuGroup>
 						<DropdownMenuItem className="cursor-pointer" onClick={() => router.push(user ? "/user" : "/login")}>
 							{user ? "Profile" : "Login"}

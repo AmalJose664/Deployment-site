@@ -2,7 +2,7 @@
 import StatusIcon from "@/components/ui/StatusIcon"
 import { getStatusBg, getStatusColor, timeToSeconds } from "@/lib/utils"
 import Link from "next/link"
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 import { IoIosArrowDown, IoIosCube, IoMdCloudDone, IoMdGitBranch } from "react-icons/io"
 import { LiaExternalLinkAltSolid } from "react-icons/lia"
 import { MdAccessTime } from "react-icons/md"

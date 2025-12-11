@@ -22,7 +22,6 @@ interface ProjectPageContainerProps {
 }
 
 export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerProps) {
-	const router = useRouter()
 	const dispatch = useAppDispatch();
 
 	const {
@@ -41,7 +40,6 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 			toast.success("New Deployment Started")
 			await createDeployment(projectId).unwrap()
 			setSseActive(true)
-			setShowBuild(true)
 			await refetch()
 		} catch (error) {
 			setSseActive(false)
@@ -89,6 +87,15 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 
 	const reDeploy = async () => {
 		if (!project || (!deployment && !lastDeployment)) return
+		if (project.status === ProjectStatus.BUILDING
+			|| project.status === ProjectStatus.QUEUED
+			|| deployment?.status === ProjectStatus.BUILDING
+			|| deployment?.status === ProjectStatus.QUEUED
+		) {
+			toast.error(`Cannot deploy when the project is in ${ProjectStatus.QUEUED}/${ProjectStatus.BUILDING} state`)
+			return
+		}
+		setShowBuild(true)
 		dispatch(
 			projectApis.util.updateQueryData(
 				"getProjectById",
