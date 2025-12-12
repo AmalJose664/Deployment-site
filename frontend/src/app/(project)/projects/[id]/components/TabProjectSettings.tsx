@@ -9,8 +9,8 @@ import { Project, ProjectFormInput } from "@/types/Project"
 import { User } from "@/types/User"
 import { JSX, memo, useEffect, useMemo, useState } from "react"
 
-import DisableProject from "@/components/project/DisableProject";
-import { DeleteProjectDialog } from "@/components/project/DeleteProject";
+import DisableProject from "@/components/modals/DisableProject";
+import { DeleteProjectDialog } from "@/components/modals/DeleteProject";
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button";
 import { AnimatePresence, motion } from "motion/react"
@@ -20,7 +20,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getBranches } from "@/lib/form";
 import { useUpdateProjectMutation } from "@/store/services/projectsApi";
-import { ChangeProjectSubdomainDialog } from "@/components/project/ChangeSubdomain";
+import { ChangeProjectSubdomainDialog } from "@/components/modals/ChangeSubdomain";
 import RightFadeComponent from "@/components/RightFadeComponent";
 
 

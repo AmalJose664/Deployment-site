@@ -30,6 +30,8 @@ import { MdKeyboardArrowRight, MdTimer } from "react-icons/md";
 import { IoIosCube, IoMdGlobe } from "react-icons/io";
 import { LuExternalLink } from "react-icons/lu";
 import RightFadeComponent from "@/components/RightFadeComponent";
+import { projectApis, useGetProjectByIdQuery } from "@/store/services/projectsApi";
+import { useSelector } from "react-redux";
 
 const DeploymentPageContainer = ({ deploymentId }: { deploymentId: string }) => {
 
@@ -42,9 +44,9 @@ const DeploymentPageContainer = ({ deploymentId }: { deploymentId: string }) => 
 		id: deploymentId,
 		params: { include: "project" },
 	});
-
+	const project = deployment?.project as Project;
 	const [showLogs, setShowLogs] = useState(false);
-	const { data: logs, refetch } = useGetDeploymentLogsQuery(
+	const { data: logs, refetch, } = useGetDeploymentLogsQuery(
 		{ deploymentId: deployment?._id ?? "" },
 		{ skip: !showLogs || !deployment?._id }
 	);
@@ -54,7 +56,9 @@ const DeploymentPageContainer = ({ deploymentId }: { deploymentId: string }) => 
 			<ErrorComponent error={error} id={deploymentId} field="Deployment" />
 		);
 	}
-
+	const { data: cachedProject } = useSelector(projectApis.endpoints.getProjectById.select(
+		{ id: project?._id || "", params: { include: "user" } }
+	))
 	if (!deployment && !isLoading) {
 		return (
 			<ErrorComponent
@@ -65,7 +69,6 @@ const DeploymentPageContainer = ({ deploymentId }: { deploymentId: string }) => 
 		);
 	}
 
-	const project = deployment?.project as Project;
 	const isFailed =
 		deployment?.status === ProjectStatus.CANCELED ||
 		deployment?.status === ProjectStatus.FAILED;
@@ -120,6 +123,12 @@ const DeploymentPageContainer = ({ deploymentId }: { deploymentId: string }) => 
 									<span className="text-lg font-normal text-neutral-500">
 										Deployment
 									</span>
+									{(cachedProject
+										&& cachedProject.currentDeployment === deployment._id)
+										&& <span className="py-1 px-2 border border-blue-500 rounded-full text-xs text-blue-400">
+											current
+										</span>
+									}
 								</h1>
 							</div>
 
@@ -314,8 +323,6 @@ const DeploymentPageContainer = ({ deploymentId }: { deploymentId: string }) => 
 
 							</div>
 						</div>
-
-
 						<RightFadeComponent className="bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden flex flex-col">
 							<div className="px-6 py-4 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50">
 								<h3 className="font-semibold text-sm text-neutral-900 dark:text-white">
@@ -327,7 +334,7 @@ const DeploymentPageContainer = ({ deploymentId }: { deploymentId: string }) => 
 									projectId={project._id}
 									deploymentId={deployment._id}
 								>
-									<h4 className="font-semibold text-primary">Build Output Files</h4>
+									<h4 id="files" className="font-semibold text-primary">Build Output Files</h4>
 								</FilesComponent>
 							</div>
 						</RightFadeComponent>

@@ -19,6 +19,11 @@ import {
 } from "@/components/ui/popover"
 import PaginationComponent from "@/components/Pagination"
 import { IoRocketOutline } from "react-icons/io5"
+import OptionsComponent from "@/components/OptionsComponent"
+import { BsArrowUpCircle } from "react-icons/bs"
+import { useRouter } from "next/navigation"
+import ChangeDeploymentModal from "@/components/modals/ChangeDeployment"
+import { useChangeProjectDeploymentMutation } from "@/store/services/projectsApi"
 
 interface AllDeploymentProps {
 	projectId: string;
@@ -28,7 +33,7 @@ interface AllDeploymentProps {
 }
 
 const AllDeployments = ({ projectId, currentDeployment, repoURL, setTab }: AllDeploymentProps) => {
-
+	const router = useRouter()
 	const [page, setPage] = useState(1)
 	const limit = 10
 	const { data, isLoading, isError, error } = useGetProjectDeploymentsQuery({ id: projectId, params: { include: "project", page, limit } })
@@ -36,6 +41,7 @@ const AllDeployments = ({ projectId, currentDeployment, repoURL, setTab }: AllDe
 
 
 	const [search, setSearch] = useState("")
+	const [selectedDeploymentId, setSelectedDeploymentId] = useState<string | null>(null)
 	const [statuses, setStatuses] = useState<Record<string, boolean>>(
 		Object.fromEntries(Object.values(ProjectStatus).map((stats) => [stats, true]))
 	)
@@ -59,24 +65,22 @@ const AllDeployments = ({ projectId, currentDeployment, repoURL, setTab }: AllDe
 				d.commit.id?.toLowerCase().includes(searchLower) ||
 				d.commit.msg?.toLowerCase().includes(searchLower) ||
 				(d.project as Project).name.toLowerCase().includes(searchLower)
-
 			return matchesSearch
 		})
 		return { filteredDeployments: filtered, statusCounts: counts }
 	}, [deployments, search, statuses])
 
 	const totalPages = meta?.totalPages
-
-
 	return (
 		<div>
+			{selectedDeploymentId && <ChangeDeploymentModal setSelectedDeploymentId={setSelectedDeploymentId} selectedDeploymentId={selectedDeploymentId} projectId={projectId} />}
 			{isLoading && (
 				<div className="flex items-center justify-center text-primary">
 					Loading...
 				</div>
 			)}
 			<div className="relative flex flex-col sm:flex-row gap-2 items-start sm:items-center justify-between">
-				<div className="relative w-full sm:w-[90%]">
+				<div className="relative w-full sm:w-[90%] cats_intheworld">
 					<CiSearch className="absolute top-2 left-3 size-5" />
 					<Input value={search} onChange={(e) => setSearch(e.target.value)}
 						className="mb-4 pl-12 w-full dark:bg-neutral-900 bg-white"
@@ -127,13 +131,15 @@ const AllDeployments = ({ projectId, currentDeployment, repoURL, setTab }: AllDe
 							href={"/deployments/" + deployment._id}
 							className="hover:no-underline px-3 py-2 flex flex-col sm:flex-row gap-2 sm:gap-4 justify-between items-start sm:items-center dark:hover:bg-zinc-800/50 hover:bg-neutral-300 transition-colors"
 						>
-							<div className="text-xs flex gap-2 items-center flex-wrap">
-								<StatusIcon status={deployment.status} />
-								<span className="text-primary break-all">
-									{deployment._id}
-								</span>
+							<div className="flex-col flex gap-2 items-center flex-wrap">
+								<div className="text-xs flex gap-2 items-center flex-wrap">
+									<StatusIcon status={deployment.status} />
+									<span className="text-primary break-all">
+										{deployment._id}
+									</span>
+								</div>
 								{currentDeployment === deployment._id && (
-									<span className="py-1 px-2 border rounded-full text-blue-400">
+									<span className="py-1 px-2 border border-blue-500 rounded-full text-xs text-blue-400">
 										current
 									</span>
 								)}
@@ -167,10 +173,28 @@ const AllDeployments = ({ projectId, currentDeployment, repoURL, setTab }: AllDe
 									<div>{(deployment.project as Project).branch}</div>
 								</div>
 							</div>
-							<button className="text-xs text-gray-400 hover:text-white transition-colors flex items-center gap-1">
-								View Logs
-								<LiaExternalLinkAltSolid size={12} />
-							</button>
+							<div onClick={(e) => e.stopPropagation()}>
+								<OptionsComponent parentClassName="" options={[
+									{
+										title: "Promote Deployment",
+										actionFn: () => setSelectedDeploymentId(deployment._id),
+										className: "mx-3",
+										isDisabled: deployment.status != ProjectStatus.READY
+											|| deployment._id === currentDeployment,
+										Svg: BsArrowUpCircle
+									},
+									{
+										title: "Inspect",
+										actionFn: () => router.push("/deployments/" + deployment._id),
+										className: "mx-3",
+									},
+									{
+										title: "View Files",
+										actionFn: () => router.push("/deployments/" + deployment._id + "#files"),
+										className: "mx-3",
+									},
+								]} />
+							</div>
 						</Link>
 					</div>
 				)

@@ -1,0 +1,45 @@
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { useChangeProjectDeploymentMutation } from "@/store/services/projectsApi"
+import { toast } from "sonner"
+
+interface NewDeploymentConfirmBoxProps {
+	selectedDeploymentId: string | null,
+	projectId: string,
+	setSelectedDeploymentId: (val: string | null) => void
+	// handleClick: () => void
+}
+
+const ChangeDeploymentModal = ({ selectedDeploymentId, setSelectedDeploymentId, projectId }: NewDeploymentConfirmBoxProps) => {
+	const [update,] = useChangeProjectDeploymentMutation()
+	const handleClick = async () => {
+		if (!selectedDeploymentId) return;
+		toast.promise(
+			update({ newDeployment: selectedDeploymentId, projectId }).unwrap(),
+			{
+				loading: "Updating deployment...",
+				success: "Deployment updated!",
+				error: (err) => "Error updating: " + err?.data?.message || "Unknown error",
+			}
+		);
+	}
+	return (
+		<div>
+			<AlertDialog open={!!selectedDeploymentId}
+				onOpenChange={(val) => { setSelectedDeploymentId(val ? selectedDeploymentId : null) }}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Update Project Current Deployment</AlertDialogTitle>
+						<AlertDialogDescription>
+							This will make changes to your current project.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogAction onClick={handleClick}>Update</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
+		</div>
+	)
+}
+export default ChangeDeploymentModal

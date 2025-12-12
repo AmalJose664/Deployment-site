@@ -30,7 +30,7 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 		isError,
 		error,
 		refetch,
-	} = useGetProjectByIdQuery({ id: projectId, params: { include: "user" } })
+	} = useGetProjectByIdQuery({ id: projectId, params: { include: "user" } },)
 
 	const [createDeployment, { }] = useCreateDeploymentMutation()
 	const [showBuild, setShowBuild] = useState(false)

@@ -18,7 +18,7 @@ import BackButton from "@/components/BackButton"
 import OptionsComponent from "@/components/OptionsComponent"
 import { IoCloudUpload, IoTrashOutline } from "react-icons/io5"
 import { GrStatusDisabled } from "react-icons/gr"
-import NewDeploymentConfirmBox from "@/components/project/NewDeploymentConfirmBox"
+import NewDeploymentConfirmBox from "@/components/modals/NewDeploymentConfirmBox"
 
 
 interface ProjectContentProps {

@@ -86,7 +86,21 @@ export const projectApis = createApi({
 				{ type: "Projects", id: project.projectId },
 				{ type: "Projects", id: "LIST" },
 			])
-		})
+		}),
+		changeProjectDeployment: builder.mutation<Project, { projectId: string, newDeployment: string }>({
+			query: (passedData) => ({
+				url: "/projects/" + passedData.projectId + "/deployments",
+				method: "PATCH",
+				data: { newCurrentDeployment: passedData.newDeployment },
+			}),
+			transformResponse: (data: any) => {
+				return data.project as Project
+			},
+			invalidatesTags: (result, error, passedData) => ([
+				{ type: "Projects", id: passedData.projectId },
+				{ type: "Projects", id: "LIST" },
+			])
+		}),
 	})
 })
 
@@ -97,6 +111,7 @@ export const {
 	useGetProjectByIdQuery,
 	useDeleteProjectMutation,
 	useUpdateProjectMutation,
-	useChangeProjectSubdomainMutation
+	useChangeProjectSubdomainMutation,
+	useChangeProjectDeploymentMutation
 } = projectApis;
 

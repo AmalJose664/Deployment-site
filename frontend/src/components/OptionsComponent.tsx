@@ -17,6 +17,7 @@ interface OptionsComponentProps {
 		Svg?: React.ComponentType,
 		className: string,
 		actionFn: () => void
+		isDisabled?: boolean
 	}[]
 }
 const OptionsComponent = ({ options, parentClassName }: OptionsComponentProps) => {
@@ -31,10 +32,9 @@ const OptionsComponent = ({ options, parentClassName }: OptionsComponentProps) =
 				<DropdownMenuContent className={cn("mr-6", parentClassName)} align="start">
 					<DropdownMenuGroup className="space-y-1">
 						{options.map(({ Svg, ...opt }, index) => (
-							<DropdownMenuItem key={index} className={cn(opt.className, "cursor-pointer")} onClick={opt.actionFn}>
+							<DropdownMenuItem disabled={opt.isDisabled} key={index} className={cn(opt.className, "cursor-pointer")} onClick={opt.actionFn}>
 								{opt.title}
 								{Svg && <Svg />}
-
 							</DropdownMenuItem>
 						))}
 					</DropdownMenuGroup>
