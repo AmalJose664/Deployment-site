@@ -68,7 +68,7 @@ const deploymentStatus = {
 
 const settings = {
 	customBuildPath: true,
-	sendKafkaMessage: true,
+	sendKafkaMessage: !true,
 	deleteSourcesAfter: !true,
 	sendLocalDeploy: true,
 	localDeploy: true,
@@ -203,6 +203,7 @@ async function fetchProjectData(deploymentId = "") {
 	const baseUrl = `${API_ENDPOINT}/api/internal`
 
 	const deploymentResponse = await axios.get(`${baseUrl}/deployments/${deploymentId}`, {
+		timeout: 24000,
 		headers: {
 			Authorization: `Bearer ${API_SERVER_CONTAINER_API_TOKEN}`
 		}
@@ -216,6 +217,7 @@ async function fetchProjectData(deploymentId = "") {
 
 	const projectId = deploymentData.deployment.project
 	const projectResponse = await axios.get(`${baseUrl}/projects/${projectId}`, {
+		timeout: 24000,
 		headers: {
 			Authorization: `Bearer ${API_SERVER_CONTAINER_API_TOKEN}`
 		}
@@ -486,6 +488,7 @@ async function uploadNonAws(dir, fileName) {
 	try {
 		const res = await axios.post(url + `/new/${PROJECT_ID}/${DEPLOYMENT_ID}`, form,
 			{
+				timeout: 24000,
 				headers: form.getHeaders(),
 				maxContentLength: Infinity,
 				maxBodyLength: Infinity
