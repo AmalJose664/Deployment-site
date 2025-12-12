@@ -132,16 +132,7 @@ class DeploymentService implements IDeploymentService {
 	async deployLocal(deploymentId: string, projectId: string): Promise<void> {
 		try {
 			const envs = getNessesaryEnvs()
-			envs.map((e) => {
-				if (e.name === "STORAGE_SERVER_ENDPOINT") {
-					e.value = "CUSTOM_VALUE"
-				}
-				else if (e.name === "API_ENDPOINT") {
-					e.value = "CUSTOM_VALUE_2"
-				}
 
-				return e
-			})
 			const message = {
 				deploymentId,
 				projectId,
