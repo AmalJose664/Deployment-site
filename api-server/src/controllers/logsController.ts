@@ -5,6 +5,7 @@ import { client } from "../config/clickhouse.js";
 import { deploymentEmitter, sseManager } from "../events/deploymentEmitter.js";
 import { v4 } from "uuid";
 import { LogMapper } from "../mappers/LogsMapper.js";
+import { deploymentService } from "../instances.js";
 
 class LogsController implements ILogsController {
 	private logsService: ILogsService;
@@ -57,7 +58,8 @@ class LogsController implements ILogsController {
 		});
 	}
 	async test(req: Request, res: Response, next: NextFunction): Promise<void> {
-		res.json({})
+		await deploymentService.deployLocal("53443424242424", "69246647869c614a349015fc")
+		res.json({ done: true })
 		return;
 	}
 }

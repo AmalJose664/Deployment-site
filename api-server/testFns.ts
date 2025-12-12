@@ -39,12 +39,16 @@ console.log("-------------------------------------------------------------------
 async function mongodbData() {
 	try {
 		await connectDb();
-		console.log(await User.updateOne({ _id: "692ab8f18a4e4f824581b33e" }, { $set: { _id: new Types.ObjectId("68e4a04f1e57fa3fe5b1a81e") } }))
-		return
+
 		const p = new P_repo();
 		const de = new D_repo();
-		console.log(await Project.deleteMany(),)
-		console.log(await Deployment.deleteMany())
+		// console.log(await Deployment.deleteMany())
+		// console.log(await Project.updateMany({}, {
+		// 	status: "NOT_STARTED", deployments: [],
+		// 	lastDeployment: null,
+		// 	tempDeployment: null,
+		// 	currentDeployment: null
+		// }))
 		return
 		const project = await Project.findById("691e1c418cb08e07e28986dc").populate("deployments", "commit_hash");
 
@@ -66,7 +70,7 @@ async function mongodbData() {
 		process.exit(0);
 	}
 }
-// mongodbData();
+mongodbData();
 
 async function commitAllMessages() {
 	const kafka = new Kafka({
@@ -147,4 +151,4 @@ async function getClickhouseData() {
 	// 	query: "TRUNCATE analytics"
 	// })
 }
-getClickhouseData().then(() => process.exit(0))
+// getClickhouseData().then(() => process.exit(0))
