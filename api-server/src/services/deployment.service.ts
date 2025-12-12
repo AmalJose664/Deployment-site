@@ -15,7 +15,7 @@ import { BUILD_SERVER_PATH, BUILD_SERVER_RUN_SCRIPT, LOCAL_TEST_SERVER_USER_FILE
 import { _Object, DeleteObjectCommand, DeleteObjectsCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import getNessesaryEnvs from "../utils/getNessesaryEnvs.js";
 import { IUserSerivce } from "../interfaces/service/IUserService.js";
-import { redisClient } from "../config/redis.js";
+// import { redisClient } from "../config/redis.js";
 
 class DeploymentService implements IDeploymentService {
 	private deploymentRepository: IDeploymentRepository;
@@ -132,14 +132,13 @@ class DeploymentService implements IDeploymentService {
 	async deployLocal(deploymentId: string, projectId: string): Promise<void> {
 		try {
 			const envs = getNessesaryEnvs()
-
-			const message = {
-				deploymentId,
-				projectId,
-				envs
-			}
-			await redisClient.publish("deployment", JSON.stringify(message))
-			return
+			// const message = {
+			// 	deploymentId,
+			// 	projectId,
+			// 	envs
+			// }
+			// await redisClient.publish("deployment", JSON.stringify(message))
+			// return
 			const command = spawn("node", [BUILD_SERVER_RUN_SCRIPT], {
 				cwd: BUILD_SERVER_PATH,
 				env: {

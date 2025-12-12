@@ -4,7 +4,7 @@ import { analyticsService } from "./instances.js";
 const PORT = process.env.PORT || 8000;
 const startServer = async () => {
 	httpServer.listen(PORT, () => console.log(`🎉🎉 Server running on port ${PORT}`));
-	await startKafkaConsumer()
+	// await startKafkaConsumer()
 };
 // remove test routes, at logs routes, deployment routes 
 startServer().catch((e) => console.log(e));
