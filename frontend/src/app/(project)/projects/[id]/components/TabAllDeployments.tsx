@@ -12,18 +12,14 @@ import NoDeployment from "./NoDeployment"
 import { Project, ProjectStatus } from "@/types/Project"
 import { useMemo, useState } from "react"
 import { Input } from "@/components/ui/input"
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover"
+
 import PaginationComponent from "@/components/Pagination"
 import { IoRocketOutline } from "react-icons/io5"
 import OptionsComponent from "@/components/OptionsComponent"
 import { BsArrowUpCircle } from "react-icons/bs"
 import { useRouter } from "next/navigation"
 import ChangeDeploymentModal from "@/components/modals/ChangeDeployment"
-import { useChangeProjectDeploymentMutation } from "@/store/services/projectsApi"
+import DeploymentStatusButtons from "@/components/DeploymentStatusButtons"
 
 interface AllDeploymentProps {
 	projectId: string;
@@ -87,26 +83,8 @@ const AllDeployments = ({ projectId, currentDeployment, repoURL, setTab }: AllDe
 						placeholder="Branches, commits, id"
 					/>
 				</div>
-				<Popover>
-					<PopoverTrigger className="border flex gap-2 mb-4 items-center py-1 px-2 rounded-md whitespace-nowrap">
-						<span className="text-sm text-primary">Status {Object.values(statuses).filter(Boolean).length} / 6 </span><IoIosArrowDown />
-					</PopoverTrigger>
-					<PopoverContent className="max-w-60">
-						<div>
-							{Object.keys(statuses).map((st) => (
-								<div key={st} className="flex gap-8 items-center hover:border-neutral-300 dark:hover:border-neutral-700 rounded-md border border-transparent pl-4">
-									<input
-										type="checkbox" className="border-none ring-0" checked={statuses[st]}
-										onChange={() => setStatuses({ ...statuses, [st]: !statuses[st] })} />
-									<div className={getStatusBg(st)[0] + " w-4 h-4 rounded-full border"} />
-									<label htmlFor="">{st.slice(0, 1).toUpperCase() + st.slice(1, 20).toLowerCase()}</label>
-								</div>
-							)
-							)}
-						</div>
-					</PopoverContent>
-				</Popover>
 
+				<DeploymentStatusButtons statuses={statuses} setStatuses={setStatuses} />
 			</div>
 			<div className="flex items-center mb-4 gap-3 flex-wrap">
 				{Object.entries(statusCounts).map((value, i) => (
@@ -178,7 +156,7 @@ const AllDeployments = ({ projectId, currentDeployment, repoURL, setTab }: AllDe
 									{
 										title: "Promote Deployment",
 										actionFn: () => setSelectedDeploymentId(deployment._id),
-										className: "mx-3",
+										className: "",
 										isDisabled: deployment.status != ProjectStatus.READY
 											|| deployment._id === currentDeployment,
 										Svg: BsArrowUpCircle
@@ -186,12 +164,12 @@ const AllDeployments = ({ projectId, currentDeployment, repoURL, setTab }: AllDe
 									{
 										title: "Inspect",
 										actionFn: () => router.push("/deployments/" + deployment._id),
-										className: "mx-3",
+										className: "",
 									},
 									{
 										title: "View Files",
 										actionFn: () => router.push("/deployments/" + deployment._id + "#files"),
-										className: "mx-3",
+										className: "",
 									},
 								]} />
 							</div>

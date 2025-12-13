@@ -31,7 +31,6 @@ class UserService implements IUserSerivce {
 		}
 
 		let user = await this.userRepository.findByUserEmail(emails[0].value);
-
 		if (!user) {
 			const newUser: Partial<IUser> = {
 				name: profile.displayName,

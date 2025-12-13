@@ -25,14 +25,16 @@ const OptionsComponent = ({ options, parentClassName }: OptionsComponentProps) =
 		<div className="mr-4">
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
-					<button className="p-2 hover:bg-zinc-800 rounded-lg transition-colors border">
+					<button className="p-2 hover:bg-secondary rounded-lg transition-colors border !duration-150">
 						<FiMoreHorizontal size={20} />
 					</button>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent className={cn("mr-6", parentClassName)} align="start">
-					<DropdownMenuGroup className="space-y-1">
+				<DropdownMenuContent className={cn("", parentClassName)} align="start"
+					side="left">
+					<DropdownMenuGroup className="space-y-1 m-1">
 						{options.map(({ Svg, ...opt }, index) => (
-							<DropdownMenuItem disabled={opt.isDisabled} key={index} className={cn(opt.className, "cursor-pointer")} onClick={opt.actionFn}>
+							<DropdownMenuItem disabled={opt.isDisabled} key={index} className={cn(opt.className,
+								"cursor-pointer border border-transparent dark:hover:border-neutral-700 hover:border-neutral-300")} onClick={opt.actionFn}>
 								{opt.title}
 								{Svg && <Svg />}
 							</DropdownMenuItem>

@@ -171,19 +171,19 @@ export default function ProjectContent() {
 												{
 													title: "Settings",
 													actionFn: () => router.push(`/projects/${project._id}?tab=settings`),
-													className: "my-2 mx-3",
+													className: "",
 													Svg: IoSettingsOutline
 												},
 												{
 													title: "View Repository",
 													actionFn: () => window.open(project.repoURL),
-													className: "my-2 mx-3",
+													className: "",
 													Svg: FiGithub
 												},
 												{
 													title: "Delete Project",
 													actionFn: () => router.push(`/projects/${project._id}?tab=settings#danger`),
-													className: "text-red-400 my-2 mx-3",
+													className: "text-red-400",
 													Svg: IoTrashOutline
 												},
 

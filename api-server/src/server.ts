@@ -10,15 +10,19 @@ const startServer = async () => {
 startServer().catch((e) => console.log(e));
 process.on("SIGINT", async () => {
 	console.log("Exiting.........");
-	await stopKafkaConsumer();
-	await analyticsService.exitService();
+	await Promise.all([
+		stopKafkaConsumer(),
+		analyticsService.exitService()
+	])
 	process.exit(0);
 });
 
 process.on("SIGTERM", async () => {
 	console.log("Exiting.....");
-	await stopKafkaConsumer();
-	await analyticsService.exitService();
+	await Promise.all([
+		stopKafkaConsumer(),
+		analyticsService.exitService()
+	])
 	process.exit(0);
 });
 

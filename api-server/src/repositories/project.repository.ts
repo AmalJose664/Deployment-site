@@ -40,13 +40,15 @@ class ProjectRepository extends BaseRepository<IProject> implements IProjectRepo
 		if (query.include?.includes("user")) {
 			findQuery = findQuery.populate("user", "name email profileImage");
 		}
-		const projects = await findQuery.sort("-_id").exec();
-		const total = await this.count(dbQuery);
+		const [projects, total] = await Promise.all([
+			findQuery.sort("-createdAt").exec(),
+			this.count(dbQuery)
+		])
 		return { projects, total };
 	}
 
 	async deleteProject(projectId: string, userId: string): Promise<IProject | null> {
-		return await Project.findOneAndUpdate({ _id: projectId, user: userId }, { isDeleted: true }, { new: true });
+		return await Project.findOneAndUpdate({ _id: projectId, user: userId, isDeleted: false }, { isDeleted: true }, { new: true });
 	}
 	async updateProject(projectId: string, userId: string, updateData: Partial<IProject>): Promise<IProject | null> {
 		return await Project.findOneAndUpdate({ _id: projectId, user: userId }, { $set: { ...updateData } }, { new: true });

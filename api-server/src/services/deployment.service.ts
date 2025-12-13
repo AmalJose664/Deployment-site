@@ -61,7 +61,7 @@ class DeploymentService implements IDeploymentService {
 			]
 		)
 		if (deployment?._id) {
-			this.deployLocal(deployment?._id, projectId)
+			this.deployLocal(deployment._id, projectId)
 		}
 		return deployment;
 	}
@@ -110,13 +110,16 @@ class DeploymentService implements IDeploymentService {
 		}
 
 		await this.deleteLocal(deploymentId, project._id);
-		await this.projectRepository.pullDeployments(
-			projectId,
-			userId,
-			deploymentId,
-			newCurrentDeployment ? newCurrentDeployment : deploymentId === project.currentDeployment ? null : project.currentDeployment,
-		);
-		return await this.deploymentRepository.deleteDeployment(projectId, deploymentId, userId);
+		const [_, deleteResult] = await Promise.all([
+			this.projectRepository.pullDeployments(
+				projectId,
+				userId,
+				deploymentId,
+				newCurrentDeployment ? newCurrentDeployment : deploymentId === project.currentDeployment ? null : project.currentDeployment,
+			),
+			this.deploymentRepository.deleteDeployment(projectId, deploymentId, userId)
+		])
+		return deleteResult
 	}
 
 	async __getDeploymentById(id: string): Promise<IDeployment | null> {
@@ -125,8 +128,7 @@ class DeploymentService implements IDeploymentService {
 	}
 
 	async __updateDeployment(projectId: string, deploymentId: string, updateData: Partial<IDeployment>): Promise<IDeployment | null> {
-		const result = await this.deploymentRepository.__updateDeployment(projectId, deploymentId, updateData);
-		return result;
+		return await this.deploymentRepository.__updateDeployment(projectId, deploymentId, updateData);
 	}
 
 	async deployLocal(deploymentId: string, projectId: string): Promise<void> {

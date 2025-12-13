@@ -55,8 +55,7 @@ class ProjectService implements IProjectService {
 	}
 
 	async getAllProjects(userId: string, query: QueryProjectDTO): Promise<{ projects: IProject[]; total: number }> {
-		const result = await this.projectRepository.getAllProjects(userId, query);
-		return result;
+		return await this.projectRepository.getAllProjects(userId, query);
 	}
 	async getProjectById(id: string, userId: string, include?: string): Promise<IProject | null> {
 		const user = await this.userRepository.findByUserId(userId);
@@ -91,13 +90,17 @@ class ProjectService implements IProjectService {
 	}
 
 	async deleteProject(projectId: string, userId: string): Promise<boolean> {
-		const user = this.userRepository.findByUserId(userId);
+		const user = await this.userRepository.findByUserId(userId);
 		if (!user) {
 			throw new AppError("User not found, Cant delete project", 404);
 		}
+
 		const result = await this.projectRepository.deleteProject(projectId, userId);
+		if (!result) {
+			return false;
+		}
 		await this.userRepository.decrementProjects(userId)
-		return result?.isDeleted ?? false;
+		return true;
 	}
 
 	async getProjectBandwidthData(projectId: string, userId: string, isMonthly: boolean): Promise<number> {

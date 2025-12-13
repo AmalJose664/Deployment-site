@@ -102,24 +102,24 @@ export function ProjectContent({
 									actionFn: () => {
 										setShowConfirm(true)
 									},
-									className: "mx-3",
+									className: "",
 									Svg: IoCloudUpload
 								},
 								{
 									title: "Manage Subdomain",
 									actionFn: scrollFn,
-									className: "mx-3",
+									className: "",
 								},
 								{
 									title: "Disable project",
 									actionFn: scrollFn,
-									className: "text-red-400 hover:text-red-500 mx-3",
+									className: "text-red-400 hover:text-red-500 ",
 									Svg: GrStatusDisabled
 								},
 								{
 									title: "Delete Project",
 									actionFn: scrollFn,
-									className: "text-red-400 hover:text-red-500 mx-3",
+									className: "text-red-400 hover:text-red-500 ",
 									Svg: IoTrashOutline
 								},
 							]} />

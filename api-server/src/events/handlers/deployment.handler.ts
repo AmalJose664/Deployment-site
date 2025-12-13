@@ -39,6 +39,7 @@ class DeploymentEventHandler {
 
 		switch (data.updateType) {
 			case UpdateTypes.START: {
+
 				await deploymentService.__updateDeployment(projectId, deploymentId, {
 					status: updates.status,
 					commit_hash: updates.commit_hash,
@@ -81,15 +82,17 @@ class DeploymentEventHandler {
 				break;
 			}
 			case UpdateTypes.CUSTOM: {
-				await deploymentService.__updateDeployment(projectId, deploymentId, {
-					status: updates.status,
-					...updates,
-					complete_at: new Date(updates.complete_at || ""),
-				});
-				await projectService.__updateProjectById(projectId, {
-					status: updates.status as unknown as ProjectStatus,
-					techStack: updates.techStack,
-				});
+				await Promise.all([
+					deploymentService.__updateDeployment(projectId, deploymentId, {
+						status: updates.status,
+						...updates,
+						complete_at: new Date(updates.complete_at || ""),
+					}),
+					projectService.__updateProjectById(projectId, {
+						status: updates.status as unknown as ProjectStatus,
+						techStack: updates.techStack,
+					})
+				])
 				break;
 			}
 			default: {

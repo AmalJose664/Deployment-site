@@ -39,10 +39,14 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 		try {
 			toast.success("New Deployment Started")
 			await createDeployment(projectId).unwrap()
+			setShowBuild(true)
 			setSseActive(true)
 			await refetch()
+			return true
 		} catch (error) {
 			setSseActive(false)
+			toast.error("Error in creating new Deployment")
+			return false
 		}
 	}
 	const { data: tempDeployment } = useGetDeploymentByIdQuery(
@@ -95,7 +99,10 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 			toast.error(`Cannot deploy when the project is in ${ProjectStatus.QUEUED}/${ProjectStatus.BUILDING} state`)
 			return
 		}
-		setShowBuild(true)
+		const goodResponse = await handleCreateDeployment()
+		if (!goodResponse) {
+			return
+		}
 		dispatch(
 			projectApis.util.updateQueryData(
 				"getProjectById",
@@ -108,7 +115,6 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 				}
 			)
 		)
-		await handleCreateDeployment()
 	}
 
 

@@ -10,18 +10,14 @@ import { CiSearch } from "react-icons/ci"
 import { Project, ProjectStatus } from "@/types/Project"
 import { useMemo, useState } from "react"
 import { Input } from "@/components/ui/input"
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover"
-
 
 import { useGetDeploymentsQuery } from "@/store/services/deploymentApi"
 import PaginationComponent from "@/components/Pagination"
 import NoDeployment from "@/app/(project)/projects/[id]/components/NoDeployment"
 import { useRouter } from "next/navigation"
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import DeploymentStatusButtons from "@/components/DeploymentStatusButtons";
+import OptionsComponent from "@/components/OptionsComponent";
 
 const AllDeployments = () => {
 	const [page, setPage] = useState(1)
@@ -79,25 +75,7 @@ const AllDeployments = () => {
 								placeholder="Branches, commits, id"
 							/>
 						</div>
-						<Popover>
-							<PopoverTrigger className="border flex gap-2 mb-4 items-center py-1 px-2 rounded-md whitespace-nowrap">
-								<span className="text-sm text-primary">Status {Object.values(statuses).filter(Boolean).length} / 6 </span><IoIosArrowDown />
-							</PopoverTrigger>
-							<PopoverContent className="max-w-60">
-								<div>
-									{Object.keys(statuses).map((st) => (
-										<div key={st} className="flex gap-8 items-center hover:border-neutral-300 dark:hover:border-neutral-700 rounded-md border border-transparent pl-4">
-											<input
-												type="checkbox" className="border-none ring-0" checked={statuses[st]}
-												onChange={() => setStatuses({ ...statuses, [st]: !statuses[st] })} />
-											<div className={getStatusBg(st)[0] + " w-4 h-4 rounded-full border"} />
-											<label htmlFor="">{st.slice(0, 1).toUpperCase() + st.slice(1, 20).toLowerCase()}</label>
-										</div>
-									)
-									)}
-								</div>
-							</PopoverContent>
-						</Popover>
+						<DeploymentStatusButtons statuses={statuses} setStatuses={setStatuses} />
 
 					</div>
 					{isLoading && (
@@ -168,10 +146,26 @@ const AllDeployments = () => {
 											<div>{(deployment.project as Project).branch}</div>
 										</div>
 									</div>
-									<button className="text-xs text-gray-400 hover:text-white transition-colors flex items-center gap-1">
-										View Logs
-										<LiaExternalLinkAltSolid size={12} />
-									</button>
+									<div onClick={(e) => e.stopPropagation()}>
+										<OptionsComponent parentClassName="" options={[
+											{
+												title: "Show Project",
+												actionFn: () => router.push("/projects/" + (deployment.project as Project)._id),
+												className: "",
+												Svg: IoIosCube
+											},
+											{
+												title: "Inspect",
+												actionFn: () => router.push("/deployments/" + deployment._id),
+												className: "",
+											},
+											{
+												title: "View Files",
+												actionFn: () => router.push("/deployments/" + deployment._id + "#files"),
+												className: "",
+											},
+										]} />
+									</div>
 								</Link>
 							</div>
 						)

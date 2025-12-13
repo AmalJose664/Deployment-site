@@ -1,22 +1,20 @@
-FROM ubuntu:focal
+FROM node:22-slim
 
-RUN apt-get update
-RUN apt-get install -y curl
-RUN curl -sL https://deb.nodesource.com/setup_20.x | bash -
 
-RUN apt-get upgrade -y
-
-RUN apt-get install -y nodejs
-RUN apt-get install -y git
+RUN apt-get update && \
+    apt-get install -y git && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /home/app
+COPY package*.json .
+RUN npm install 
+
 COPY main.sh main.sh
 COPY script.js script.js
-COPY package*.json .
 
-RUN npm install
 RUN chmod +x main.sh
 RUN chmod +x script.js
 
 
 ENTRYPOINT ["/home/app/main.sh"]
+

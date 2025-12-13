@@ -20,6 +20,10 @@ const NavbarUser = () => {
 	const { data: user } = useGetUserQuery()
 	const [logout] = useLogoutMutation()
 	const router = useRouter()
+	const logoutAndRedirect = () => {
+		logout()
+		router.push("/login")
+	}
 	return (
 		<div className="">
 			<DropdownMenu>
@@ -62,7 +66,7 @@ const NavbarUser = () => {
 					</DropdownMenuItem>
 					<DropdownMenuItem disabled>API</DropdownMenuItem>
 					<DropdownMenuSeparator />
-					<DropdownMenuItem onClick={() => logout()}>
+					<DropdownMenuItem onClick={() => logoutAndRedirect()}>
 						Log out
 
 					</DropdownMenuItem>
