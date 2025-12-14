@@ -1,8 +1,10 @@
+import Stripe from "stripe";
 import { Request, Response, NextFunction } from "express";
 import { IPaymentController } from "../interfaces/controller/IPaymentController.js";
 import { IPaymentService } from "../interfaces/service/IPaymentService.js";
 import { stripe } from "../config/stripe.js";
 import { HTTP_STATUS_CODE } from "../utils/statusCodes.js";
+import AppError from "../utils/AppError.js";
 
 class PaymentController implements IPaymentController {
 	private paymentService: IPaymentService
@@ -62,8 +64,20 @@ class PaymentController implements IPaymentController {
 				amountPaid: result.amountPaid,
 				paymentStatus: result.paymentStatus
 			});
-		} catch (error) {
-			next(error)
+		} catch (err) {
+			const error = err as Stripe.errors.StripeError
+			if (error.type === 'StripeInvalidRequestError') {
+				return next(new AppError('Payment session not found. It may have expired or is invalid.', 404));
+			}
+
+			if (error.type === 'StripeAuthenticationError') {
+				return next(new AppError('Payment service authentication failed', 500));
+			}
+
+			if (error.type === 'StripeAPIError') {
+				return next(new AppError('Payment service is temporarily unavailable', 503));
+			}
+			next(err);
 		}
 	}
 }

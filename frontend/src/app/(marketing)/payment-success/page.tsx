@@ -1,7 +1,7 @@
 
 import { redirect } from "next/navigation";
 
-import PaymentSuccess from "@/components/PaymentSuccess";
+import PaymentSuccess from "@/app/(marketing)/payment-success/PaymentSuccess";
 
 export default function SuccessPage({ searchParams }: any) {
 	const sessionId = searchParams.session_id;

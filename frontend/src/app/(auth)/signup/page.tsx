@@ -18,10 +18,11 @@ export default function SignupPage() {
 	const user = useSelector((state: RootState) => state.userReducer);
 
 	useEffect(() => {
-		if (user.access_token) {
-			router.back()
+		const verifySessionCode = () => {
+			localStorage.clear()
 		}
-	}, [user, router]);
+		verifySessionCode()
+	}, [router]);
 	return (<>
 		<div className="relative min-h-screen flex items-center justify-center p-4">
 

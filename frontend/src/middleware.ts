@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
 
-const protectedRoutes = ["/projects", "/login/success", "/deployments", "/user"]
+const protectedRoutes = ["/projects", "/login/success", "/deployments", "/user", "/new", "/user/plan", "/payment-success"]
 const exemptAfterAuthRoutes = ["/login", "/signup"]
 
 export async function middleware(req: NextRequest) {
@@ -10,59 +10,89 @@ export async function middleware(req: NextRequest) {
 	const cookies = req.cookies
 	const accessToken = cookies.get("access_token")?.value
 	const refreshToken = cookies.get("refresh_token")?.value
-	// return NextResponse.next()
 
 	if (exemptAfterAuthRoutes.includes(path)) {
 		if (accessToken && refreshToken) {
-			return NextResponse.redirect(new URL("/", req.url))
+			return NextResponse.redirect(new URL("/projects", req.url))
 		}
 	}
+
+
 	if (protectedRoutes.some((route) => path.startsWith(route))) {
-		if ((!accessToken && !refreshToken) || !refreshToken) {
-			return NextResponse.redirect(new URL("/login", req.url));
+
+		if (!accessToken && !refreshToken) {
+			return NextResponse.redirect(new URL("/login", req.url))
 		}
-		try {
-			const verifyResponse = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_ENDPOINT}/auth/verify`, {
-				headers: {
-					'Cookie': `access_token=${accessToken}`
-				},
-				credentials: 'include'
-			})
-			if (verifyResponse.status !== 200) {
-				if (!refreshToken) {
-					return NextResponse.redirect(new URL("/login", req.url));
+		if (accessToken) {
+			try {
+				const verifyResponse = await fetch(
+					`${process.env.NEXT_PUBLIC_API_SERVER_ENDPOINT}/auth/verify`,
+					{
+						headers: {
+							'Cookie': `access_token=${accessToken}`
+						},
+						credentials: 'include',
+						cache: 'no-store'
+					}
+				)
+
+				if (verifyResponse.ok) {
+					return NextResponse.next()
 				}
-
-				const refreshResponse = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_ENDPOINT}/auth/refresh`, {
-					headers: {
-						'Cookie': `refresh_token=${refreshToken}`
-					},
-					method: "POST",
-					credentials: 'include'
-				})
-				if (!refreshResponse.ok || refreshResponse.status === 401) {
-
-					return NextResponse.redirect(new URL("/login", req.url));
-				}
-				const response = NextResponse.next()
-				const setCookie = refreshResponse.headers.get('set-cookie')
-
-				if (setCookie) {
-					response.headers.set("set-cookie", setCookie)
-				}
-
-				return response
+			} catch (error) {
+				console.error("Verify error:", error)
 			}
-			return NextResponse.next()
-		} catch (error: any) {
-			console.log("Auth cheking error on tokens", error.message)
-			return NextResponse.redirect(new URL("/login", req.url));
 		}
-	}
 
+		if (refreshToken) {
+			try {
+				const refreshResponse = await fetch(
+					`${process.env.NEXT_PUBLIC_API_SERVER_ENDPOINT}/auth/refresh`,
+					{
+						method: "POST",
+						headers: {
+							'Cookie': `refresh_token=${refreshToken}`
+						},
+						credentials: 'include',
+						cache: 'no-store'
+					}
+				)
+
+				if (refreshResponse.ok) {
+					const response = NextResponse.next()
+
+					const setCookieHeaders = refreshResponse.headers.getSetCookie()
+					setCookieHeaders.forEach(cookie => {
+						response.headers.append('Set-Cookie', cookie)
+					})
+
+					return response
+				}
+			} catch (error) {
+				console.error("Refresh error:", error)
+			}
+		}
+
+		const loginUrl = new URL("/login", req.url)
+		const response = NextResponse.redirect(loginUrl)
+
+		// response.cookies.delete("access_token")
+		// response.cookies.delete("refresh_token")
+
+		return response
+	}
 	return NextResponse.next()
 }
 
 export const config = {
-	matcher: ["/projects/:path*", "/projects", "/deployments/:path*", "/deployments", "/login", "/signup", "/auth/:path*"],
+	matcher: [
+		"/projects/:path*",
+		"/deployments/:path*",
+		"/user/:path*",
+		"/new/:path*",
+		"/login",
+		"/signup",
+		"/login/success",
+		"/payment-success"
+	]
 }

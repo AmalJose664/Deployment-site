@@ -17,13 +17,13 @@ import { GithubLoginButton } from '../components/GithubLogin';
 
 export default function LoginPage() {
 	const router = useRouter();
-	const user = useSelector((state: RootState) => state.userReducer);
 
 	useEffect(() => {
-		if (user.access_token) {
-			router.back()
+		const verifySessionCode = () => {
+			localStorage.clear()
 		}
-	}, [user, router]);
+		verifySessionCode()
+	}, [router]);
 	return (<>
 		<div className="relative min-h-screen flex items-center justify-center p-3">
 

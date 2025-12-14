@@ -1,36 +1,66 @@
 "use client"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
-import ThemeSwitcher from "@/components/ThemeIcon"
+import RightFadeComponent from "@/components/RightFadeComponent"
 import axiosInstance from "@/lib/axios"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 
 
 const Page = () => {
 	const router = useRouter()
+	const [code, setCode] = useState<string | null>("STANDBY")
 	useEffect(() => {
 		const verifyLogin = async () => {
 			try {
+				const codeFromStorage = localStorage.getItem("session_code")
+				if (codeFromStorage) {
+					router.push("/projects")
+					setCode(codeFromStorage)
+					console.log("retunred")
+					return
+				} else {
+					setCode(null)
+				}
+				console.log("calling")
 				await axiosInstance.get("/auth");
+				console.log("called")
+				localStorage.setItem("session_code", Math.random().toString(36).slice(2, 12))
+				await new Promise((res) => setTimeout(res, 1000))
 				router.push("/projects");
 			} catch (error) {
 				console.error("User not authenticated", error);
 				router.push("/login");
 			}
 		};
-
 		verifyLogin();
 	}, [router]);
-
 	return (
 		<div className="flex w-full flex-1 flex-col items-center justify-center px-4 relative mt-10">
 			<BackgroundPattern className="opacity-100 absolute top-10/12 " />
 			<div className="flex  flex-col items-center gap-6 text-center absolute top-10/12 mt-60">
 				<LoadingSpinner size="md" className="duration-300" />
-				<h1 >Loading your account...</h1>
-				<p className="text-base/7 text-less max-w-prose ">
-					Just a moment while we set things up for you.
-				</p>
+				{code === "STANDBY" && (
+					<h3 className="max-w-prose ">
+						Loading....
+					</h3>
+				)}
+				{(code && code !== "STANDBY") && (
+					<RightFadeComponent>
+						<p className="text-base/7 text-less max-w-prose ">
+							Redirecting...
+						</p>
+					</RightFadeComponent>
+				)}
+				{!code && <>
+					<RightFadeComponent>
+						<h1 >Loading your account...</h1>
+						<p className="text-base/7 text-less max-w-prose ">
+							Just a moment while we set things up for you.
+						</p>
+					</RightFadeComponent>
+				</>
+				}
+
 			</div>
 		</div>
 	)
