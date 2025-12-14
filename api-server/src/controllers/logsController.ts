@@ -8,60 +8,60 @@ import { LogMapper } from "../mappers/LogsMapper.js";
 import { deploymentService } from "../instances.js";
 
 class LogsController implements ILogsController {
-	private logsService: ILogsService;
-	constructor(logsService: ILogsService) {
-		this.logsService = logsService;
-	}
+    private logsService: ILogsService;
+    constructor(logsService: ILogsService) {
+        this.logsService = logsService;
+    }
 
-	async getLogsByProject(req: Request, res: Response, next: NextFunction): Promise<void> {
-		try {
-			const projectId = req.params.projectId;
-			const user = req.user?.id as string;
-			const result = await this.logsService.getProjectsLogs(projectId, user, {});
+    async getLogsByProject(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const projectId = req.params.projectId;
+            const user = req.user?.id as string;
+            const result = await this.logsService.getProjectsLogs(projectId, user, {});
 
-			const response = LogMapper.toLogsResponse(result.logs, result.total);
-			res.json(response);
-			return;
-		} catch (error) {
-			next(error);
-		}
-	}
-	async getLogsByDeployment(req: Request, res: Response, next: NextFunction): Promise<void> {
-		try {
-			const deploymentId = req.params.deploymentId;
-			const user = req.user?.id as string;
-			const result = await this.logsService.getDeploymentLog(deploymentId, user, {});
+            const response = LogMapper.toLogsResponse(result.logs, result.total);
+            res.json(response);
+            return;
+        } catch (error) {
+            next(error);
+        }
+    }
+    async getLogsByDeployment(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const deploymentId = req.params.deploymentId;
+            const user = req.user?.id as string;
+            const result = await this.logsService.getDeploymentLog(deploymentId, user, {});
 
-			const response = LogMapper.toLogsResponse(result.logs, result.total);
-			res.json(response);
-			return;
-		} catch (error) {
-			next(error);
-		}
-	}
+            const response = LogMapper.toLogsResponse(result.logs, result.total);
+            res.json(response);
+            return;
+        } catch (error) {
+            next(error);
+        }
+    }
 
-	async streamLogs(req: Request, res: Response, next: NextFunction): Promise<void> {
-		const id = req.params.deploymentId;
-		try {
-			sseManager.addClient(v4(), id, res, req);
-		} catch (error) {
-			deploymentEmitter.offAll(id);
-			next(error);
-		}
-	}
+    async streamLogs(req: Request, res: Response, next: NextFunction): Promise<void> {
+        const id = req.params.deploymentId;
+        try {
+            sseManager.addClient(v4(), id, res, req);
+        } catch (error) {
+            deploymentEmitter.offAll(id);
+            next(error);
+        }
+    }
 
-	async getData(req: Request, res: Response, next: NextFunction): Promise<void> {
-		res.json({
-			clientCount: sseManager.getClientCount(),
-			listerCount: sseManager.getListeners(),
-			listerners: sseManager.getEventFns(),
-		});
-	}
-	async test(req: Request, res: Response, next: NextFunction): Promise<void> {
-		// await deploymentService.deployLocal("53443424242424", "69246647869c614a349015fc")
-		res.json({ done: true })
-		return;
-	}
+    async getData(req: Request, res: Response, next: NextFunction): Promise<void> {
+        res.json({
+            clientCount: sseManager.getClientCount(),
+            listerCount: sseManager.getListeners(),
+            listerners: sseManager.getEventFns(),
+        });
+    }
+    async test(req: Request, res: Response, next: NextFunction): Promise<void> {
+        // await deploymentService.deployLocal("53443424242424", "69246647869c614a349015fc")
+        res.json({ done: true });
+        return;
+    }
 }
 
 export default LogsController;

@@ -5,7 +5,6 @@ import LogRepo from "./repositories/log.repository.js";
 import AnalyticsRepo from "./repositories/analytics.repository.js";
 import ProjectBandwidthRepository from "./repositories/projectBandwidth.repository.js";
 
-
 import UserService from "./services/user.service.js";
 import ProjectService from "./services/project.service.js";
 import DeploymentService from "./services/deployment.service.js";
@@ -34,11 +33,10 @@ export const logsService = new LogsService(logRepo, deploymentRepo);
 export const analyticsService = new AnalyticsService(analyticsRepo, projectBandwidthRepo);
 export const userService = new UserService(userRepo, projectService);
 export const deploymentService = new DeploymentService(deploymentRepo, projectRepo, userService);
-export const paymentService = new PaymentService(userRepo)
+export const paymentService = new PaymentService(userRepo);
 
 export const projectController = new ProjectController(projectService);
 export const deploymentController = new DeploymentController(deploymentService);
 export const logsController = new LogsController(logsService);
 export const analyticsController = new AnalyticsController(analyticsService);
-export const paymentController = new PaymentController(paymentService)
-
+export const paymentController = new PaymentController(paymentService);
