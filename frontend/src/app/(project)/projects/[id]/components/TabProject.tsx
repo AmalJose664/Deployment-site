@@ -8,15 +8,21 @@ import { Logs } from "@/components/LogsComponent"
 import { Project } from "@/types/Project"
 import { Deployment } from "@/types/Deployment"
 import { IoRocketOutline } from "react-icons/io5"
+import { Suspense } from "react"
+import { LoadingSpinner2 } from "@/components/LoadingSpinner"
 
 interface TabProjectProps {
 	project: Project
-	deployment?: Deployment
-	tempDeployment?: Deployment
-	lastDeployment?: Deployment
-	onCreateDeployment: () => void
-	setShowBuild: (state: boolean) => void;
-	showBuild: boolean
+	deploymentCtx: {
+		deployment?: Deployment
+		tempDeployment?: Deployment
+		lastDeployment?: Deployment
+		onCreateDeployment: () => void
+	}
+	build: {
+		showBuild: boolean
+		setShowBuild: (v: boolean) => void
+	}
 	setTabs: (state: string) => void;
 	reDeploy: () => void;
 	refetchLogs: () => void;
@@ -24,11 +30,16 @@ interface TabProjectProps {
 }
 
 
-const TabProject = ({ project, deployment, tempDeployment, lastDeployment, onCreateDeployment, setShowBuild, showBuild, setTabs, reDeploy, refetchLogs }: TabProjectProps) => {
+const TabProject = ({ project, deploymentCtx, build, setTabs, reDeploy, refetchLogs }: TabProjectProps) => {
+	const { lastDeployment, deployment, tempDeployment, onCreateDeployment } = deploymentCtx
+	const { setShowBuild, showBuild } = build
+
+
+
+
 	return (
 		<>
 			<div className="dark:bg-neutral-950 border bg-neutral-50 w-full rounded-md mb-6 mt-4 p-4">
-
 				{(project.deployments && project.deployments.length === 0 && !lastDeployment) && (
 					<NoDeployment
 						buttonAction={onCreateDeployment}
@@ -39,8 +50,6 @@ const TabProject = ({ project, deployment, tempDeployment, lastDeployment, onCre
 						learnMoreUrl="#"
 					/>
 				)}
-
-
 				<ProjectOverview
 					project={project}
 					deployment={deployment || lastDeployment}
@@ -113,7 +122,16 @@ const TabProject = ({ project, deployment, tempDeployment, lastDeployment, onCre
 					type={"Last"}
 				/>
 			)}
-			{project.deployments && project.deployments?.length > 0 && <ProjectSimpleStats project={project} />}
+			{project.deployments && project.deployments?.length > 0 && (
+				<div className="border px-3 py-2 rounded-md mt-9">
+					<h3 className="mb-3 ml-2 mt-2 text-xl">Stats</h3>
+					<Suspense fallback={
+						<LoadingSpinner2 isLoading />
+					}>
+						<ProjectSimpleStats project={project} />
+					</Suspense>
+				</div>
+			)}
 		</>
 	)
 }

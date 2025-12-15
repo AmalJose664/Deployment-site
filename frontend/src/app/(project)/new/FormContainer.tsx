@@ -27,7 +27,7 @@ function ProjectForm() {
 	const form = useForm<ProjectFormInput>({
 
 		defaultValues: {
-			name: 'new-ui-projectsqq',
+			name: '',
 			repoURL: '',
 			branch: "main",
 			installCommand: "install",
@@ -73,7 +73,10 @@ function ProjectForm() {
 			router.push(`/projects/${result._id}`)
 
 			console.log("Form submitted ", data)
-		} catch (error) {
+		} catch (error: any) {
+			if (error.status === 401) {
+				router.push("/login")
+			}
 			console.log("Error!", error)
 			toast.error("Error on creating project")
 		}

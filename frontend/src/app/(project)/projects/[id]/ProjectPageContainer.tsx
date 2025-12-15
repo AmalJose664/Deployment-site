@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation"
 import { projectApis, useGetProjectByIdQuery } from "@/store/services/projectsApi"
 import { useCreateDeploymentMutation, useGetDeploymentByIdQuery } from "@/store/services/deploymentApi"
 
-import ProjectLoading from "./components/ProjectLoading"
 import ErrorComponent from "../../../../components/ErrorComponent"
 import { ProjectContent } from "./components/Content"
 import { useDeploymentSSE } from "@/hooks/useUpdatesSse"
@@ -15,6 +14,7 @@ import { addLogs, clearLogs } from "@/store/slices/logSlice"
 import { ProjectStatus } from "@/types/Project"
 import { useAppDispatch } from "@/store/store"
 import { toast } from "sonner"
+import { LoadingSpinner2 } from "@/components/LoadingSpinner"
 
 interface ProjectPageContainerProps {
 	projectId: string
@@ -120,7 +120,11 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 
 
 
-	if (isLoading) return <ProjectLoading />
+	if (isLoading) return (
+		<div className="h-screen flex items-center justify-center gap-2">
+			<LoadingSpinner2 isLoading={true} />
+		</div>
+	)
 	if (isError) return <ErrorComponent error={error} id={projectId} field="Project" />
 	if (!project) {
 		return (

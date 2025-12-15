@@ -20,6 +20,7 @@ import { BsArrowUpCircle } from "react-icons/bs"
 import { useRouter } from "next/navigation"
 import ChangeDeploymentModal from "@/components/modals/ChangeDeployment"
 import DeploymentStatusButtons from "@/components/DeploymentStatusButtons"
+import { LoadingSpinner2 } from "@/components/LoadingSpinner"
 
 interface AllDeploymentProps {
 	projectId: string;
@@ -70,11 +71,7 @@ const AllDeployments = ({ projectId, currentDeployment, repoURL, setTab }: AllDe
 	return (
 		<div>
 			{selectedDeploymentId && <ChangeDeploymentModal setSelectedDeploymentId={setSelectedDeploymentId} selectedDeploymentId={selectedDeploymentId} projectId={projectId} />}
-			{isLoading && (
-				<div className="flex items-center justify-center text-primary">
-					Loading...
-				</div>
-			)}
+
 			<div className="relative flex flex-col sm:flex-row gap-2 items-start sm:items-center justify-between">
 				<div className="relative w-full sm:w-[90%] cats_intheworld">
 					<CiSearch className="absolute top-2 left-3 size-5" />
@@ -86,6 +83,7 @@ const AllDeployments = ({ projectId, currentDeployment, repoURL, setTab }: AllDe
 
 				<DeploymentStatusButtons statuses={statuses} setStatuses={setStatuses} />
 			</div>
+			<LoadingSpinner2 isLoading={isLoading} />
 			<div className="flex items-center mb-4 gap-3 flex-wrap">
 				{Object.entries(statusCounts).map((value, i) => (
 					(statuses[value[0]] && value[1] > 0) && (
@@ -143,7 +141,7 @@ const AllDeployments = ({ projectId, currentDeployment, repoURL, setTab }: AllDe
 								<div className="text-sm text-primary mb-1 max-w-full sm:max-w-[80px] overflow-hidden text-ellipsis whitespace-nowrap">
 									{deployment.commit.id}
 								</div>
-								<div className="text-sm text-primary mb-1 break-words">{deployment.commit.msg}</div>
+								<div className="text-sm text-primary mb-1 wrap-break-word">{deployment.commit.msg}</div>
 							</div>
 							<div className="flex items-center gap-4 text-xs text-gray-400">
 								<div className="flex items-center text-xs gap-1.5">
@@ -194,7 +192,7 @@ const AllDeployments = ({ projectId, currentDeployment, repoURL, setTab }: AllDe
 				<div className="flex items-center justify-center px-4">
 					<div className="border p-4 rounded-md max-w-full">
 						<p>Error Loading Deployments</p>
-						<p className="break-words">{(error as any)?.message || (error as { data?: { message?: string } })?.data?.message || "Something went wrong"}</p>
+						<p className="wrap-break-word">{(error as any)?.message || (error as { data?: { message?: string } })?.data?.message || "Something went wrong"}</p>
 					</div>
 				</div>
 			)}

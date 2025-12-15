@@ -113,18 +113,18 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, setTabs 
 								{(isprojectError)
 									&&
 									(isDeplymentError) &&
-									<Button variant={"secondary"} onClick={reDeploy} className='hover:!bg-primary hover:!text-secondary !duration-200
+									<Button variant={"secondary"} onClick={reDeploy} className='hover:bg-primary! hover:text-secondary! duration-200!
 								 border rounded-lg text-sm font-medium  transition-colors  flex justify-start gap-3 px-4 py-3'>
 										Re Deploy < GrRotateRight className="text-green-400 group-hover:rotate-z-90 transition-all duration-300" />
 									</Button>
 								}
 								<Button variant={"secondary"} onClick={() => setTabs("settings")}
-									className='hover:!bg-primary hover:!text-secondary !duration-200 group
+									className='hover:bg-primary! hover:text-secondary! duration-200! group
 								 border rounded-lg text-sm font-medium  transition-colors  flex justify-start gap-3 px-4 py-3'>
-									Settings <IoSettingsOutline className="group-hover:!translate-x-1.5 group-hover:!rotate-z-45 !transition-all !duration-300" />
+									Settings <IoSettingsOutline className="group-hover:translate-x-1.5! group-hover:rotate-z-45! transition-all! duration-300!" />
 								</Button>
 								<Button variant={"secondary"} onClick={() => setTabs("monitoring")}
-									className='hover:!bg-primary hover:!text-secondary !duration-200
+									className='hover:bg-primary! hover:text-secondary! duration-200!
 								 border rounded-lg text-sm font-medium  transition-colors  flex justify-start gap-3 px-4 py-3'>
 									Usage & Analytics <BsActivity size={16} className="text-gray-500" />
 								</Button>

@@ -50,4 +50,13 @@ export type ProjectFormInput = {
 		value: string
 	}[];
 }
-
+export type ProjectSimpleStatsType = {
+	totalDeployments: number,
+	successRate: number,
+	failureRate: number,
+	failedBuilds: number,
+	avgBuildTime: number,
+	buildHistory: string[],
+	lastDeployed: Date | null,
+	bandwidth: number,
+}

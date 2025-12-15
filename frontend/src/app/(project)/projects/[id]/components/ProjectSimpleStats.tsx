@@ -1,65 +1,134 @@
-
-
-import { IoMdGitBranch } from "react-icons/io";
-
-import { MdAccessTime } from "react-icons/md";
-import { BsActivity } from "react-icons/bs";
-import { IoIosTrendingUp } from "react-icons/io";
+import { BsGlobe2, BsActivity, BsHddNetwork, } from "react-icons/bs";
+import { IoIosTrendingDown } from "react-icons/io";
+import { MdOutlineCheckCircle, MdAccessTime, MdErrorOutline } from "react-icons/md";
 import { Project } from "@/types/Project";
 import RightFadeComponent from "@/components/RightFadeComponent";
+import { useGetProjectsSimpleStatsQuery } from "@/store/services/projectsApi";
+import { formatBytes, getElapsedTimeClean } from "@/lib/utils";
+import { StatusHistory, SubtleProgressBar, ThinSparkline } from "@/components/SimpleStatsCompnts";
+import { LuHistory } from "react-icons/lu";
 const ProjectSimpleStats = ({ project }: { project: Project }) => {
 
+	const { data } = useGetProjectsSimpleStatsQuery(project._id)
+	console.log(data)
 
 	const mockStats = {
-		totalDeployments: project.deployments?.length,
-		successRate: 94,
-		avgBuildTime: '48s',
-		lastDeployed: '2m ago',
+		totalDeployments: data?.totalDeployments || project.deployments?.length,
+		successRate: data?.successRate || 0,
+		failureRate: data?.failureRate || 0,
+		avgBuildTime: data?.avgBuildTime || 0,
+		lastDeployed: getElapsedTimeClean(data?.lastDeployed || undefined),
+		bandwidth: data?.bandwidth || 0,
+		buildHistory: data?.buildHistory,
+		failedBuilds: data?.failedBuilds
+
 	};
-
-
 	return (
-		<RightFadeComponent delay={.1} inView className="grid grid-cols-1 lg:grid-cols-4 gap-4 mt-8 ">
-			<div className=" border rounded-xl p-5 dark:bg-neutral-900 bg-white">
-				<div className="flex items-center gap-3 mb-2">
-					<div className="p-2 border rounded-lg">
-						<BsActivity className="" size={20} />
-					</div>
-					<span className="text-sm text-less">Total Deployments</span>
-				</div>
-				<p className="text-3xl font-semibold">{mockStats.totalDeployments}</p>
-			</div>
+		<RightFadeComponent delay={.1} inView >
+			<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
 
-			<div className=" border  rounded-xl p-5 dark:bg-neutral-900 bg-white">
-				<div className="flex items-center gap-3 mb-2">
-					<div className="p-2 border  rounded-lg">
-						<IoIosTrendingUp className="" size={20} />
+				<div className="border rounded-lg p-3 dark:bg-neutral-950 bg-white h-22 flex flex-col justify-between relative overflow-hidden">
+					<div className="flex items-center gap-1.5">
+						<BsActivity className="text-neutral-400" size={13} />
+						<span className="text-[11px] font-medium text-less uppercase tracking-wider">Deploys</span>
 					</div>
-					<span className="text-sm text-less">Success Rate</span>
+					<div className="flex items-end justify-between z-10">
+						<p className="text-xl font-mono font-semibold tracking-tight text-primary">{mockStats.totalDeployments}</p>
+						<div className="mb-0.5">
+							<ThinSparkline data={[0, 1, 20, 30, 90, 0]} />
+						</div>
+					</div>
 				</div>
-				<p className="text-3xl font-semibold">{mockStats.successRate}%</p>
-			</div>
 
-			<div className="border rounded-xl p-5 dark:bg-neutral-900 bg-white">
-				<div className="flex items-center gap-3 mb-2">
-					<div className="p-2 border  rounded-lg">
-						<MdAccessTime className="" size={20} />
+				<div className="border  rounded-lg p-3 dark:bg-neutral-950 bg-white h-22 flex flex-col justify-between">
+					<div className="flex justify-between items-start">
+						<div className="flex items-center gap-1.5">
+							<MdOutlineCheckCircle className="text-emerald-400" size={14} />
+							<span className="text-[11px] font-medium text-less uppercase tracking-wider">Success Rate</span>
+						</div>
 					</div>
-					<span className="text-sm text-less">Avg Build Time</span>
+					<div>
+						<div className="flex items-baseline gap-1">
+							<p className="text-xl font-mono font-semibold tracking-tight text-primary">{mockStats.successRate}</p>
+							<span className="text-xs font-mono text-primary">%</span>
+						</div>
+						<SubtleProgressBar percentage={mockStats.successRate} color="bg-emerald-500/80" />
+					</div>
 				</div>
-				<p className="text-3xl font-semibold">{mockStats.avgBuildTime}</p>
-			</div>
+				<div className="border  rounded-lg p-3 dark:bg-neutral-950 bg-white h-22 flex flex-col justify-between">
+					<div className="flex justify-between items-start">
+						<div className="flex items-center gap-1.5">
+							<MdErrorOutline className="text-red-400" size={14} />
+							<span className="text-[11px] font-medium text-less uppercase tracking-wider">Failure Rate</span>
+						</div>
+					</div>
+					<div>
+						<div className="flex items-baseline gap-1">
+							<p className="text-xl font-mono font-semibold tracking-tight text-primary">{mockStats.failureRate}</p>
+							<span className="text-xs font-mono text-primary">%</span>
+						</div>
+						<SubtleProgressBar percentage={mockStats.failureRate} color="bg-red-600/80" />
+					</div>
+				</div>
+				<div className="border  rounded-lg p-3 dark:bg-neutral-950 bg-white h-22 flex flex-col justify-between">
+					<div className="flex justify-between items-start">
+						<div className="flex items-center gap-1.5">
+							<MdErrorOutline className="text-neutral-400" size={14} />
+							<span className="text-[11px] font-medium text-less uppercase tracking-wider">Failed Builds</span>
+						</div>
+					</div>
+					<div className="flex items-center justify-between">
+						<p className="text-xl font-mono font-semibold tracking-tight text-primary">{mockStats.failedBuilds}</p>
+						<ThinSparkline data={[100, 2, 0]} />
+					</div>
+				</div>
 
-			<div className=" border rounded-xl p-5 dark:bg-neutral-900 bg-white">
-				<div className="flex items-center gap-3 mb-2">
-					<div className="p-2 border  rounded-lg">
-						<IoMdGitBranch className="" size={20} />
+
+				<div className="border  rounded-lg p-3 dark:bg-neutral-950 bg-white h-22 flex flex-col justify-between">
+					<div className="flex items-center gap-1.5">
+						<BsHddNetwork className="text-neutral-400" size={13} />
+						<span className="text-[11px] font-medium text-less uppercase tracking-wider">Bandwidth</span>
 					</div>
-					<span className="text-sm text-less">Last Deployed</span>
+					<div>
+						<p className="text-xl font-semibold tracking-tight text-primary">{formatBytes(mockStats.bandwidth)} <span className="text-xs font-normal text-primary">GB</span></p>
+					</div>
 				</div>
-				<p className="font-semibold text-sm mt-3">{mockStats.lastDeployed}</p>
+
+				<div className="border  rounded-lg p-3 dark:bg-neutral-950 bg-white h-22 flex flex-col justify-between">
+					<div className="flex items-center gap-1.5">
+						<MdAccessTime className="text-neutral-400" size={14} />
+						<span className="text-[11px] font-medium text-less uppercase tracking-wider">Avg Build Time</span>
+					</div>
+					<div className="flex items-end justify-between">
+						<p className="text-xl font-mono font-semibold tracking-tight text-primary">{mockStats.avgBuildTime}s</p>
+						<div className="flex items-center text-emerald-500/80 bg-emerald-50 dark:bg-emerald-900/20 px-1.5 py-0.5 rounded text-[10px] font-medium">
+							<IoIosTrendingDown size={10} className="mr-0.5" /> Faster
+						</div>
+					</div>
+				</div>
+
+				<div className="border rounded-lg p-3 dark:bg-neutral-950 bg-white h-22 flex flex-col justify-between">
+					<div className="flex items-center gap-1.5">
+						<BsGlobe2 className="text-neutral-400" size={13} />
+						<span className="text-[11px] font-medium text-less uppercase tracking-wider">Latest Deploy</span>
+					</div>
+					<p className="text-base font-mono font-medium text-primary">{mockStats.lastDeployed} ago</p>
+				</div>
+
+				<div className="border rounded-lg p-3 dark:bg-neutral-950 bg-white h-22 flex flex-col">
+					<div className="flex justify-between items-start">
+						<div className="flex items-center gap-1.5">
+							<LuHistory className="text-neutral-400" size={14} />
+							<span className="text-[11px] font-medium text-less uppercase tracking-wider">Builds History</span>
+						</div>
+					</div>
+					<div className="mt-5">
+						<StatusHistory statuses={mockStats.buildHistory || []} />
+					</div>
+				</div>
 			</div>
-		</RightFadeComponent >
+		</RightFadeComponent>
 	)
 }
 export default ProjectSimpleStats
+

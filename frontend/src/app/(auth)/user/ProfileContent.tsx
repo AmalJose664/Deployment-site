@@ -13,6 +13,7 @@ import { VscAccount } from 'react-icons/vsc';
 import { FaGithub, FaGoogle } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import RightFadeComponent from '@/components/RightFadeComponent';
+import { SubtleProgressBar } from '@/components/SimpleStatsCompnts';
 
 
 
@@ -26,7 +27,7 @@ const ProfileContent = () => {
 	}
 	return (
 		<div>
-			<div className="min-h-screen bg-gradient-to-br from-background to-slate-100 dark:from-background dark:to-neutral-900">
+			<div className="min-h-screen bg-linear-to-br from-background to-slate-100 dark:from-background dark:to-neutral-900">
 				<div className="sticky top-0 z-10 dark:bg-neutral-950/80 backdrop-blur-md">
 					<div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3">
 						<BackButton />
@@ -80,13 +81,14 @@ const ProfileContent = () => {
 									<IoIosCube className="w-7 h-7 " />
 								</div>
 							</div>
-							{userDetailed && <div className='h-1 w-full bg-gray-500'>
+							{userDetailed && <SubtleProgressBar percentage={getPercentage(userDetailed?.projects || 0, currentPlan.maxProjects)} color="bg-blue-500/80" />}
+							{/* {userDetailed && <div className='h-1 w-full bg-gray-500'>
 								<div
 									style={{ width: getPercentage(userDetailed?.projects || 0, currentPlan.maxProjects) }}
 									className="h-1 bg-blue-400">
 								</div>
 							</div>
-							}
+							} */}
 						</RightFadeComponent>
 
 						<RightFadeComponent delay={.1} className="dark:bg-neutral-900 bg-white rounded-xl border p-6 shadow-md hover:shadow-lg transition-shadow duration-200">
@@ -101,13 +103,8 @@ const ProfileContent = () => {
 									<IoMdCloudDone className="w-7 h-7 " />
 								</div>
 							</div>
-							{userDetailed && <div className='h-1 w-full bg-gray-500'>
-								<div
-									style={{ width: getPercentage(userDetailed?.deploymentsToday || 0, currentPlan.maxDailyDeployments) }}
-									className="h-1 bg-blue-400">
-								</div>
-							</div>
-							}
+							{userDetailed && <SubtleProgressBar percentage={getPercentage(userDetailed?.deploymentsToday || 0, currentPlan.maxDailyDeployments)} color="bg-blue-500/80" />}
+
 						</RightFadeComponent >
 
 						<RightFadeComponent delay={.18} className="dark:bg-neutral-900 bg-white rounded-xl border  p-6 shadow-md hover:shadow-lg transition-shadow duration-200">

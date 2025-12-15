@@ -15,7 +15,7 @@ interface NoDeploymentProps {
 const NoDeployment = ({ buttonAction, buttonText, descriptionText, learnMoreUrl, titleText, buttonIcon }: NoDeploymentProps) => {
 
 	return (
-		<div className="border rounded-md  flex items-center justify-center">
+		<div className="border rounded-md  flex items-center justify-center mb-4">
 			<Empty>
 				<EmptyHeader>
 					<EmptyMedia variant="default">

@@ -21,12 +21,12 @@ const app = express();
 const httpServer = createServer(app);
 
 app.use(
-    cors({
-        origin: process.env.FRONTEND_URL,
-        // methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-        credentials: true,
-        // allowedHeaders: ["Content-Type", "Authorization"],
-    }),
+	cors({
+		origin: process.env.FRONTEND_URL,
+		// methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+		credentials: true,
+		// allowedHeaders: ["Content-Type", "Authorization"],
+	}),
 );
 app.use("/api/billing/stripe-webhook", express.raw({ type: "application/json" }));
 app.use(express.json());
@@ -34,20 +34,9 @@ app.use(cookieParser());
 app.use(passport.initialize());
 
 app.use((req: any, res: any, next: any) => {
-    const time = new Date();
-    console.log(`\n----${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}----- ${req.path} ------${req.method}`);
-    next();
-});
-app.use((req: Request, res: Response, next: NextFunction) => {
-    const originalJson = res.json;
-    res.json = function (body?: any) {
-        const result = originalJson.call(this, body);
-        console.log("Response stats>", res.statusCode, ">>> ", res.statusMessage);
-
-        return result;
-    };
-
-    next();
+	const time = new Date();
+	console.log(`\n----${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}----- ${req.path} ------${req.method}`);
+	next();
 });
 
 app.use("/api/analytics", analyticsRouter);
@@ -64,9 +53,9 @@ app.use("/api/internal", internalRoutes);
 // --------------------------------------
 
 app.get("/", (req, res) => {
-    console.log(req.headers);
-    res.json({ status: "working" });
-    return;
+	console.log(req.headers);
+	res.json({ status: "working" });
+	return;
 });
 
 app.use(errorHandler);

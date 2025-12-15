@@ -22,6 +22,7 @@ import { getBranches } from "@/lib/form";
 import { useUpdateProjectMutation } from "@/store/services/projectsApi";
 import { ChangeProjectSubdomainDialog } from "@/components/modals/ChangeSubdomain";
 import RightFadeComponent from "@/components/RightFadeComponent";
+import { LoadingSpinner2 } from "@/components/LoadingSpinner";
 
 
 
@@ -509,16 +510,7 @@ const ProjectSettings = ({ project, reDeploy, setTabs }: { project: Project, reD
 		<div className="">
 			<div className="">
 				<form className="flex flex-col gap-3 p-4" noValidate onSubmit={handleSubmit(saveData)}>
-					{isLoading && (
-						<motion.div
-							initial={{ y: 20, opacity: 0 }}
-							animate={{ y: 0, opacity: 1 }}
-							transition={{ duration: 0.3, ease: "easeInOut" }}
-							className="flex gap-6 items-center justify-center">
-							<p className="text-gray-500">Loading...</p>
-							<AiOutlineLoading3Quarters className="animate-spin " />
-						</motion.div>
-					)}
+					<LoadingSpinner2 isLoading={isLoading} />
 					<SaveBar control={form.control} handleSubmit={handleSubmit} saveAndDeploy={saveAndDeploy} />
 
 					<Details project={project} form={form} branches={branches} />

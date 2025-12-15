@@ -168,6 +168,6 @@ export function shortHash(hash: string) {
 }
 
 export function getPercentage(value: number, limit: number) {
-	if (limit === 0) return `0%`;
-	return `${((value / limit) * 100).toFixed(2)}%`;
+	if (limit === 0) return 0;
+	return ((value / limit) * 100);
 }

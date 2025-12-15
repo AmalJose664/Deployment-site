@@ -131,13 +131,14 @@ export function ProjectContent({
 					<TabsContent value="overview">
 						<TabProject
 							project={project}
-							deployment={deployment}
-							tempDeployment={tempDeployment}
-							lastDeployment={lastDeployment}
-							onCreateDeployment={onCreateDeployment}
-							setShowBuild={setShowBuild}
+							deploymentCtx={{
+								deployment,
+								tempDeployment,
+								lastDeployment,
+								onCreateDeployment
+							}}
+							build={{ setShowBuild, showBuild }}
 							reDeploy={reDeploy}
-							showBuild={showBuild}
 							setTabs={setTabs}
 							refetchLogs={refetchLogs}
 						/>

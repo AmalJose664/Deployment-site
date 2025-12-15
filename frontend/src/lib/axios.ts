@@ -24,8 +24,8 @@ const processQueue = (error: Error | null, token: string | null = null) => {
 	failedQueue = [];
 };
 
-// axiosInstance.interceptors.request.use((config) => {
-// 	console.log("used this instance")
+// axiosInstance.interceptors.request.use(async (config) => {
+// 	await new Promise((res) => setTimeout(res, 2000)) // delay for loading animation
 // 	return config
 // })
 

@@ -23,14 +23,14 @@ const ProjectDeploymentBox = ({ deployment, projectBranch, repoURL, showLogs, ty
 	const router = useRouter()
 	return (
 		<RightFadeComponent delay={.1} inView className="border  rounded-xl overflow-hidden dark:bg-neutral-900 bg-white mb-4">
-			<div className="px-6 py-4 border-b border-gray-800">
+			<div className="px-6 py-4 border-b">
 				<h2 className="text-lg font-semibold">{type} Deployment</h2>
 			</div>
 
 
 			<div className="divide-y divide-gray-800" onClick={() => router.push("/deployments/" + deployment._id)}>
 				<div
-					className="px-6 py-4 hover:bg-zinc-800/50 transition-colors cursor-pointer"
+					className="px-6 py-4 hover:bg-secondary/50 transition-colors cursor-pointer"
 				>
 					<div className="flex items-start justify-between">
 						<div className="flex items-start gap-4 flex-1">

@@ -2,9 +2,7 @@
 import StatusIcon from "@/components/ui/StatusIcon"
 import { getStatusBg, getStatusColor, timeToSeconds } from "@/lib/utils"
 import Link from "next/link"
-import { motion } from "motion/react";
-import { IoIosArrowDown, IoIosCube, IoMdCloudDone, IoMdGitBranch } from "react-icons/io"
-import { LiaExternalLinkAltSolid } from "react-icons/lia"
+import { IoIosCube, IoMdCloudDone, IoMdGitBranch } from "react-icons/io"
 import { MdAccessTime } from "react-icons/md"
 import { CiSearch } from "react-icons/ci"
 import { Project, ProjectStatus } from "@/types/Project"
@@ -15,9 +13,9 @@ import { useGetDeploymentsQuery } from "@/store/services/deploymentApi"
 import PaginationComponent from "@/components/Pagination"
 import NoDeployment from "@/app/(project)/projects/[id]/components/NoDeployment"
 import { useRouter } from "next/navigation"
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import DeploymentStatusButtons from "@/components/DeploymentStatusButtons";
 import OptionsComponent from "@/components/OptionsComponent";
+import { LoadingSpinner2 } from "@/components/LoadingSpinner";
 
 const AllDeployments = () => {
 	const [page, setPage] = useState(1)
@@ -61,7 +59,7 @@ const AllDeployments = () => {
 
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-background to-slate-100 dark:from-background dark:to-neutral-900">
+		<div className="min-h-screen bg-linear-to-br from-background to-slate-100 dark:from-background dark:to-neutral-900">
 			<div className="max-w-[1400px] mx-auto px-6  rounded-md py-4">
 				<h1 className="text-xl font-semibold text-primary flex gap-2 mb-4 items-center">
 					All Deployments  <IoMdCloudDone />
@@ -78,16 +76,7 @@ const AllDeployments = () => {
 						<DeploymentStatusButtons statuses={statuses} setStatuses={setStatuses} />
 
 					</div>
-					{isLoading && (
-						<motion.div
-							initial={{ y: 20, opacity: 0 }}
-							animate={{ y: 0, opacity: 1 }}
-							transition={{ duration: 0.3, ease: "easeInOut" }}
-							className="flex gap-6 items-center mb-10 justify-center">
-							<p className="text-gray-500 ">Loading...</p>
-							<AiOutlineLoading3Quarters className="animate-spin " />
-						</motion.div>
-					)}
+					<LoadingSpinner2 isLoading={isLoading} />
 					<div className="flex items-center mb-4 gap-3 flex-wrap">
 						{Object.entries(statusCounts).map((value, i) => (
 							(statuses[value[0]] && value[1] > 0) && (
@@ -138,7 +127,7 @@ const AllDeployments = () => {
 										<div className="text-sm text-primary mb-1 max-w-full sm:max-w-[80px] overflow-hidden text-ellipsis whitespace-nowrap">
 											{deployment.commit.id}
 										</div>
-										<div className="text-sm text-primary mb-1 break-words">{deployment.commit.msg}</div>
+										<div className="text-sm text-primary mb-1 wrap-break-word">{deployment.commit.msg}</div>
 									</div>
 									<div className="flex items-center gap-4 text-xs text-gray-400">
 										<div className="flex items-center text-xs gap-1.5">
@@ -175,7 +164,7 @@ const AllDeployments = () => {
 						<div className="flex items-center justify-center px-4">
 							<div className="border p-4 rounded-md max-w-full">
 								<p>Error Loading Deployments</p>
-								<p className="break-words">{(error as any)?.message || (error as { data?: { message?: string } })?.data?.message || "Something went wrong"}</p>
+								<p className="wrap-break-word">{(error as any)?.message || (error as { data?: { message?: string } })?.data?.message || "Something went wrong"}</p>
 							</div>
 						</div>
 					)}

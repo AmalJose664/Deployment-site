@@ -32,6 +32,7 @@ import { LuExternalLink } from "react-icons/lu";
 import RightFadeComponent from "@/components/RightFadeComponent";
 import { projectApis, useGetProjectByIdQuery } from "@/store/services/projectsApi";
 import { useSelector } from "react-redux";
+import { LoadingSpinner2 } from "@/components/LoadingSpinner";
 
 const DeploymentPageContainer = ({ deploymentId }: { deploymentId: string }) => {
 
@@ -96,16 +97,7 @@ const DeploymentPageContainer = ({ deploymentId }: { deploymentId: string }) => 
 
 			<div className="max-w-[1350px] mx-auto px-4 sm:px-6 py-8 border mt-4 rounded-md mb-10 dark:bg-zinc-950 bg-zinc-100">
 				{isLoading ? (
-					<motion.div
-						initial={{ y: 20, opacity: 0 }}
-						animate={{ y: 0, opacity: 1 }}
-						className="flex flex-col items-center justify-center h-[50vh] gap-4"
-					>
-						<AiOutlineLoading3Quarters className="animate-spin text-3xl text-neutral-400" />
-						<p className="text-neutral-500 text-sm animate-pulse">
-							Retrieving deployment details...
-						</p>
-					</motion.div>
+					<LoadingSpinner2 isLoading={isLoading} loadingText="Retrieving deployment details..." />
 				) : (
 					<motion.div
 						initial={{ opacity: 0, y: 10 }}

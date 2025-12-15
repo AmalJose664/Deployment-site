@@ -1,4 +1,6 @@
 import { cva, VariantProps } from "class-variance-authority"
+import { motion } from "motion/react"
+import { AiOutlineLoading3Quarters } from "react-icons/ai"
 
 const spinnerVariants = cva(
 	"border-4 rounded-full border-t-transparent animate-spin border-primary",
@@ -27,3 +29,20 @@ export const LoadingSpinner = ({ size, className }: LoadingSpinnerProps) => {
 		</div>
 	)
 }
+
+export const LoadingSpinner2 = ({ isLoading, loadingText }: { isLoading: boolean, loadingText?: string }) => {
+	return (
+		<div>{isLoading && (
+			<motion.div
+				initial={{ y: 20, opacity: 0 }}
+				animate={{ y: 0, opacity: 1 }}
+				transition={{ duration: 0.3, ease: "easeInOut" }}
+				className="flex gap-6 items-center mb-10 justify-center">
+				<p className="text-gray-500 ">{loadingText || "Loading..."}</p>
+				<AiOutlineLoading3Quarters className="animate-spin " />
+			</motion.div>
+		)}</div>
+
+	)
+}
+export default LoadingSpinner
