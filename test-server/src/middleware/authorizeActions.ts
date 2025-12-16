@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 
-export const authenticaContainerteToken = (req: Request, res: Response, next: NextFunction) => {
+export const authorizeActions = (req: Request, res: Response, next: NextFunction) => {
 	const token = req.headers["authorization"]?.split(" ")[1];
 	if (!token) {
 		console.log("No token");
-		return res.status(401).json({ message: "Project data fetching failed, No container token provided" });
+		return res.status(401).json({ message: "File uploading failed, No container token provided" });
 	}
 	const server_token = process.env.CONTAINER_API_TOKEN;
 
@@ -12,7 +12,7 @@ export const authenticaContainerteToken = (req: Request, res: Response, next: Ne
 		console.log("Invalid token");
 		console.log(server_token, "<<<>>>>", token);
 
-		return res.status(401).json({ message: "Project data fetching failed, Invalid token" });
+		return res.status(401).json({ message: "File uploading failed, Invalid token" });
 	}
 	next();
 };

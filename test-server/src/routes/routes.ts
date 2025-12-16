@@ -3,6 +3,7 @@ import { downloadFile, newDeployment, provideProjectFiles, provideProjectIndex, 
 import { testSubmit1, testSubmit2, testSubmit3 } from "../controller/testFunctions.js";
 import { validateObjectId } from "../middleware/validate.js";
 import multer from "multer"
+import { authorizeActions } from "../middleware/authorizeActions.js";
 
 const upload = multer({ dest: 'public/temp/' });
 const router = Router({})
@@ -31,6 +32,7 @@ router.use(
 router.post(
 	"/new/:projectId/:deploymentId",
 	upload.single("file"),
+	authorizeActions,
 	validateObjectId('projectId'),
 	validateObjectId('deploymentId'),
 	newDeployment

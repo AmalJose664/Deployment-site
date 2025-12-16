@@ -14,8 +14,8 @@ import archiver from "archiver";
 import FormData from "form-data";
 import axios from 'axios';
 
-let DEPLOYMENT_ID = process.env.DEPLOYMENT_ID || "69347c6d6031f8e069ce7c9d"   // Received from env by apiserver or use backup for local testing
-let PROJECT_ID = process.env.PROJECT_ID || "6934502adfa2d8c1c254aabc"   // Received from env by apiserver or use backup for local testing
+let DEPLOYMENT_ID = process.env.DEPLOYMENT_ID || "693c6bd1d1f5cc40415cd522"   // Received from env by apiserver or use backup for local testing
+let PROJECT_ID = process.env.PROJECT_ID || "69246647869c614a349015fc"   // Received from env by apiserver or use backup for local testing
 
 const kafka = new Kafka({
 	clientId: `docker-build-server-${PROJECT_ID}`,
@@ -86,6 +86,15 @@ let logsNumber = 0
 let logBuffer = [];
 let flushTimer = null;
 // ----------------------------------------------------FUNCTIONS--------------------------------------------------
+
+const deleteEnvs = () => {
+
+	delete process.env.KAFKA_USERNAME;
+	delete process.env.KAFKA_PASSWORD;
+	delete process.env.AWS_SECRETKEY;
+	delete process.env.AWS_ACCESSKEY;
+	delete process.env.CONTAINER_API_TOKEN;
+}
 
 const sendLogsAsBatch = async () => {
 
@@ -202,51 +211,65 @@ async function fetchProjectData(deploymentId = "") {
 	const API_ENDPOINT = process.env.API_ENDPOINT
 	const baseUrl = `${API_ENDPOINT}/api/internal`
 
-	const deploymentResponse = await axios.get(`${baseUrl}/deployments/${deploymentId}`, {
-		timeout: 24000,
-		headers: {
-			Authorization: `Bearer ${API_SERVER_CONTAINER_API_TOKEN}`
-		}
-	})
-
-	const deploymentData = deploymentResponse.data
-	if (!deploymentData.deployment) {
-
-		throw new ContainerError("Deployment data not found", "data fetching", "Invalid project or deployment Id")
-	}
-
-	const projectId = deploymentData.deployment.project
-	const projectResponse = await axios.get(`${baseUrl}/projects/${projectId}`, {
-		timeout: 24000,
-		headers: {
-			Authorization: `Bearer ${API_SERVER_CONTAINER_API_TOKEN}`
-		}
-	})
-
-	const projectData = projectResponse.data
-	if (!projectData.project) {
-
-		throw new ContainerError("Project data not found", "data fetching", "Invalid project or deployment Id")
-	}
-	if (!projectData.project.installCommand) {
-		publishLogs({
-			DEPLOYMENT_ID, PROJECT_ID,
-			level: "WARN",
-			message: "install command not found; running with default command", stream: "data error"
+	try {
+		const deploymentResponse = await axios.get(`${baseUrl}/deployments/${deploymentId}`, {
+			timeout: 24000,
+			headers: {
+				Authorization: `Bearer ${API_SERVER_CONTAINER_API_TOKEN}`
+			}
 		})
-		//logs
 
-	}
-	if (!projectData.project.buildCommand) {
-		publishLogs({
-			DEPLOYMENT_ID, PROJECT_ID,
-			level: "WARN",
-			message: "build command not found; running with default command", stream: "data error"
+		const deploymentData = deploymentResponse.data
+
+		if (!deploymentData.deployment) {
+			throw new ContainerError("Deployment data not found", "data fetching", "Invalid project or deployment Id")
+		}
+
+		const projectId = deploymentData.deployment.project
+		const projectResponse = await axios.get(`${baseUrl}/projects/${projectId}`, {
+			timeout: 24000,
+			headers: {
+				Authorization: `Bearer ${API_SERVER_CONTAINER_API_TOKEN}`
+			}
 		})
-		//logs
-	}
 
-	return [projectData.project, deploymentData.deployment]
+		const projectData = projectResponse.data
+		if (!projectData.project) {
+			throw new ContainerError("Project data not found", "data fetching", "Invalid project or deployment Id")
+		}
+
+		if (!projectData.project.installCommand) {
+			publishLogs({
+				DEPLOYMENT_ID, PROJECT_ID,
+				level: "WARN",
+				message: "install command not found; running with default command", stream: "data error"
+			})
+			//logs
+
+		}
+		if (!projectData.project.buildCommand) {
+			publishLogs({
+				DEPLOYMENT_ID, PROJECT_ID,
+				level: "WARN",
+				message: "build command not found; running with default command", stream: "data error"
+			})
+			//logs
+		}
+
+		return [projectData.project, deploymentData.deployment]
+	} catch (error) {
+		if (axios.isAxiosError(error)) {
+			console.log("Error on fetching Project data", error)
+			publishLogs({
+				DEPLOYMENT_ID, PROJECT_ID,
+				level: "ERROR",
+				message: `Error on fetching Project data, ${error.message}`,
+				stream: "data fetching"
+			});
+			throw new ContainerError("Api server not reachable " + error.message, "data fetching", "Api server not reachable")
+		}
+		throw error
+	}
 }
 
 function getDynamicBuildRoot(tool = "") {
@@ -330,7 +353,7 @@ async function validatePackageJsonAndGetFramework(dir, rootDir) {
 	]
 	const suspiciousCommands = [
 		'curl', 'wget', 'Invoke-WebRequest', 'certutil',
-		'rm -rf', 'rmdir', 'del ', 'format ', 'mkfs', 'chmod', 'chown',
+		'rm -rf', 'rmdir', 'del ', 'format ', 'mkfs', 'chmod', "node", 'chown',
 		'scp', 'ftp', 'base64', 'eval(', 'spawn(', 'exec(', 'shutdown',
 		'sudo', 'dd if=', 'mkfs', 'tar -cf /', 'nc ', 'netcat'
 	];
@@ -477,7 +500,7 @@ async function uploadNonAws(dir, fileName) {
 	if (!settings.sendLocalDeploy) return
 	const url = process.env.STORAGE_SERVER_ENDPOINT || ""
 	if (!url && settings.localDeploy) {
-		throw new ContainerError("No url found for storage server", "upload")
+		throw new ContainerError("Storage server not reachable", "upload")
 	}
 	const zipStream = createReadStream(path.join(dir, fileName));
 	const form = new FormData();
@@ -489,7 +512,10 @@ async function uploadNonAws(dir, fileName) {
 		const res = await axios.post(url + `/new/${PROJECT_ID}/${DEPLOYMENT_ID}`, form,
 			{
 				timeout: 24000,
-				headers: form.getHeaders(),
+				headers: {
+					Authorization: `Bearer ${API_SERVER_CONTAINER_API_TOKEN}`,
+					...form.getHeaders()
+				},
 				maxContentLength: Infinity,
 				maxBodyLength: Infinity
 			}
@@ -498,14 +524,14 @@ async function uploadNonAws(dir, fileName) {
 		console.log(result, " <<< <<",)
 		return
 	} catch (error) {
-		console.log("Error on uploading files")
+		console.log("Error on uploading files", error)
 		publishLogs({
 			DEPLOYMENT_ID, PROJECT_ID,
 			level: "ERROR",
 			message: `Error on uploading files, ${error.message}`,
 			stream: "upload"
 		});
-		throw new ContainerError(error.message, "upload", "Storage server not reachable")
+		throw new ContainerError("Storage server not reachable  " + error.message, "upload", "Storage server not reachable")
 	}
 
 }
@@ -809,5 +835,5 @@ process.on('uncaughtException', async (err) => {
 	await producer.disconnect();
 	process.exit(1);
 });
-
+deleteEnvs()
 init()

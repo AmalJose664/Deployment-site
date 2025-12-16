@@ -90,7 +90,7 @@ const ProjectSimpleStats = ({ project }: { project: Project }) => {
 						<span className="text-[11px] font-medium text-less uppercase tracking-wider">Bandwidth</span>
 					</div>
 					<div>
-						<p className="text-xl font-semibold tracking-tight text-primary">{formatBytes(mockStats.bandwidth)} <span className="text-xs font-normal text-primary">GB</span></p>
+						<p className="text-xl font-semibold tracking-tight text-primary">{formatBytes(mockStats.bandwidth)} </p>
 					</div>
 				</div>
 

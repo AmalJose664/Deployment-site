@@ -28,7 +28,7 @@ export default function SignupPage() {
 
 			<div className="absolute top-8 left-8">
 				<Link href="/" className=' hover:no-underline'>
-					<TitleWithLogo />
+					<TitleWithLogo useSvg />
 				</Link>
 			</div>
 

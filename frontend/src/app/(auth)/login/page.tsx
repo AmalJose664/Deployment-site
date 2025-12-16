@@ -29,7 +29,7 @@ export default function LoginPage() {
 
 			<div className="absolute top-8 left-8 ">
 				<Link href="/" className=' hover:no-underline'>
-					<TitleWithLogo />
+					<TitleWithLogo useSvg />
 				</Link>
 			</div>
 			<div className="absolute top-8 right-8">

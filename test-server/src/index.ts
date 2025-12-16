@@ -5,13 +5,14 @@ import path from "path";
 import { fileURLToPath } from "url";
 import router from "./routes/routes.js";
 import { producer } from "./config/kafka.js";
+import { validateEnv } from "./config/env.config.js";
 
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const port = 4000;
+const port = process.env.PORT || 4000;
 process.env['KAFKAJS_NO_PARTITIONER_WARNING'] = "1"
 
 
@@ -35,7 +36,7 @@ app.use(router)
 
 // --------------------------------------------------------------------------------------------
 
-
+validateEnv()
 app.listen(port, async () => {
 	await producer.connect()
 	console.log(`Server is running on http://localhost:${port}`);

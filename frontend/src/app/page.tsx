@@ -1,9 +1,7 @@
+import { Footer } from '@/components/GlobalFooter';
 import Navbar from '@/components/Navbar';
-import ThemeSwitcher from '@/components/ThemeIcon';
-import TitleWithLogo from '@/components/TitleWithLogo';
 import { SITE_NAME } from '@/config/constants';
 import {
-	Terminal,
 	Zap,
 	Globe,
 	Shield,
@@ -19,10 +17,7 @@ import {
 	Layers
 } from 'lucide-react';
 import {
-	Activity,
-	ArrowUpRight,
 	Database,
-	Server,
 	TerminalSquare
 } from 'lucide-react';
 import Link from 'next/link';
@@ -130,13 +125,13 @@ const Hero2 = () => {
 
 				<div className="lg:col-span-5 relative h-[500px] hidden lg:block">
 					<div className="w-full h-full bg-slate-90/50 border border-secondary relative overflow-hidden p-8 backdrop-blur-sm">
-						<div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:2rem_2rem]"></div>
+						<div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-size-[2rem_2rem]"></div>
 
 						<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-slate-950 border-2 border-slate-700 flex items-center justify-center  z-20 shadow-2xl">
 							<div className="absolute inset-2 bg-blue-500/5 border border-blue-500/20 animate-pulse"></div>
 							<Cpu className="w-24 h-24 text-slate-600" strokeWidth={1} />
-							<div className="absolute top-0 left-1/2 w-[2px] h-full bg-gradient-to-b from-transparent via-blue-500/50 to-transparent -z-10"></div>
-							<div className="absolute top-1/2 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent -z-10"></div>
+							<div className="absolute top-0 left-1/2 w-[2px] h-full bg-linear-to-b from-transparent via-blue-500/50 to-transparent -z-10"></div>
+							<div className="absolute top-1/2 left-0 w-full h-[2px] bg-linear-to-r from-transparent via-blue-500/50 to-transparent -z-10"></div>
 						</div>
 						<div className="absolute top-16 left-16 w-16 h-16 bg-slate-950 border border-slate-700 flex flex-col items-center justify-center z-10">
 							<Globe className="w-6 h-6 text-slate-500 mb-1" />
@@ -176,7 +171,7 @@ const Features = () => {
 				<div className="text-center mb-16">
 					<h2 className="text-3xl sm:text-4xl font-bold text-primary mb-4">
 						Everything you need to <br />
-						<span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">
+						<span className="text-transparent bg-clip-text bg-linear-to-r from-purple-400 to-pink-500">
 							scale your frontend
 						</span>
 					</h2>
@@ -188,7 +183,7 @@ const Features = () => {
 						icon={Globe}
 						title="Global Storage Network"
 						description="Your content is cached and served to regions worldwide, ensuring low latency for every user."
-						className="md:col-span-2 bg-gradient-to-br from-white/5 to-purple-900/10"
+						className="md:col-span-2 bg-linear-to-br from-white/5 to-purple-900/10"
 					/>
 					<FeatureCard
 						icon={GitBranch}
@@ -308,7 +303,7 @@ const CodeSection = () => {
 
 								<div className="flex gap-3">
 									<div className="mt-1">
-										<div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center">
+										<div className="w-8 h-8 rounded-lg bg-linear-to-tr from-blue-500 to-purple-600 flex items-center justify-center">
 											<span className="text-white font-bold text-xs">O</span>
 										</div>
 									</div>
@@ -391,7 +386,7 @@ const BottomBoxes = () => {
 					</div>
 
 					<div className="p-8 lg:p-12 bg-slate-950 relative overflow-hidden">
-						<div className="absolute inset-0 opacity-10 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:16px_16px]"></div>
+						<div className="absolute inset-0 opacity-10 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] bg-size-[16px_16px]"></div>
 						<h3 className="font-mono uppercase text-sm text-blue-500 mb-6 tracking-wider">Live Metrics</h3>
 						<div className="space-y-6 font-mono">
 							<div>
@@ -417,13 +412,13 @@ const BottomBoxes = () => {
 const CTA = () => {
 	return (
 		<section className="py-24 relative overflow-hidden">
-			<div className="absolute inset-0 bg-gradient-to-b from-transparent to-purple-900/20 pointer-events-none" />
+			<div className="absolute inset-0 bg-linear-to-b from-transparent to-purple-900/20 pointer-events-none" />
 			<div className="max-w-4xl mx-auto px-4 text-center relative z-10">
 				<h2 className="text-4xl sm:text-5xl font-bold text-primary mb-8 tracking-tight">
 					Ready to launch?
 				</h2>
 				<p className="text-xl text-less mb-10 max-w-2xl mx-auto">
-					Join 100,000+ developers building the future of the web with {SITE_NAME}.
+					Join 1+ developers building the future of the web with {SITE_NAME}.
 					Start for free, scale when you need to.
 				</p>
 				<div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -434,61 +429,6 @@ const CTA = () => {
 				</div>
 			</div>
 		</section>
-	);
-};
-
-const Footer = () => {
-	return (
-		<footer className="border bg-background pt-16 pb-8">
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-				<div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-					<div>
-						<h3 className="text-primary font-bold mb-4">Product</h3>
-						<ul className="space-y-2">
-							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Infrastructure</a></li>
-							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Previews</a></li>
-							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Edge Functions</a></li>
-							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Analytics</a></li>
-						</ul>
-					</div>
-					<div>
-						<h3 className="text-primary font-bold mb-4">Resources</h3>
-						<ul className="space-y-2">
-							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Documentation</a></li>
-							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Guides</a></li>
-							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Help Center</a></li>
-							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Changelog</a></li>
-						</ul>
-					</div>
-					<div>
-						<h3 className="text-primary font-bold mb-4">Company</h3>
-						<ul className="space-y-2">
-							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">About</a></li>
-							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Blog</a></li>
-							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Careers</a></li>
-							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Contact</a></li>
-						</ul>
-					</div>
-					<div>
-						<h3 className="text-primary font-bold mb-4">Legal</h3>
-						<ul className="space-y-2">
-							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Privacy Policy</a></li>
-							<li><a href="#" className="text-gray-500 hover:text-some-less text-sm">Terms of Service</a></li>
-						</ul>
-					</div>
-				</div>
-				<div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-					<div className="flex items-center gap-2">
-						<TitleWithLogo useSvg />
-						<span className="text-less text-sm">© 2025 Lynfera Inc. All rights reserved.</span>
-					</div>
-					<div className="flex gap-6">
-						<Github className="text-gray-500 hover:text-some-less cursor-pointer" size={20} />
-						<ThemeSwitcher className="rounded-full" />
-					</div>
-				</div>
-			</div>
-		</footer>
 	);
 };
 

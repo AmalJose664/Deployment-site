@@ -6,7 +6,7 @@ yarn-debug.log*
 yarn-error.log*
 
 
-test-server/config/kafka.ts
+test-server/src/config/kafka.ts
 test-server/public/user-projects/
 
 test-grounds/

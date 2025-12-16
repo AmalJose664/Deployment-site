@@ -14,7 +14,7 @@ export function provideProjectFiles(req: Request, res: Response, next: NextFunct
 	const projectId = req.params.projectId;
 	const deploymentId = req.params.deploymentId;
 
-	const projectPath = path.join(__dirname, "..", 'public', 'user-projects', projectId, deploymentId);
+	const projectPath = path.join(__dirname, "..", "..", 'public', 'user-projects', projectId, deploymentId);
 	express.static(projectPath, {
 		setHeaders: (res, filePath, stat) => {
 			res.setHeader('Access-Control-Allow-Origin', '*');
@@ -30,7 +30,7 @@ export function provideProjectIndex(req: Request, res: Response): void {
 
 	const projectId = req.params.projectId;
 	const deploymentId = req.params.deploymentId;
-	const indexPath = path.join(__dirname, 'public', 'user-projects', projectId, deploymentId, 'index.html');
+	const indexPath = path.join(__dirname, "..", "..", 'public', 'user-projects', projectId, deploymentId, 'index.html');
 	res.sendFile(indexPath);
 };
 
@@ -66,8 +66,6 @@ export async function downloadFile(req: Request, res: Response) {
 
 		const fileName = path.basename(filePath);
 		res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
-
-
 		res.sendFile(normalizedPath);
 
 	} catch (error) {
