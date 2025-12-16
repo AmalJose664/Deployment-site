@@ -1,19 +1,11 @@
-import { Footer } from "@/components/GlobalFooter";
-import {
-	Rocket,
-	Globe,
-	Database,
-	ServerOff,
-	ShieldCheck,
-	Zap,
-	Layout,
-	Code2,
-	CheckCircle2,
-	XCircle
-} from "lucide-react";
+import { SITE_NAME } from "@/config/constants";
+
+import { BsXCircle } from "react-icons/bs";
+import { LuLayoutDashboard, LuServerOff } from "react-icons/lu";
+import { MdOutlineCheckCircleOutline } from "react-icons/md";
 
 export const metadata = {
-	title: "Product | Frontend Deployment Platform",
+	title: "Product | " + SITE_NAME,
 	description:
 		"The fastest way to deploy React applications to the global edge. Static hosting, asset storage, and zero configuration.",
 };
@@ -53,9 +45,9 @@ const page = () => {
 				<div className="mx-auto max-w-7xl px-6 lg:px-8">
 					<div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
 
-						<div className="rounded-2xl border border-less bg-background p-8 shadow-sm ring-1 ring-less">
+						<div className="rounded-2xl border border-less dark:bg-zinc-900 bg-white p-8 shadow-sm ring-1 ring-less">
 							<h3 className="flex items-center text-xl font-bold tracking-tight text-primary">
-								<Layout className="mr-2 h-5 w-5 text-indigo-600" />
+								<LuLayoutDashboard className="mr-2 h-5 w-5 text-indigo-600" />
 								What We Optimize For
 							</h3>
 							<p className="mt-4 text-sm leading-6 text-some-less">
@@ -64,28 +56,28 @@ const page = () => {
 							</p>
 							<ul className="mt-8 space-y-3 text-sm leading-6 text-less">
 								<li className="flex gap-x-3">
-									<CheckCircle2 className="h-6 w-5 flex-none text-emerald-500" />
+									<MdOutlineCheckCircleOutline className="h-6 w-5 flex-none text-emerald-500" />
 									React, Vue, Svelte, and Angular SPAs
 								</li>
 								<li className="flex gap-x-3">
-									<CheckCircle2 className="h-6 w-5 flex-none text-emerald-500" />
+									<MdOutlineCheckCircleOutline className="h-6 w-5 flex-none text-emerald-500" />
 									Assets (HTML, CSS, JS, Images, Fonts, WASM)
 								</li>
 								<li className="flex gap-x-3">
-									<CheckCircle2 className="h-6 w-5 flex-none text-emerald-500" />
+									<MdOutlineCheckCircleOutline className="h-6 w-5 flex-none text-emerald-500" />
 									Client-side routing handling
 								</li>
 								<li className="flex gap-x-3">
-									<CheckCircle2 className="h-6 w-5 flex-none text-emerald-500" />
+									<MdOutlineCheckCircleOutline className="h-6 w-5 flex-none text-emerald-500" />
 									Object Storage for user-generated media
 								</li>
 							</ul>
 						</div>
 
 						{/* Not Supported Column */}
-						<div className="rounded-2xl border bg-background p-8">
+						<div className="rounded-2xl border dark:bg-zinc-900 bg-white p-8">
 							<h3 className="flex items-center text-xl font-bold tracking-tight text-primary">
-								<ServerOff className="mr-2 h-5 w-5 text-some-less" />
+								<LuServerOff className="mr-2 h-5 w-5 text-some-less" />
 								Out of Scope
 							</h3>
 							<p className="mt-4 text-sm leading-6 text-less">
@@ -94,19 +86,19 @@ const page = () => {
 							</p>
 							<ul className="mt-8 space-y-3 text-sm leading-6 text-less">
 								<li className="flex gap-x-3">
-									<XCircle className="h-6 w-5 flex-none text-red-300" />
+									<BsXCircle className="h-6 w-5 flex-none text-red-300" />
 									Server-side Node.js/Python runtimes
 								</li>
 								<li className="flex gap-x-3">
-									<XCircle className="h-6 w-5 flex-none text-red-300" />
+									<BsXCircle className="h-6 w-5 flex-none text-red-300" />
 									Long-running background jobs
 								</li>
 								<li className="flex gap-x-3">
-									<XCircle className="h-6 w-5 flex-none text-red-300" />
+									<BsXCircle className="h-6 w-5 flex-none text-red-300" />
 									Relational Databases (Postgres, MySQL) hosting
 								</li>
 								<li className="flex gap-x-3">
-									<XCircle className="h-6 w-5 flex-none text-red-300" />
+									<BsXCircle className="h-6 w-5 flex-none text-red-300" />
 									Serverless Functions (Lambda/Edge Compute)
 								</li>
 							</ul>
@@ -115,7 +107,6 @@ const page = () => {
 					</div>
 				</div>
 			</section>
-			<Footer />
 		</main>
 	)
 }

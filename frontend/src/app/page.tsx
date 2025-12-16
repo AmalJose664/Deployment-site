@@ -1,26 +1,17 @@
 import { Footer } from '@/components/GlobalFooter';
 import Navbar from '@/components/Navbar';
+import TitleWithLogo from '@/components/TitleWithLogo';
+import StatusIcon from '@/components/ui/StatusIcon';
 import { SITE_NAME } from '@/config/constants';
-import {
-	Zap,
-	Globe,
-	Shield,
-	Github,
-	Command,
-	Cpu,
-	ArrowRight,
-	CheckCircle2,
-	Menu,
-	X,
-	Code2,
-	GitBranch,
-	Layers
-} from 'lucide-react';
-import {
-	Database,
-	TerminalSquare
-} from 'lucide-react';
+
 import Link from 'next/link';
+import { BsCpu, BsTerminalFill } from 'react-icons/bs';
+import { FaCode, FaDatabase, FaGithub, FaGlobeAmericas } from 'react-icons/fa';
+import { FiArrowRight } from 'react-icons/fi';
+import { GoZap } from 'react-icons/go';
+import { IoIosGitBranch } from 'react-icons/io';
+import { IoLayers } from 'react-icons/io5';
+import { MdKeyboardCommandKey, MdOutlineCheckCircle, MdOutlineShield } from 'react-icons/md';
 
 
 export default function Home() {
@@ -41,12 +32,17 @@ export default function Home() {
 
 const Hero = () => {
 	return (
-		<div className="relative pt-32 pb-20 sm:pt-40 sm:pb-24 overflow-hidden">
+		<div className="relative pt-32 pb-20 sm:pt-40 sm:pb-24 overflow-hidden ">
 			{/* Background Gradients */}
 			<div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gradient-to-b from-purple-900/20 to-transparent blur-3xl -z-10" />
 			<div className="absolute top-20 right-0 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl -z-10" />
+			<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center'>
+				<div className='flex items-center justify-center gap-6 w-full mb-20'>
+					<TitleWithLogo useSvg logoClassName='text-3xl' svgClassName='size-9' />
+				</div>
+			</div>
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center ">
 
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
 				<h1 className="text-5xl sm:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b dark:from-white from-zinc-950 to-gray-400 tracking-tight mb-8 max-w-4xl mx-auto leading-tight">
 					Develop. Preview. <br />
 					<span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
@@ -60,11 +56,11 @@ const Hero = () => {
 				</p>
 
 				<div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-					<Link href={"/signup"} className="w-full sm:w-auto px-8 py-3.5 dark:bg-white bg-black dark:text-black text-white  border rounded-full font-bold text-lg hover:bg-white/10 transition-all flex items-center justify-center gap-2">
+					<Link href={"/signup"} className="w-full sm:w-auto px-8 py-3.5 dark:bg-white bg-black dark:text-black text-white  border rounded-full font-bold text-lg transition-all flex items-center justify-center gap-2">
 						Get Started
 					</Link>
 					<Link href={"/new"} className="w-full sm:w-auto px-8 py-3.5 dark:bg-white bg-black dark:text-black text-white border rounded-full font-bold text-lg transition-all flex items-center justify-center gap-2">
-						<Github size={20} />
+						<FaGithub size={20} />
 						Import from GitHub
 					</Link>
 				</div>
@@ -75,7 +71,7 @@ const Hero = () => {
 						<div className="w-3 h-3 rounded-full bg-yellow-500" />
 						<div className="w-3 h-3 rounded-full bg-green-500" />
 						<div className="ml-4 text-xs text-gray-500 font-mono flex items-center gap-2">
-							<Command size={12} /> {SITE_NAME} new — deploy
+							<MdKeyboardCommandKey size={12} /> {SITE_NAME} new — deploy
 						</div>
 					</div>
 					<div className="p-6 text-left font-mono text-sm sm:text-base dark:bg-background bg-white border-t border-primary">
@@ -129,12 +125,12 @@ const Hero2 = () => {
 
 						<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-slate-950 border-2 border-slate-700 flex items-center justify-center  z-20 shadow-2xl">
 							<div className="absolute inset-2 bg-blue-500/5 border border-blue-500/20 animate-pulse"></div>
-							<Cpu className="w-24 h-24 text-slate-600" strokeWidth={1} />
+							<BsCpu className="w-24 h-24 text-slate-600" />
 							<div className="absolute top-0 left-1/2 w-[2px] h-full bg-linear-to-b from-transparent via-blue-500/50 to-transparent -z-10"></div>
 							<div className="absolute top-1/2 left-0 w-full h-[2px] bg-linear-to-r from-transparent via-blue-500/50 to-transparent -z-10"></div>
 						</div>
 						<div className="absolute top-16 left-16 w-16 h-16 bg-slate-950 border border-slate-700 flex flex-col items-center justify-center z-10">
-							<Globe className="w-6 h-6 text-slate-500 mb-1" />
+							<FaGlobeAmericas className="w-6 h-6 text-slate-500 mb-1" />
 							<span className="text-[10px] font-mono uppercase text-slate-500">Edge</span>
 						</div>
 						<svg className="absolute inset-0 w-full h-full z-0 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
@@ -143,10 +139,9 @@ const Hero2 = () => {
 						</svg>
 
 						<div className="absolute bottom-16 right-16 w-16 h-16 bg-slate-950 border border-slate-700 flex flex-col items-center justify-center z-10">
-							<Database className="w-6 h-6 text-slate-500 mb-1" />
+							<FaDatabase className="w-6 h-6 text-slate-500 mb-1" />
 							<span className="text-[10px] font-mono uppercase text-slate-500">Store</span>
 						</div>
-
 					</div>
 				</div>
 			</div>
@@ -180,29 +175,29 @@ const Features = () => {
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 					{/* Bento Grid Layout */}
 					<FeatureCard
-						icon={Globe}
+						icon={FaGlobeAmericas}
 						title="Global Storage Network"
 						description="Your content is cached and served to regions worldwide, ensuring low latency for every user."
 						className="md:col-span-2 bg-linear-to-br from-white/5 to-purple-900/10"
 					/>
 					<FeatureCard
-						icon={GitBranch}
+						icon={IoIosGitBranch}
 						title="Manual Deploy"
 						description="Unfortunately you have to deploy manully for each git push :( ."
 					/>
 					<FeatureCard
-						icon={Layers}
+						icon={IoLayers}
 						title="Framework Agnostic"
 						description="Zero-config support for Vue, Svelte and static sites."
 					/>
 					<FeatureCard
-						icon={Shield}
+						icon={MdOutlineShield}
 						title="DDoS Protection"
 						description="Enterprise-grade security baked in. SSL is automatic and free forever."
 						className="md:col-span-2 from-white/5 to-blue-900/10"
 					/>
 					<FeatureCard
-						icon={Zap}
+						icon={GoZap}
 						title="Instant Rollbacks"
 						description="Mistake in production? Rollback to any previous deployment in one click."
 					/>
@@ -247,26 +242,22 @@ const CodeSection = () => {
 				<div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 					<div>
 						<div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-purple-500/30 bg-purple-500/10 text-sm text-purple-400 mb-6">
-							<Code2 size={16} />
+							<FaCode size={16} />
 							<span>Developer Experience</span>
 						</div>
 						<h2 className="text-3xl sm:text-4xl font-bold text-primary mb-6">
 							Preview every commit. <br />
 							Collaborate instantly.
 						</h2>
-						<p className="text-some-less text-lg mb-8 leading-relaxed">
-							Stop sharing screenshots. {SITE_NAME} generates a unique preview URL for every pull request,
-							so your team can review the real app before it merges.
-						</p>
 
 						<ul className="space-y-4">
 							{[
 								"Automatic HTTPS for every deployment",
 								"Instant cache invalidation",
-								"Serverless Functions built-in"
+								"Serverless Functions not built-in"
 							].map((item, i) => (
 								<li key={i} className="flex items-center gap-3 text-less">
-									<CheckCircle2 className="text-green-500" size={20} />
+									<MdOutlineCheckCircle className="text-green-500" size={20} />
 									{item}
 								</li>
 							))}
@@ -279,7 +270,7 @@ const CodeSection = () => {
 						<div className="rounded-xl border border-white/10 bg-[#0d1117] overflow-hidden shadow-2xl">
 							<div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-white/5">
 								<div className="flex items-center gap-2">
-									<Github size={16} className="text-gray-400" />
+									<FaGithub size={16} className="text-gray-400" />
 									<span className="text-sm text-gray-300 font-mono">{SITE_NAME}/website</span>
 								</div>
 								<div className="text-xs text-gray-500">Pull Request #42</div>
@@ -288,15 +279,31 @@ const CodeSection = () => {
 							<div className="p-4 space-y-4">
 								<div className="flex gap-3">
 									<div className="mt-1">
-										<div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs text-white font-bold">
-											JD
+										<div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs text-primary font-bold">
+											{SITE_NAME.slice(0, 1)}
 										</div>
 									</div>
 									<div className="flex-1">
-										<div className="bg-white/5 rounded-lg p-3 border border-white/10">
-											<p className="text-sm text-gray-300 mb-2">
-												I've updated the hero section colors. <span className="text-purple-400 font-bold">@OrbitBot</span> can you deploy a preview?
+										<div className="bg-white/5 rounded-lg p-3 border flex items-center gap-4 border-white/10">
+											<p className="text-sm text-some-less">
+												Install Complete
 											</p>
+											<StatusIcon status='READY' />
+										</div>
+									</div>
+								</div>
+								<div className="flex gap-3">
+									<div className="mt-1">
+										<div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs text-primary font-bold">
+											{SITE_NAME.slice(0, 1)}
+										</div>
+									</div>
+									<div className="flex-1">
+										<div className="bg-white/5 rounded-lg p-3 border flex items-center gap-4 border-white/10">
+											<p className="text-sm text-some-less">
+												Build Complete
+											</p>
+											<StatusIcon status='READY' />
 										</div>
 									</div>
 								</div>
@@ -304,13 +311,13 @@ const CodeSection = () => {
 								<div className="flex gap-3">
 									<div className="mt-1">
 										<div className="w-8 h-8 rounded-lg bg-linear-to-tr from-blue-500 to-purple-600 flex items-center justify-center">
-											<span className="text-white font-bold text-xs">O</span>
+											<span className="text-white font-bold text-xs">{SITE_NAME.slice(0, 1)}</span>
 										</div>
 									</div>
 									<div className="flex-1">
 										<div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
 											<div className="p-3 bg-white/5 border-b border-white/10 flex items-center justify-between">
-												<span className="text-sm font-bold text-white">{SITE_NAME} Bot</span>
+												<span className="text-sm font-bold text-white">{SITE_NAME}</span>
 												<span className="text-xs text-gray-500">Just now</span>
 											</div>
 											<div className="p-3">
@@ -320,9 +327,9 @@ const CodeSection = () => {
 												<div className="flex items-center gap-3 p-2 bg-black/30 rounded border border-white/10 group cursor-pointer hover:border-blue-500/50 transition-colors">
 													<div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
 													<span className="text-sm text-blue-400 font-mono truncate">
-														orbit-website-git-hero-update-orbit.app
+														git-hero-update-{SITE_NAME.toLowerCase()}.app
 													</span>
-													<ArrowRight size={14} className="ml-auto text-less group-hover:text-blue-400" />
+													<FiArrowRight size={14} className="ml-auto text-less group-hover:text-blue-400" />
 												</div>
 											</div>
 										</div>
@@ -347,7 +354,7 @@ const BottomBoxes = () => {
 
 					<div className="p-8 lg:p-12 bg-slate-950/50 hover:bg-slate-900 transition-colors group">
 						<div className="mb-6">
-							<TerminalSquare className="w-8 h-8 dark:text-slate-500 text-slate-900 group-hover:text-blue-500 transition-colors" strokeWidth={1.5} />
+							<BsTerminalFill className="w-8 h-8 dark:text-slate-500 text-slate-900 group-hover:text-blue-500 transition-colors" strokeWidth={1.5} />
 
 						</div>
 						<h3 className="text-xl font-bold mb-4 text-slate-200">Atomic Builds</h3>
@@ -361,7 +368,7 @@ const BottomBoxes = () => {
 
 					<div className="p-8 lg:p-12 bg-slate-950/50 hover:bg-slate-900 transition-colors group">
 						<div className="mb-6">
-							<Layers className="w-8 h-8 dark:text-slate-500 text-slate-900 group-hover:text-blue-500 transition-colors" strokeWidth={1.5} />
+							<IoLayers className="w-8 h-8 dark:text-slate-500 text-slate-900 group-hover:text-blue-500 transition-colors" strokeWidth={1.5} />
 						</div>
 						<h3 className="text-xl font-bold mb-4 text-slate-200">Seamless Deployment Switching</h3>
 						<p className="text-slate-400 leading-relaxed mb-8">
@@ -374,7 +381,7 @@ const BottomBoxes = () => {
 
 					<div className="p-8 lg:p-12 bg-slate-950/50 hover:bg-slate-900 transition-colors group">
 						<div className="mb-6">
-							<Shield className="w-8 h-8 dark:text-slate-500 text-slate-900 group-hover:text-blue-500 transition-colors" strokeWidth={1.5} />
+							<MdOutlineShield className="w-8 h-8 dark:text-slate-500 text-slate-900 group-hover:text-blue-500 transition-colors" strokeWidth={1.5} />
 						</div>
 						<h3 className="text-xl font-bold mb-4 text-slate-200">Deployment-focused</h3>
 						<p className="text-slate-400 leading-relaxed mb-8">

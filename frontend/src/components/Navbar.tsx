@@ -70,6 +70,11 @@ export default function Navbar({ className, showOtherLinks }: { className: strin
 							</Link>
 						</li>
 					}
+					<li>
+						<Link href="/docs" className="hover:text-blue-400">
+							Docs
+						</Link>
+					</li>
 				</ul>
 				<button
 					aria-label="Notifications"

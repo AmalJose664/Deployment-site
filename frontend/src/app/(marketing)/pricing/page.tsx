@@ -1,7 +1,12 @@
 
-import Navbar from "@/components/Navbar"
+import { SITE_NAME } from "@/config/constants";
 import PlanBox from "./PlanBox";
 import BackButton from "@/components/BackButton"
+export const metadata = {
+	title: "Pricing | " + SITE_NAME,
+	description:
+		"Prices that grow with you",
+};
 const page = () => {
 	return (
 		<PricingPage />

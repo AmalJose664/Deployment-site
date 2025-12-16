@@ -1,16 +1,12 @@
 "use client";
 
-
-import React from 'react';
 import { FcGoogle, } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 import Link from "next/link";
 import { GoogleLoginButton } from '../components/GoogleLogin';
 
-import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { RootState } from '@/store/store';
 import ThemeSwitcher from '@/components/ThemeIcon';
 import TitleWithLogo from '@/components/TitleWithLogo';
 import { GithubLoginButton } from '../components/GithubLogin';

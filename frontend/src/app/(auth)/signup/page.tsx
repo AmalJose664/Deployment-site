@@ -5,17 +5,15 @@ import { FaGithub } from "react-icons/fa";
 import Link from 'next/link';
 import { GoogleLoginButton } from '../components/GoogleLogin';
 
-import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { RootState } from '@/store/store';
 import ThemeSwitcher from '@/components/ThemeIcon';
 import TitleWithLogo from '@/components/TitleWithLogo';
 
 
+
 export default function SignupPage() {
 	const router = useRouter();
-	const user = useSelector((state: RootState) => state.userReducer);
 
 	useEffect(() => {
 		const verifySessionCode = () => {

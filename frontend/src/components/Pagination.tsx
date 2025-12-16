@@ -19,10 +19,10 @@ interface PaginationProps {
 const PaginationComponent = ({ page, setPage, totalPages }: PaginationProps) => {
 	return (
 		<Pagination>
-			<PaginationContent className="flex gap-4 items-center">
+			<PaginationContent className="flex gap-0 items-center">
 				<PaginationItem>
 					<PaginationPrevious
-						size={1}
+						size={"sm"}
 						href="#"
 						onClick={(e) => {
 							e.preventDefault()
@@ -35,7 +35,7 @@ const PaginationComponent = ({ page, setPage, totalPages }: PaginationProps) => 
 				{/* First page */}
 				<PaginationItem>
 					<PaginationLink
-						size={1}
+						size={"sm"}
 						href="#"
 						onClick={(e) => {
 							e.preventDefault()
@@ -66,7 +66,7 @@ const PaginationComponent = ({ page, setPage, totalPages }: PaginationProps) => 
 					.map(pageNum => (
 						<PaginationItem key={pageNum}>
 							<PaginationLink
-								size={1}
+								size={"sm"}
 								href="#"
 								onClick={(e) => {
 									e.preventDefault()
@@ -91,7 +91,7 @@ const PaginationComponent = ({ page, setPage, totalPages }: PaginationProps) => 
 				{totalPages > 1 && (
 					<PaginationItem>
 						<PaginationLink
-							size={1}
+							size={"sm"}
 							href="#"
 							onClick={(e) => {
 								e.preventDefault()
@@ -107,13 +107,13 @@ const PaginationComponent = ({ page, setPage, totalPages }: PaginationProps) => 
 
 				<PaginationItem>
 					<PaginationNext
-						size={1}
+						size={"sm"}
 						href="#"
 						onClick={(e) => {
 							e.preventDefault()
 							setPage(p => Math.min(totalPages, p + 1))
 						}}
-						className={page === totalPages ? "pointer-events-none opacity-50" : "no-underline hover:bg-accent"}
+						className={page === totalPages ? "pointer-events-none opacity-50 " : "no-underline hover:bg-accent"}
 					/>
 				</PaginationItem>
 			</PaginationContent>

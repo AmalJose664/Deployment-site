@@ -6,7 +6,6 @@ import {
 	DropdownMenuItem,
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
-	DropdownMenuShortcut,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "./ui/button"
@@ -59,12 +58,16 @@ const NavbarUser = () => {
 					</DropdownMenuGroup>
 					<DropdownMenuSeparator />
 					<DropdownMenuItem >
+						<Link target="" className="no-underline" href={"/docs"} >
+							Docs
+						</Link>
+					</DropdownMenuItem>
+					<DropdownMenuItem >
 						<Link target="_blank" className="flex gap-2 items-center no-underline" href={LINKS.REPO} >
 							GitHub
 							<RxExternalLink />
 						</Link>
 					</DropdownMenuItem>
-					<DropdownMenuItem disabled>API</DropdownMenuItem>
 					<DropdownMenuSeparator />
 					<DropdownMenuItem onClick={() => logoutAndRedirect()}>
 						Log out

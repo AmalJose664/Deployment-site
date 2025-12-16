@@ -1,9 +1,9 @@
 import { cn } from "@/lib/utils"
 import { ProjectStatus } from "@/types/Project"
-import { Box } from "lucide-react"
 import Link from "next/link"
 import { JSX } from "react"
 import { FaAngular, FaReact, FaVuejs } from "react-icons/fa"
+import { IoIosCube } from "react-icons/io"
 import { SiSolid, SiSvelte, SiVite } from "react-icons/si"
 
 const TechStack = ({ stack, link, status }: { stack: string, link: string, status: string }) => {
@@ -76,7 +76,7 @@ const TechStack = ({ stack, link, status }: { stack: string, link: string, statu
 		"aspect-video bg-gradient-to-br from-gray-800 to-gray-900 rounded-md flex flex-col items-center justify-center group cursor-pointer relative overflow-hidden")}>
 		{stacks[stack] || (
 			<>
-				<Box className="text-gray-700 mb-2" size={40} />
+				<IoIosCube className="text-gray-700 mb-2" size={40} />
 				<span className="text-xs text-gray-600">Preview generated</span>
 			</>
 		)}
