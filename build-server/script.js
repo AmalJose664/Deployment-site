@@ -588,7 +588,7 @@ async function validateAnduploadFiles(sourceDir, targetDir) {
 
 					// const command = new PutObjectCommand({
 					// 	Bucket: AWS_BUCKET_NAME,
-					// 	Key: `__app_build_outputs/${PROJECT_ID}/${DEPLOYMENT_ID}/${relPath}`,
+					// 	Key: `__app_build_outputs/${PROJECT_ID}/${DEPLOYMENT_ID}/${relPath.replaceAll("\\", "/")}`,
 					// 	Body: createReadStream(fullPath),
 					// 	ContentType: mime.lookup(fullPath)
 					// });
