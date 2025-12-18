@@ -4,14 +4,14 @@ import { queryOptions } from "../repository/IAnalyticsRepository.js";
 export type BandWidthWithProjectType = Record<string, number>;
 
 export interface IAnalyticsService {
-    saveBatch(): Promise<void>;
-    addEvent(event: BufferAnalytics): Promise<void>;
-    addEventBatch(event: BufferAnalytics[], bandwidthByProjectBatch: BandWidthWithProjectType): Promise<void>;
-    exitService(): Promise<void>;
+	saveBatch(): Promise<void>;
+	addEvent(event: BufferAnalytics): Promise<void>;
+	addEventBatch(event: BufferAnalytics[], bandwidthByProjectBatch: BandWidthWithProjectType): Promise<void>;
+	exitService(): Promise<void>;
 
-    getBandwidthData(projectId: string, range: string, interval: string): Promise<[unknown[], queryOptions]>;
-    getOverView(projectId: string, range: string, interval: string): Promise<[unknown[], queryOptions]>;
-    getRealtime(projectId: string, interval: string): Promise<[unknown[], queryOptions]>;
-    getTopPages(projectId: string, interval: string, limit: number): Promise<[unknown[], queryOptions]>;
-    getOsStats(projectId: string, interval: string): Promise<[unknown[], queryOptions]>;
+	getBandwidthData(projectId: string, range: string, interval: string): Promise<[unknown[], queryOptions]>;
+	getOverView(projectId: string, range: string, interval: string): Promise<[unknown[], queryOptions]>;
+	getRealtime(projectId: string, interval: string): Promise<[unknown[], queryOptions]>;
+	getTopPages(projectId: string, interval: string, limit: number): Promise<[unknown[], queryOptions]>;
+	getOsStats(projectId: string, interval: string): Promise<[unknown[], queryOptions]>;
 }

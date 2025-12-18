@@ -167,38 +167,42 @@ class ProjectService implements IProjectService {
 			currentDeployment: deployment._id.toString(),
 		});
 	}
-	async findProjectSimpleStats(userId: string, projectId: string): Promise<{
-		totalDeployments: number,
-		successRate: number,
-		failureRate: number,
-		failedBuilds: number,
-		avgBuildTime: number,
-		buildHistory: string[],
-		lastDeployed: Date | null,
-		bandwidth: number,
+	async findProjectSimpleStats(
+		userId: string,
+		projectId: string,
+	): Promise<{
+		totalDeployments: number;
+		successRate: number;
+		failureRate: number;
+		failedBuilds: number;
+		avgBuildTime: number;
+		buildHistory: string[];
+		lastDeployed: Date | null;
+		bandwidth: number;
 	}> {
 		const [deploymentObj, projectBandwidth] = await Promise.all([
 			this.deploymentRepository.findProjectDeployments(userId, projectId, { page: 1, limit: 5000 }),
-			this.projectBandwidthRepo.getProjectMonthlyBandwidth(projectId, userId)
-		])
-		const { deployments, total } = deploymentObj
-		const stats = deployments.reduce((acc, curr) => {
-			if (curr.status === DeploymentStatus.READY) acc.success++;
-			else if (curr.status === DeploymentStatus.FAILED || curr.status === DeploymentStatus.CANCELED) {
-				acc.failure++;
-			}
-			acc.totalBuildTime += curr.duration_ms || 0;
-			return acc;
-		}, { success: 0, failure: 0, totalBuildTime: 0 });
+			this.projectBandwidthRepo.getProjectMonthlyBandwidth(projectId, userId),
+		]);
+		const { deployments, total } = deploymentObj;
+		const stats = deployments.reduce(
+			(acc, curr) => {
+				if (curr.status === DeploymentStatus.READY) acc.success++;
+				else if (curr.status === DeploymentStatus.FAILED || curr.status === DeploymentStatus.CANCELED) {
+					acc.failure++;
+				}
+				acc.totalBuildTime += curr.duration_ms || 0;
+				return acc;
+			},
+			{ success: 0, failure: 0, totalBuildTime: 0 },
+		);
 
 		const totalReturned = deployments.length;
 		const successRate = totalReturned === 0 ? 0 : Math.round((stats.success / totalReturned) * 100);
 		const avgBuildTime = totalReturned === 0 ? 0 : Math.round(stats.totalBuildTime / total / 1000);
 
-		const buildHistory = deployments
-			.slice(0, 10)
-			.map(d => d.status);
-		return ({
+		const buildHistory = deployments.slice(0, 10).map((d) => d.status);
+		return {
 			totalDeployments: total,
 			successRate,
 			failureRate: totalReturned === 0 ? 0 : Math.round((stats.failure / total) * 100),
@@ -207,7 +211,7 @@ class ProjectService implements IProjectService {
 			buildHistory,
 			lastDeployed: deployments[0]?.createdAt || null,
 			bandwidth: projectBandwidth,
-		});
+		};
 	}
 
 	async __getProjectById(id: string): Promise<IProject | null> {

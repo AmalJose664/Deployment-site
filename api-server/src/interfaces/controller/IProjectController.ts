@@ -9,7 +9,7 @@ export interface IProjectController {
 	updateSubdomain(req: Request, res: Response, next: NextFunction): Promise<void>;
 	deleteProject(req: Request, res: Response, next: NextFunction): Promise<void>;
 	checkSubdomainAvailable(req: Request, res: Response, next: NextFunction): Promise<void>;
-	getProjectSimpleStats(req: Request, res: Response, next: NextFunction): Promise<void>
+	getProjectSimpleStats(req: Request, res: Response, next: NextFunction): Promise<void>;
 
 	__getProjects(req: Request, res: Response, next: NextFunction): Promise<void>;
 }

@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { z } from "zod";
 import { ZodError } from "zod/v3";
 
 const envSchema = z.object({
@@ -35,21 +35,20 @@ const envSchema = z.object({
 	CLICKHOUSE_PASSWORD: z.string(),
 	CLICKHOUSE_HOST_URL_WITH_PORT: z.url(),
 
-
 	STRIPE_SECRET_KEY: z.string(),
 	STRIPE_PUBLISHABLE_KEY: z.string(),
 	STRIPE_WEBHOOK_SECRET: z.string(),
 	REDIS_URL: z.url(),
-})
+});
 
 export function validateEnv() {
 	try {
 		envSchema.parse(process.env);
-		console.log("Env validation passed")
-		return
+		console.log("Env validation passed");
+		return;
 	} catch (err) {
-		const error = err as ZodError
-		console.error('❌ Environment validation failed:');
+		const error = err as ZodError;
+		console.error("❌ Environment validation failed:");
 		console.log(error);
 		process.exit(1);
 	}

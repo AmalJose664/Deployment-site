@@ -4,7 +4,7 @@ import { startKafkaConsumer, stopKafkaConsumer } from "./events/index.js";
 import { analyticsService } from "./instances.js";
 const PORT = process.env.PORT || 8000;
 const startServer = async () => {
-	console.log("starting.....")
+	console.log("starting.....");
 	validateEnv();
 	httpServer.listen(PORT, () => console.log(`🎉🎉 Server running on port ${PORT}`));
 	// await startKafkaConsumer()
@@ -12,7 +12,7 @@ const startServer = async () => {
 
 // remove test routes, at logs routes, deployment routes
 startServer().catch((e) => {
-	console.error('❌ Failed to start server:', e);
+	console.error("❌ Failed to start server:", e);
 	process.exit(1);
 });
 process.on("SIGINT", async () => {

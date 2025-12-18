@@ -3,34 +3,34 @@ import { IAnalyticsRepository, queryOptions } from "../interfaces/repository/IAn
 import { BufferAnalytics } from "../models/Analytics.js";
 
 class AnalyticsRepository implements IAnalyticsRepository {
-    private client: ClickHouseClient;
+	private client: ClickHouseClient;
 
-    constructor(client: ClickHouseClient) {
-        this.client = client;
-    }
-    async insertBatch(data: BufferAnalytics[]): Promise<void> {
-        if (data.length === 0) return;
-        const recordStartTime = performance.now();
-        await this.client.insert({
-            table: "analytics",
-            values: data,
-            format: "JSONEachRow",
-            clickhouse_settings: {
-                async_insert: 1,
-                wait_for_async_insert: 0,
-            },
-        });
+	constructor(client: ClickHouseClient) {
+		this.client = client;
+	}
+	async insertBatch(data: BufferAnalytics[]): Promise<void> {
+		if (data.length === 0) return;
+		const recordStartTime = performance.now();
+		await this.client.insert({
+			table: "analytics",
+			values: data,
+			format: "JSONEachRow",
+			clickhouse_settings: {
+				async_insert: 1,
+				wait_for_async_insert: 0,
+			},
+		});
 
-        console.log(`Network time: ${(performance.now() - recordStartTime).toFixed(2)}ms`);
-        console.log("data inserted from repo, ", data[0].project_id, data.length);
-    }
-    async insertSingle(data: BufferAnalytics): Promise<void> {
-        this.insertBatch([data]);
-    }
+		console.log(`Network time: ${(performance.now() - recordStartTime).toFixed(2)}ms`);
+		console.log("data inserted from repo, ", data[0].project_id, data.length);
+	}
+	async insertSingle(data: BufferAnalytics): Promise<void> {
+		this.insertBatch([data]);
+	}
 
-    async getBandwidth(projectId: string, queryOptions: queryOptions): Promise<unknown[]> {
-        const result = await this.client.query({
-            query: `SELECT 
+	async getBandwidth(projectId: string, queryOptions: queryOptions): Promise<unknown[]> {
+		const result = await this.client.query({
+			query: `SELECT 
           	toStartOfInterval(
             toTimeZone(timestamp, 'Asia/Kolkata'), 
             INTERVAL {interval:UInt32} ${queryOptions.intervalUnit}
@@ -45,20 +45,20 @@ class AnalyticsRepository implements IAnalyticsRepository {
         	ORDER BY time
       `,
 
-            query_params: {
-                projectId,
-                range: queryOptions.range,
-                interval: queryOptions.interval,
-            },
-            format: "JSONEachRow",
-        });
+			query_params: {
+				projectId,
+				range: queryOptions.range,
+				interval: queryOptions.interval,
+			},
+			format: "JSONEachRow",
+		});
 
-        return await result.json();
-    }
-    async getOverview(projectId: string, queryOptions: queryOptions): Promise<unknown[]> {
-        console.log(queryOptions);
-        const result = await this.client.query({
-            query: `SELECT
+		return await result.json();
+	}
+	async getOverview(projectId: string, queryOptions: queryOptions): Promise<unknown[]> {
+		console.log(queryOptions);
+		const result = await this.client.query({
+			query: `SELECT
   			toStartOfInterval(
     		toTimeZone(timestamp, 'Asia/Kolkata'),
     		INTERVAL {interval:UInt32} ${queryOptions.intervalUnit}
@@ -73,20 +73,20 @@ class AnalyticsRepository implements IAnalyticsRepository {
 			GROUP BY time
 			ORDER BY time`,
 
-            query_params: {
-                projectId,
-                range: queryOptions.range,
-                interval: queryOptions.interval,
-            },
-            format: "JSONEachRow",
-        });
+			query_params: {
+				projectId,
+				range: queryOptions.range,
+				interval: queryOptions.interval,
+			},
+			format: "JSONEachRow",
+		});
 
-        return await result.json();
-    }
-    async getRealtime(projectId: string, queryOptions: queryOptions): Promise<unknown[]> {
-        console.log(queryOptions);
-        const result = await this.client.query({
-            query: `SELECT 
+		return await result.json();
+	}
+	async getRealtime(projectId: string, queryOptions: queryOptions): Promise<unknown[]> {
+		console.log(queryOptions);
+		const result = await this.client.query({
+			query: `SELECT 
     		count() as total_requests,
     		countIf(status_code >= 400) as errors,
     		countIf(status_code < 400) as successful,
@@ -98,19 +98,19 @@ class AnalyticsRepository implements IAnalyticsRepository {
 			WHERE project_id = {projectId:String}
   			AND timestamp >= now() - INTERVAL {interval:UInt32} ${queryOptions.intervalUnit}`,
 
-            query_params: {
-                projectId,
-                interval: queryOptions.interval,
-            },
-            format: "JSONEachRow",
-        });
+			query_params: {
+				projectId,
+				interval: queryOptions.interval,
+			},
+			format: "JSONEachRow",
+		});
 
-        return await result.json();
-    }
-    async getTopPages(projectId: string, queryOptions: queryOptions): Promise<unknown[]> {
-        console.log(queryOptions);
-        const result = await this.client.query({
-            query: `SELECT 
+		return await result.json();
+	}
+	async getTopPages(projectId: string, queryOptions: queryOptions): Promise<unknown[]> {
+		console.log(queryOptions);
+		const result = await this.client.query({
+			query: `SELECT 
     		path,
     		count() as requests,
     		avg(response_time) as avg_response_time,
@@ -124,20 +124,20 @@ class AnalyticsRepository implements IAnalyticsRepository {
 			LIMIT {limit:UInt32}
 			`,
 
-            query_params: {
-                projectId,
-                interval: queryOptions.interval,
-                limit: queryOptions.limit,
-            },
-            format: "JSONEachRow",
-        });
+			query_params: {
+				projectId,
+				interval: queryOptions.interval,
+				limit: queryOptions.limit,
+			},
+			format: "JSONEachRow",
+		});
 
-        return await result.json();
-    }
-    async getOsStats(projectId: string, queryOptions: queryOptions): Promise<unknown[]> {
-        console.log(queryOptions);
-        const result = await this.client.query({
-            query: `SELECT 
+		return await result.json();
+	}
+	async getOsStats(projectId: string, queryOptions: queryOptions): Promise<unknown[]> {
+		console.log(queryOptions);
+		const result = await this.client.query({
+			query: `SELECT 
     		ua_os,
     		count() as users,
     		(count() * 100.0 / sum(count()) OVER ()) as percentage
@@ -149,15 +149,15 @@ class AnalyticsRepository implements IAnalyticsRepository {
 			ORDER BY users DESC
 			`,
 
-            query_params: {
-                projectId,
-                interval: queryOptions.interval,
-            },
-            format: "JSONEachRow",
-        });
+			query_params: {
+				projectId,
+				interval: queryOptions.interval,
+			},
+			format: "JSONEachRow",
+		});
 
-        return await result.json();
-    }
+		return await result.json();
+	}
 }
 
 export default AnalyticsRepository;

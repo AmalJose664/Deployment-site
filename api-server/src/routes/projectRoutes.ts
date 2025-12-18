@@ -40,9 +40,7 @@ projectRouter.patch(
 	projectController.updateSubdomain.bind(projectController),
 );
 
-
 projectRouter.delete("/:projectId", authenticateToken, validateObjectId("projectId"), projectController.deleteProject.bind(projectController));
-
 
 projectRouter.get(
 	"/:projectId/simple-stats",
@@ -67,7 +65,6 @@ projectRouter.patch(
 	validateBody(ProjectDeploymentUpdateSchema),
 	projectController.changeCurrentDeployment.bind(projectController),
 );
-
 
 projectRouter.post(
 	"/:projectId/deployments",

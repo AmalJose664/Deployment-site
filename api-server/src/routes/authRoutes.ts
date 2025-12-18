@@ -1,13 +1,13 @@
 import { Router } from "express";
 import passport from "passport";
 import {
-    checkAuth,
-    getAuthenticatedUser,
-    getAuthenticatedUserDetails,
-    oAuthLoginCallback,
-    refresh,
-    userLogout,
-    verifyAuth,
+	checkAuth,
+	getAuthenticatedUser,
+	getAuthenticatedUserDetails,
+	oAuthLoginCallback,
+	refresh,
+	userLogout,
+	verifyAuth,
 } from "../controllers/authController.js";
 import { authenticateToken } from "../middlewares/authMiddleware.js";
 

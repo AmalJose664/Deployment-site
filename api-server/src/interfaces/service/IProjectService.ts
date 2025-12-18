@@ -16,16 +16,19 @@ export interface IProjectService {
 	getUserBandwidthData(userId: string, isMonthly: boolean): Promise<number>;
 	changeProjectSubdomain(userId: string, projectId: string, newSubdomain: string): Promise<IProject | null>;
 	checkSubdomainAvaiable(newSubdomain: string): Promise<boolean>;
-	findProjectSimpleStats(userId: string, projectId: string): Promise<{
-		totalDeployments: number,
-		successRate: number,
-		failureRate: number,
-		failedBuilds: number,
-		avgBuildTime: number,
-		buildHistory: string[],
-		lastDeployed: Date | null,
-		bandwidth: number,
-	}>
+	findProjectSimpleStats(
+		userId: string,
+		projectId: string,
+	): Promise<{
+		totalDeployments: number;
+		successRate: number;
+		failureRate: number;
+		failedBuilds: number;
+		avgBuildTime: number;
+		buildHistory: string[];
+		lastDeployed: Date | null;
+		bandwidth: number;
+	}>;
 
 	__getProjectById(id: string): Promise<IProject | null>;
 	__updateProjectById(projectId: string, updateData: Partial<IProject>, options?: options): Promise<IProject | null>;
