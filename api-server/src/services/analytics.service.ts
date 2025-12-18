@@ -10,7 +10,7 @@ class AnalyticsService implements IAnalyticsService {
 
 	private analyticsBuffer: BufferAnalytics[] = [];
 	private readonly BATCH_SIZE = 570;
-	private readonly FLUSH_INTERVAL = 7000 * 10; // 7s
+	private readonly FLUSH_INTERVAL = 6000 * 10; // 7s
 	private readonly MAX_BUFFER_SIZE = 10000;
 	private flushTimer?: NodeJS.Timeout;
 	private isFlushing = false;
@@ -40,7 +40,7 @@ class AnalyticsService implements IAnalyticsService {
 		const batch = this.analyticsBuffer.splice(0, this.BATCH_SIZE);
 		try {
 			await this.analyticsRepo.insertBatch(batch);
-			console.log(`✅ Saved ${batch.length} analytics events`);
+			console.log(`✅ Saved ${batch.length} analytics `);
 		} catch (error) {
 			console.error("save analytics error:", error, "Discarding data");
 		} finally {

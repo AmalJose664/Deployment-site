@@ -37,7 +37,7 @@ class KafkaEventConsumer implements IKafkaEventConsumer {
 			});
 
 			this.isRunning = true;
-			console.log("Kafka consumers started successfully");
+			console.log("-------------------------------Kafka consumers started successfully-------------------------------");
 		} catch (error) {
 			console.error("Failed to start Kafka consumers:", error);
 			throw error;

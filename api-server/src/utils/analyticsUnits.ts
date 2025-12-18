@@ -6,6 +6,8 @@ type rangeFieldsTypes = "1h" | "24h" | "7d" | "30d";
  * 								   _______interval_______ _______interval_______ _______interval_______ _______interval________
  *
  * 				range	 >>---->  |--------------------------------------------------------------------------------------------|
+ *  
+ * 				Basic range Interval understanding......
  */
 
 const intervalMap: Record<timesFieldTypes, number> = {

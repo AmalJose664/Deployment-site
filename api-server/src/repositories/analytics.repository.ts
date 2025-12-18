@@ -22,7 +22,7 @@ class AnalyticsRepository implements IAnalyticsRepository {
 		});
 
 		console.log(`Network time: ${(performance.now() - recordStartTime).toFixed(2)}ms`);
-		console.log("data inserted from repo, ", data[0].project_id, data.length);
+
 	}
 	async insertSingle(data: BufferAnalytics): Promise<void> {
 		this.insertBatch([data]);
