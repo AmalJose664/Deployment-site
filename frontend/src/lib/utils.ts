@@ -124,11 +124,17 @@ export const formatDuration = (ms: number) => {
 	return minutes > 0 ? `${minutes}m ${remainingSeconds}s` : `${seconds}s`;
 };
 
-export const getRandomBlue = () => {
-	const min = 1;
-	const max = 9;
-	return `var(--color-blue-${Math.floor(Math.random() * (max - min + 1)) + min}00)`;
-}
+export const BLUE_COLORS = [
+	"var(--color-blue-600)",
+	"var(--color-blue-300)",
+	"var(--color-blue-800)",
+	"var(--color-blue-400)",
+	"var(--color-blue-700)",
+	"var(--color-blue-200)",
+	"var(--color-blue-900)",
+	"var(--color-blue-500)",
+	"var(--color-blue-100)",
+]
 
 
 export const formatBytes = (size: number): string => {

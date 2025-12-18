@@ -108,13 +108,13 @@ export default function BandwidthChart({ projectId }: { projectId: string }) {
 							<button
 								key={key}
 								data-active={activeChart === key}
-								className="data-[active=true]:bg-blue-800/50  relative flex flex-1 flex-col justify-center gap-1 border-t px-4 py-4 text-left even:border-l sm:border-t-0 sm:border-l sm:px-6"
+								className="dark:data-[active=true]:bg-blue-800/50 data-[active=true]:bg-blue-300  relative flex flex-1 flex-col justify-center gap-1 border-t px-4 py-4 text-left even:border-l sm:border-t-0 sm:border-l sm:px-6"
 								onClick={() => setActiveChart(key)}
 							>
-								<span className="text-muted-foreground text-xs flex-1">
+								<span className="text-less text-xs flex-1">
 									{chartConfig[key].label}
 								</span>
-								<span className="text-sm flex gap-2 leading-none font-bold ">
+								<span className="text-sm flex text-less gap-2 leading-none font-bold ">
 									{totals[key]?.toFixed(2)} MB <Icon className="size-4" />
 								</span>
 
@@ -187,7 +187,7 @@ export default function BandwidthChart({ projectId }: { projectId: string }) {
 							<ChartTooltip
 								content={
 									<ChartTooltipContent
-										className="w-[180px]"
+										className="w-[180px] dark:border-zinc-700 border-zinc-300"
 										labelFormatter={(value) => {
 											const date = new Date(value)
 											return date.toLocaleString("en-US", {

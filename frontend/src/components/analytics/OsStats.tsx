@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select"
 import { useGetOsStatsQuery } from "@/store/services/analyticsApi"
 import { useState } from "react"
-import { getRandomBlue } from "@/lib/utils"
+import { BLUE_COLORS } from "@/lib/utils"
 
 const chartConfig = {
 } satisfies ChartConfig
@@ -34,9 +34,9 @@ function OsList({ projectId }: { projectId: string }) {
 		interval,
 	})
 	const chartData =
-		osStatsData?.map((item: any) => ({
+		osStatsData?.map((item: any, index) => ({
 			...item,
-			fill: getRandomBlue(),
+			fill: BLUE_COLORS[index % BLUE_COLORS.length],
 		})) || []
 	if (isLoading) {
 		return (
@@ -83,13 +83,14 @@ function OsList({ projectId }: { projectId: string }) {
 					<PieChart>
 						<ChartTooltip
 							content={<ChartTooltipContent
+								className="dark:border-zinc-700 border-zinc-300"
 								hideLabel
 								formatter={(value, name, props) => (
 									<div className="flex flex-col gap-1">
 										<div className="text-xs font-medium">{Number(value).toFixed(2)}%</div>
 										<div className="flex items-center gap-2">
 											<span className="font-bold"> {props.payload.users}</span>
-											<span className="text-muted-foreground">Users</span>
+											<span className="text-muted-foreground">Requests</span>
 										</div>
 									</div>
 								)}

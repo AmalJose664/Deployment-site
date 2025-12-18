@@ -132,7 +132,7 @@ export default function TopPagesChart({ projectId }: { projectId: string }) {
 							<ChartTooltip
 								cursor={false}
 								content={
-									<ChartTooltipContent
+									<ChartTooltipContent className="dark:border-zinc-700 border-zinc-300"
 										hideLabel
 										formatter={(value, name, props) => (
 											<div className="flex flex-col gap-1">

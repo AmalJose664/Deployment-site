@@ -71,7 +71,7 @@ export default function OverviewChart({ projectId }: { projectId: string }) {
 	const totals = useMemo(
 		() => ({
 			requests: overviewData?.reduce((acc, curr) => acc + curr.requests, 0) || 0,
-			uniqueVisitors: overviewData?.reduce((acc, curr) => acc + curr.uniqueVisitors, 0) || 0,
+			uniqueVisitors: Math.max(...(overviewData?.map((ovrview) => ovrview.uniqueVisitors) || [0])),
 			avgResponseTime: overviewData?.length
 				? (overviewData.reduce((acc, curr) => acc + curr.avgResponseTime, 0) / overviewData.length)
 				: 0,
@@ -135,14 +135,14 @@ export default function OverviewChart({ projectId }: { projectId: string }) {
 							<button
 								key={key}
 								data-active={activeChart === key}
-								className="data-[active=true]:bg-blue-800/50 relative flex flex-1 flex-col justify-center gap-1 border-t px-3 py-3 text-left even:border-l sm:border-t-0 sm:border-l sm:px-4 sm:py-4"
+								className="dark:data-[active=true]:bg-blue-800/50 data-[active=true]:bg-blue-300 relative flex flex-1 flex-col justify-center gap-1 border-t px-3 py-3 text-left even:border-l sm:border-t-0 sm:border-l sm:px-4 sm:py-4"
 								onClick={() => setActiveChart(key)}
 							>
-								<span className="text-muted-foreground text-xs flex items-center gap-1.5">
+								<span className="text-less text-xs flex items-center gap-1.5">
 									<Icon className="h-3.5 w-3.5" />
 									{chartConfig[key].label}
 								</span>
-								<span className="text-sm font-bold leading-none sm:text-base">
+								<span className="text-sm font-bold text-less leading-none sm:text-base">
 									{value} {unitMap[key]}
 								</span>
 							</button>
@@ -221,7 +221,7 @@ export default function OverviewChart({ projectId }: { projectId: string }) {
 							<ChartTooltip
 								content={
 									<ChartTooltipContent
-										className="w-[200px]"
+										className="w-[200px] dark:border-zinc-700 border-zinc-300"
 										labelFormatter={(value) => {
 											const date = new Date(value)
 											return date.toLocaleString("en-US", {
