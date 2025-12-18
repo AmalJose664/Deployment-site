@@ -1,6 +1,19 @@
-export const BUCKET_NAME = "new-vercel-664" //                             FILL HERE
-export const BASE_PATH_S3 = `https://${BUCKET_NAME}.s3.us-east-1.amazonaws.com/__app_build_outputs`
+const USE_NON_AWS_STORAGE = true
+
+const AWS_SERVER_FILES_ENDPOINT = "__app_build_outputs/"
+const NON_AWS_SERVER_FILES_ENDPOINT = "projects/"
+
+export const BUCKET_NAME = process.env.AWS_STORAGE_BUCKET_NAME //                             FILL HERE
+export const AWS_STORAGE_SERVER_URL = `https://${BUCKET_NAME}.s3.us-east-1.amazonaws.com`
+
+export const NON_AWS_STORAGE_SERVER_URL = process.env.NON_AWS_STORAGE_SERVER_URL
 
 
-export const STORAGE_SERVER_URL = `http://localhost:4000`
-export const STORAGE_SERVER_FILES = `${STORAGE_SERVER_URL}/projects/`
+
+
+export const STORAGE_SERVER_URL = USE_NON_AWS_STORAGE
+	? NON_AWS_STORAGE_SERVER_URL
+	: AWS_STORAGE_SERVER_URL
+export const STORAGE_SERVER_FILES_ENDPOINT = `${STORAGE_SERVER_URL}/${USE_NON_AWS_STORAGE
+	? NON_AWS_SERVER_FILES_ENDPOINT
+	: AWS_SERVER_FILES_ENDPOINT}`

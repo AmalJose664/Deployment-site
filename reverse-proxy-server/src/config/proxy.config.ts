@@ -1,6 +1,6 @@
 import http from "http";
 import https from "https";
-import { STORAGE_SERVER_FILES } from "../constants/paths.js";
+import { STORAGE_SERVER_FILES_ENDPOINT } from "../constants/paths.js";
 
 export const httpAgent = new http.Agent({
 	keepAlive: true,
@@ -22,5 +22,5 @@ export const proxyTimeouts = {
 };
 
 export const getTargetUrl = (projectId: string, deploymentId: string) => {
-	return `${STORAGE_SERVER_FILES}${projectId}/${deploymentId}`;
+	return `${STORAGE_SERVER_FILES_ENDPOINT}${projectId}/${deploymentId}`;
 };

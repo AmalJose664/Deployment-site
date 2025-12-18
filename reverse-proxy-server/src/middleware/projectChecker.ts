@@ -12,7 +12,10 @@ declare global {
 		}
 	}
 }
-
+export type RequestWithProject = Request & {
+	project?: IProject;
+	startTime?: number
+}
 
 export async function checkProject(req: Request, res: Response, next: NextFunction) {
 	const ownDomain = process.env.OWN_DOMAIN

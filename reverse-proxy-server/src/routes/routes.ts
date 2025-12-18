@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { validateObjectId } from "../middleware/validate.js";
-import { extraProxy } from "../middleware/extraProxy.js";
+import { extraProxy } from "../middleware/proxy.js";
 import { invalidateSlugs } from "../controller/extrasController.js";
 
 const router = Router()
