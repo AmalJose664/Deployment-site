@@ -11,7 +11,7 @@ test-server/public/user-projects/
 
 test-grounds/
 test-grounds/*
-
+.vscode/
 
 nginx-1.28.0/conf/fastcgi_params
 nginx-1.28.0/conf/fastcgi.conf
