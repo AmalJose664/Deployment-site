@@ -5,9 +5,13 @@ import { invalidateSlugs } from "../controller/extrasController.js";
 
 const router = Router()
 
-router.get("/track", (_, res) => {
+router.get("/track", (req, res) => {
+	console.log(req.header("X-Original-URI"))
+	console.log(req.header("X-Real-IP"))
+	console.log(req.header("X-Host"))
 	res.json({})
 })
+
 router.get("/invalidate/:slug", invalidateSlugs)
 
 router.get(
