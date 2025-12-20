@@ -7,16 +7,20 @@ import AppError from "../utils/AppError.js";
 import { IProjectBandwidthRepository } from "../interfaces/repository/IProjectBandwidth.js";
 import { projectBandwidthRepo } from "../repository/projectBandwidth.repo.js";
 import { IPlans, PLANS } from "../constants/plan.js";
+import { redisService } from "../cache/redis.js";
+import { IRedisCache } from "../interfaces/cache/IRedis.js";
 
 // ←
 class ProjectService implements IProjectService {
 	private projectRepository: IProjectRepo;
 	private projectBandwidthRepo: IProjectBandwidthRepository
 	private projectCache: NodeCache
-	constructor(projectRepo: IProjectRepo, projectBandwidthRepo: IProjectBandwidthRepository, projectCache: NodeCache) {
+	private redisCache: IRedisCache
+	constructor(projectRepo: IProjectRepo, projectBandwidthRepo: IProjectBandwidthRepository, projectCache: NodeCache, redisCache: IRedisCache) {
 		this.projectRepository = projectRepo;
 		this.projectBandwidthRepo = projectBandwidthRepo
 		this.projectCache = projectCache
+		this.redisCache = redisCache
 	}
 
 	async findProjectBySlug(slug: string): Promise<IProject | null> {
@@ -58,5 +62,5 @@ class ProjectService implements IProjectService {
 export const projectService = new ProjectService(projectRepo, projectBandwidthRepo, new NodeCache({
 	stdTTL: 300,          // Node Cache not meant for scalability, use redis for scalability of project
 	checkperiod: 60 * 3   // Node Cache not meant for scalability, use redis for scalability of project
-})
+}), redisService
 )

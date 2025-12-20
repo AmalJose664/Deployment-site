@@ -15,6 +15,7 @@
 		"dotenv": "^17.2.3",
 		"express": "^5.1.0",
 		"http-proxy-middleware": "^3.0.5",
+		"ioredis": "^5.8.2",
 		"isbot": "^5.1.32",
 		"kafkajs": "^2.2.4",
 		"mongoose": "^8.19.2",

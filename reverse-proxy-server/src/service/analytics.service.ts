@@ -59,6 +59,7 @@ class AnalyticsService implements IAnalyticsService {
 	}
 
 	sendAnalytics(data: IAnalytics): void {
+
 		this.queueAnalytics(data)
 	}
 

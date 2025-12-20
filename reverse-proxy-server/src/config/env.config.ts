@@ -5,7 +5,8 @@ export function validateEnv() {
 		"KAFKA_USERNAME",
 		"KAFKA_PASSWORD",
 		"AWS_STORAGE_BUCKET_NAME",
-		"NON_AWS_STORAGE_SERVER_URL"
+		"NON_AWS_STORAGE_SERVER_URL",
+		"REDIS_URL"
 	];
 
 	const missing = required.filter(key => !process.env[key]);
