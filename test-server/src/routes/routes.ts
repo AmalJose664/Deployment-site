@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { downloadFile, newDeployment, provideProjectFiles, provideProjectIndex, } from "../controller/controller.js";
-import { testSubmit1, testSubmit2, testSubmit3 } from "../controller/testFunctions.js";
 import { validateObjectId } from "../middleware/validate.js";
 import multer from "multer"
 import { authorizeActions } from "../middleware/authorizeActions.js";
@@ -38,9 +37,6 @@ router.post(
 	newDeployment
 );
 
-router.post('/submit', testSubmit1)
-router.post('/submit2', testSubmit2);
-router.post('/submit3', testSubmit3)
 
 
 export default router

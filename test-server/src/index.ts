@@ -4,7 +4,6 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import router from "./routes/routes.js";
-import { producer } from "./config/kafka.js";
 import { validateEnv } from "./config/env.config.js";
 
 
@@ -38,6 +37,5 @@ app.use(router)
 
 validateEnv()
 app.listen(port, async () => {
-	await producer.connect()
 	console.log(`Server is running on http://localhost:${port}`);
 });
