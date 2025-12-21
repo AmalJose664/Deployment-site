@@ -16,7 +16,7 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { BaseSettings } from "./BasicDetails";
 import { AdvancedSettings } from "./AdvancedDetails";
 import { ConfigPreview } from "./ConfigPreview";
-import { getBranches, repoCheck } from "@/lib/form";
+import { getBranches, repoCheck } from "@/lib/moreUtils/form";
 import { IoIosCube } from "react-icons/io";
 import { toast } from "sonner";
 import BackButton from "@/components/BackButton";

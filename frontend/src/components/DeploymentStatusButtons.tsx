@@ -3,7 +3,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover"
-import { getStatusBg } from "@/lib/utils"
+import { getStatusBg } from "@/lib/moreUtils/combined"
 import { Dispatch, SetStateAction } from "react"
 import { IoIosArrowDown } from "react-icons/io"
 interface DeploymentStatusButtonsProps {

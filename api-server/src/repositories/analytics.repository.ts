@@ -1,5 +1,5 @@
 import { ClickHouseClient } from "@clickhouse/client";
-import { IAnalyticsRepository, queryOptions } from "../interfaces/repository/IAnalyticsRepository.js";
+import { IAnalyticsRepository, QueryOptions } from "../interfaces/repository/IAnalyticsRepository.js";
 import { BufferAnalytics } from "../models/Analytics.js";
 
 class AnalyticsRepository implements IAnalyticsRepository {
@@ -28,7 +28,7 @@ class AnalyticsRepository implements IAnalyticsRepository {
 		this.insertBatch([data]);
 	}
 
-	async getBandwidth(projectId: string, queryOptions: queryOptions): Promise<unknown[]> {
+	async getBandwidth(projectId: string, queryOptions: QueryOptions): Promise<unknown[]> {
 		const result = await this.client.query({
 			query: `SELECT 
           	toStartOfInterval(
@@ -55,8 +55,7 @@ class AnalyticsRepository implements IAnalyticsRepository {
 
 		return await result.json();
 	}
-	async getOverview(projectId: string, queryOptions: queryOptions): Promise<unknown[]> {
-		console.log(queryOptions);
+	async getOverview(projectId: string, queryOptions: QueryOptions): Promise<unknown[]> {
 		const result = await this.client.query({
 			query: `SELECT
   			toStartOfInterval(
@@ -83,8 +82,7 @@ class AnalyticsRepository implements IAnalyticsRepository {
 
 		return await result.json();
 	}
-	async getRealtime(projectId: string, queryOptions: queryOptions): Promise<unknown[]> {
-		console.log(queryOptions);
+	async getRealtime(projectId: string, queryOptions: QueryOptions): Promise<unknown[]> {
 		const result = await this.client.query({
 			query: `SELECT 
     		count() as total_requests,
@@ -107,8 +105,7 @@ class AnalyticsRepository implements IAnalyticsRepository {
 
 		return await result.json();
 	}
-	async getTopPages(projectId: string, queryOptions: queryOptions): Promise<unknown[]> {
-		console.log(queryOptions);
+	async getTopPages(projectId: string, queryOptions: QueryOptions): Promise<unknown[]> {
 		const result = await this.client.query({
 			query: `SELECT 
     		path,
@@ -134,8 +131,7 @@ class AnalyticsRepository implements IAnalyticsRepository {
 
 		return await result.json();
 	}
-	async getOsStats(projectId: string, queryOptions: queryOptions): Promise<unknown[]> {
-		console.log(queryOptions);
+	async getOsStats(projectId: string, queryOptions: QueryOptions): Promise<unknown[]> {
 		const result = await this.client.query({
 			query: `SELECT 
     		ua_os,

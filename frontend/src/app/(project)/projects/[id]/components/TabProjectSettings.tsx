@@ -18,7 +18,7 @@ import { ProjectFormSchema } from "@/lib/schema/project";
 import { Controller, useFieldArray, useForm, UseFormReturn, useFormState, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getBranches } from "@/lib/form";
+import { getBranches } from "@/lib/moreUtils/form";
 import { useUpdateProjectMutation } from "@/store/services/projectsApi";
 import { ChangeProjectSubdomainDialog } from "@/components/modals/ChangeSubdomain";
 import RightFadeComponent from "@/components/RightFadeComponent";

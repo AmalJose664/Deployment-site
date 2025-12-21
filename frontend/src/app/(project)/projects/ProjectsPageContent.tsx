@@ -11,7 +11,8 @@ import { useDebounce } from '@/hooks/useDebounce';
 import ProjectEmptyState from './ProjectEmptyState';
 import { Project, ProjectStatus } from '@/types/Project';
 import { useRouter } from "next/navigation"
-import { cn, getStatusBg } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import { getStatusBg } from '@/lib/moreUtils/combined';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import OptionsComponent from "@/components/OptionsComponent";

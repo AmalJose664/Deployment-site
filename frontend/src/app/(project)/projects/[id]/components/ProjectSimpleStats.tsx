@@ -4,7 +4,7 @@ import { MdOutlineCheckCircle, MdAccessTime, MdErrorOutline } from "react-icons/
 import { Project } from "@/types/Project";
 import RightFadeComponent from "@/components/RightFadeComponent";
 import { useGetProjectsSimpleStatsQuery } from "@/store/services/projectsApi";
-import { formatBytes, getElapsedTimeClean } from "@/lib/utils";
+import { formatBytes, getElapsedTimeClean } from "@/lib/moreUtils/combined";
 import { StatusHistory, SubtleProgressBar, ThinSparkline } from "@/components/SimpleStatsCompnts";
 import { LuHistory } from "react-icons/lu";
 const ProjectSimpleStats = ({ project }: { project: Project }) => {

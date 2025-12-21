@@ -12,7 +12,7 @@ import {
 	getGithubBranchUrl,
 	getGithubCommitUrl,
 	getStatusColor,
-} from "@/lib/utils";
+} from "@/lib/moreUtils/combined";
 import { useGetDeploymentByIdQuery } from "@/store/services/deploymentApi";
 import { useGetDeploymentLogsQuery } from "@/store/services/logsApi";
 import { Project, ProjectStatus } from "@/types/Project";

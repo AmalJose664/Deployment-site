@@ -4,12 +4,12 @@ import { Request, Response, NextFunction } from "express";
 
 interface DecodedUser {
 	id: string;
-	email: string;
+	plan: string;
 }
 
 declare global {
 	namespace Express {
-		interface User extends DecodedUser {}
+		interface User extends DecodedUser { }
 		interface Request {
 			validatedQuery?: any;
 			validatedBody?: any;

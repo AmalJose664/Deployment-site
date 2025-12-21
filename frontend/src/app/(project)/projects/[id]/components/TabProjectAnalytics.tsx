@@ -10,6 +10,7 @@ import {
 import { BsInfoCircle } from "react-icons/bs";
 import RightFadeComponent from "@/components/RightFadeComponent";
 import { CgClose } from "react-icons/cg";
+import { useGetUserQuery } from "@/store/services/authApi";
 
 const BandwidthChart = lazy(() => import("@/components/analytics/Bandwidth"));
 const OverviewChart = lazy(() => import("@/components/analytics/Overview"));
@@ -19,6 +20,7 @@ const OsStats = lazy(() => import("@/components/analytics/OsStats"));
 
 const ProjectAnalytics = ({ projectId }: { projectId: string }) => {
 	const [showNote, setShowNote] = useState(true)
+	const { data: user } = useGetUserQuery()
 	return (
 		<div>
 			{showNote &&
@@ -50,7 +52,7 @@ const ProjectAnalytics = ({ projectId }: { projectId: string }) => {
 					<AccordionTrigger className="hover:no-underline text-xl">Traffic Overview</AccordionTrigger>
 					<AccordionContent>
 						<Suspense fallback={<div className="flex h-[400px] items-center justify-center">Loading...</div>}>
-							<OverviewChart projectId={projectId} />
+							<OverviewChart projectId={projectId} userPlan={user?.plan || ""} />
 						</Suspense>
 					</AccordionContent>
 				</AccordionItem>
@@ -59,7 +61,7 @@ const ProjectAnalytics = ({ projectId }: { projectId: string }) => {
 					<AccordionTrigger className="hover:no-underline text-xl">Bandwidth</AccordionTrigger>
 					<AccordionContent>
 						<Suspense fallback={<div className="flex h-[400px] items-center justify-center">Loading...</div>}>
-							<BandwidthChart projectId={projectId} />
+							<BandwidthChart projectId={projectId} userPlan={user?.plan || ""} />
 						</Suspense>
 					</AccordionContent>
 				</AccordionItem>

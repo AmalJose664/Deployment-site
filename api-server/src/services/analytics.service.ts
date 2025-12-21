@@ -1,8 +1,9 @@
-import { IAnalyticsRepository, queryOptions } from "../interfaces/repository/IAnalyticsRepository.js";
+import { PLANS } from "../constants/plan.js";
+import { IAnalyticsRepository, QueryOptions } from "../interfaces/repository/IAnalyticsRepository.js";
 import { IProjectBandwidthRepository } from "../interfaces/repository/IProjectBandwidthRepository.js";
 import { BandWidthWithProjectType, IAnalyticsService } from "../interfaces/service/IAnalyticsService.js";
 import { BufferAnalytics } from "../models/Analytics.js";
-import { getInterval, getUnit, getRange } from "../utils/analyticsUnits.js";
+import { getInterval, getUnit, getRange, validateFreeAnalyticsParams, fillEmptyQueries } from "../utils/analyticsUnits.js";
 
 class AnalyticsService implements IAnalyticsService {
 	private analyticsRepo: IAnalyticsRepository;
@@ -84,27 +85,39 @@ class AnalyticsService implements IAnalyticsService {
 		}
 	}
 
-	async getBandwidthData(projectId: string, range: string, interval: string): Promise<[unknown[], queryOptions]> {
+	async getBandwidthData(projectId: string, range: string | undefined, interval: string | undefined, userPlan: string): Promise<[unknown[], QueryOptions]> {
+		const [filteredRange, fillteredInterval] = fillEmptyQueries(range, interval)
+
 		const queryOptions = {
-			range: getRange(range),
-			rangeUnit: getUnit(range),
-			interval: getInterval(interval),
-			intervalUnit: getUnit(interval),
+			interval: getInterval(fillteredInterval),
+			intervalUnit: getUnit(fillteredInterval),
+			range: getRange(filteredRange),
+			rangeUnit: getUnit(filteredRange),
 		};
+		console.log(queryOptions)
+		if (userPlan !== PLANS.PRO.name) {
+			validateFreeAnalyticsParams(queryOptions, range, interval)
+		}
 		const data = await this.analyticsRepo.getBandwidth(projectId, queryOptions);
 		return [data, queryOptions];
 	}
-	async getOverView(projectId: string, range: string, interval: string): Promise<[unknown[], queryOptions]> {
+	async getOverView(projectId: string, range: string | undefined, interval: string | undefined, userPlan: string): Promise<[unknown[], QueryOptions]> {
+		const [filteredRange, fillteredInterval] = fillEmptyQueries(range, interval)
+
 		const queryOptions = {
-			range: getRange(range),
-			rangeUnit: getUnit(range),
-			interval: getInterval(interval),
-			intervalUnit: getUnit(interval),
+			interval: getInterval(fillteredInterval),
+			intervalUnit: getUnit(fillteredInterval),
+			range: getRange(filteredRange),
+			rangeUnit: getUnit(filteredRange),
 		};
+		console.log(queryOptions)
+		if (userPlan !== PLANS.PRO.name) {
+			validateFreeAnalyticsParams(queryOptions, range, interval)
+		}
 		const data = await this.analyticsRepo.getOverview(projectId, queryOptions);
 		return [data, queryOptions];
 	}
-	async getRealtime(projectId: string, interval: string): Promise<[unknown[], queryOptions]> {
+	async getRealtime(projectId: string, interval: string): Promise<[unknown[], QueryOptions]> {
 		const queryOptions = {
 			interval: getInterval(interval),
 			intervalUnit: getUnit(interval),
@@ -112,7 +125,7 @@ class AnalyticsService implements IAnalyticsService {
 		const data = await this.analyticsRepo.getRealtime(projectId, queryOptions);
 		return [data, queryOptions];
 	}
-	async getTopPages(projectId: string, interval: string, limit: number): Promise<[unknown[], queryOptions]> {
+	async getTopPages(projectId: string, interval: string, limit: number): Promise<[unknown[], QueryOptions]> {
 		const queryOptions = {
 			interval: getInterval(interval),
 			intervalUnit: getUnit(interval),
@@ -121,7 +134,7 @@ class AnalyticsService implements IAnalyticsService {
 		const data = await this.analyticsRepo.getTopPages(projectId, queryOptions);
 		return [data, queryOptions];
 	}
-	async getOsStats(projectId: string, interval: string): Promise<[unknown[], queryOptions]> {
+	async getOsStats(projectId: string, interval: string): Promise<[unknown[], QueryOptions]> {
 		const queryOptions = {
 			interval: getInterval(interval),
 			intervalUnit: getUnit(interval),

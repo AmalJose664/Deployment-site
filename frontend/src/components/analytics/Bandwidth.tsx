@@ -23,6 +23,11 @@ import {
 import { useGetBandWidthQuery } from "@/store/services/analyticsApi"
 import { TiArrowUp, TiArrowDown } from "react-icons/ti";
 import { HiMiniArrowsUpDown } from "react-icons/hi2"
+import { useEffect } from "react"
+import { PLANS } from "@/config/plan"
+import { intervalsMap, IntervalsMapType } from "@/lib/moreUtils/analytics"
+import { IoMdLock } from "react-icons/io"
+import { MdOutlineKeyboardArrowDown } from "react-icons/md"
 
 const chartConfig = {
 	requestMB: {
@@ -43,9 +48,9 @@ const chartConfig = {
 } satisfies ChartConfig
 
 
-export default function BandwidthChart({ projectId }: { projectId: string }) {
-	const [range, setRange] = useState("24h")
-	const [interval, setInterval] = useState("1h")
+export default function BandwidthChart({ projectId, userPlan }: { projectId: string, userPlan: string }) {
+	const [range, setRange] = useState<keyof IntervalsMapType>("24h")
+	const [interval, setIntervalA] = useState("1h")
 	const [activeChart, setActiveChart] = useState<keyof typeof chartConfig>("totalMB")
 
 	const { data: bandwidthData, isLoading: loading, error } = useGetBandWidthQuery({ interval, projectId, range })
@@ -58,16 +63,25 @@ export default function BandwidthChart({ projectId }: { projectId: string }) {
 		}),
 		[bandwidthData]
 	)
-
+	const isPremiumUser = userPlan === PLANS.PRO.name
+	useEffect(() => {
+		if (!isPremiumUser) return
+		if (range === "24h") {
+			setIntervalA(intervalsMap[range][1].value)
+		}
+		if (range !== "24h") {
+			setIntervalA(intervalsMap[range][0].value)
+		}
+	}, [range])
 	const handleRangeChange = (newRange: string) => {
-		setRange(newRange)
+		setRange(newRange as keyof IntervalsMapType)
 		// Auto-adjust interval based on range
 		if (newRange === "1h" || newRange === "24h") {
-			setInterval("1h")
+			setIntervalA("1h")
 		} else if (newRange === "7d") {
-			setInterval("1d")
+			setIntervalA("1d")
 		} else {
-			setInterval("1d")
+			setIntervalA("1d")
 		}
 	}
 
@@ -125,17 +139,57 @@ export default function BandwidthChart({ projectId }: { projectId: string }) {
 			</CardHeader>
 			<CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
 				<div className="mb-4 flex gap-2">
-					<Select value={range} onValueChange={handleRangeChange}>
-						<SelectTrigger className="w-[140px]">
-							<SelectValue placeholder="Select range" />
-						</SelectTrigger>
-						<SelectContent className="dark:bg-background">
-							<SelectItem value="1h">Last Hour</SelectItem>
-							<SelectItem value="24h">Last 24 Hours</SelectItem>
-							<SelectItem value="7d">Last 7 Days</SelectItem>
-							<SelectItem value="30d">Last 30 Days</SelectItem>
-						</SelectContent>
-					</Select>
+
+					<div>
+						<p className="text-xs ml-2">
+							Range
+						</p>
+						<Select value={range} onValueChange={(e) =>
+							isPremiumUser ? setRange(e as keyof IntervalsMapType) : handleRangeChange(e)
+						}>
+							<SelectTrigger className="w-[140px]">
+								<SelectValue placeholder="Select range" />
+							</SelectTrigger>
+							<SelectContent className="dark:bg-background">
+								<SelectItem value="1h">Last Hour</SelectItem>
+								<SelectItem value="24h">Last 24 Hours</SelectItem>
+								<SelectItem value="7d">Last 7 Days</SelectItem>
+								<SelectItem value="30d">Last 30 Days</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
+					<div>
+						<p className="text-xs ml-2">
+							Interval
+						</p>
+						{isPremiumUser ? (
+							<Select value={interval} onValueChange={(e) => setIntervalA(e)}>
+								<SelectTrigger className="w-[140px]">
+									<SelectValue placeholder="Select range" />
+								</SelectTrigger>
+								<SelectContent className="dark:bg-background">
+									{intervalsMap[range] && intervalsMap[range].map((i, index) => (
+										<SelectItem key={index} value={i.value}>{i.label}</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						) : (
+							<div className="relative group inline-flex gap-2 items-center border px-4 py-1 rounded-md cursor-not-allowed">
+								<IoMdLock size={20} className="text-some-less" />
+								<MdOutlineKeyboardArrowDown size={24} className="text-some-less" />
+								<div
+									className="absolute -top-16 left-1/2 -translate-x-1/2 w-44 px-3 py-2 text-sm text-secondary 
+								bg-white border rounded-md shadow-md 
+								opacity-0 invisible
+								group-hover:opacity-100 group-hover:visible
+								transition-opacity duration-200
+								delay-500
+								pointer-events-none
+								">Upgrade to Pro to unlock this option
+								</div>
+							</div>
+						)}
+					</div>
 				</div>
 				{(bandwidthData?.length === 0 || !bandwidthData) ? (<Card className="dark:bg-background">
 					<CardContent className="flex h-[400px] items-center justify-center">

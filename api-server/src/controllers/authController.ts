@@ -2,29 +2,23 @@ import { NextFunction, Request, Response } from "express";
 import { Profile, VerifyCallback } from "passport-google-oauth20";
 
 import { HTTP_STATUS_CODE } from "../utils/statusCodes.js";
-import { generateAccessToken, generateRefreshToken } from "../utils/generateToken.js";
 import jwt from "jsonwebtoken";
 import { userService } from "../instances.js";
 import { UserMapper } from "../mappers/userMapper.js";
 import AppError from "../utils/AppError.js";
+import { issueAuthAccessCookies, issueAuthRefreshCookies } from "../utils/authUtils.js";
+import { JwtPayload } from "jsonwebtoken";
 
+interface RefreshTokenPayload extends JwtPayload {
+	id: string;
+}
 export const oAuthLoginCallback = (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const accessToken = generateAccessToken(req.user);
-		const refreshToken = generateRefreshToken(req.user);
-
-		res.cookie("refresh_token", refreshToken, {
-			httpOnly: process.env.NODE_ENV === "production",
-			secure: process.env.NODE_ENV === "production",
-			sameSite: "lax",
-			maxAge: 24 * 60 * 60 * 1000,
-		});
-		res.cookie("access_token", accessToken, {
-			httpOnly: process.env.NODE_ENV === "production",
-			secure: process.env.NODE_ENV === "production",
-			sameSite: "lax",
-			maxAge: 12 * 60 * 60 * 1000,
-		});
+		if (!req.user) {
+			return next(new AppError("User not authenticated", 401));
+		}
+		issueAuthAccessCookies(res, req.user)
+		issueAuthRefreshCookies(res, req.user)
 
 		const frontend = process.env.FRONTEND_URL + "/auth/success";
 		res.redirect(frontend);
@@ -39,7 +33,7 @@ export const googleLoginStrategy = async (accessToken: string, refreshToken: str
 		const user = await userService.googleLoginStrategy(profile);
 		const doneUser = {
 			id: user._id,
-			email: user.email,
+			plan: user.plan,
 		};
 		done(null, doneUser);
 	} catch (error) {
@@ -53,7 +47,7 @@ export const githubLoginStrategy = async (accessToken: string, refreshToken: str
 		const user = await userService.githubLoginStrategy(profile);
 		const doneUser = {
 			id: user._id,
-			email: user.email,
+			plan: user.plan,
 		};
 		done(null, doneUser);
 	} catch (error) {
@@ -61,7 +55,7 @@ export const githubLoginStrategy = async (accessToken: string, refreshToken: str
 	}
 };
 
-export const refresh = (req: Request, res: Response, next: NextFunction) => {
+export const refresh = async (req: Request, res: Response, next: NextFunction) => {
 	const refreshToken = req.cookies.refresh_token;
 	if (!refreshToken) {
 		console.log("No refresh token");
@@ -69,16 +63,14 @@ export const refresh = (req: Request, res: Response, next: NextFunction) => {
 		return;
 	}
 	try {
-		const decoded: any = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as string);
-		console.log(decoded, "Trying to decode refesh");
+		const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as string) as RefreshTokenPayload;
 
-		const newAccessToken = generateAccessToken({ id: decoded.id, email: decoded.email });
-		res.cookie("access_token", newAccessToken, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
-			sameSite: "lax",
-			maxAge: 12 * 60 * 60 * 1000,
-		});
+		console.log(decoded, "Trying to decode refesh");
+		const user = await userService.getUser(decoded.id)
+		if (!user) {
+			throw new AppError("User not found", 404)
+		}
+		issueAuthAccessCookies(res, { id: user._id, plan: user.plan })
 		return res.status(200).json({ ok: true });
 	} catch (error) {
 		next(new AppError("Error during token valiadation", 500, error));

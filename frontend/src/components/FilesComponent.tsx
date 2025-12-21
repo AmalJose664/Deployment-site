@@ -1,4 +1,4 @@
-import { formatBytes } from "@/lib/utils"
+import { formatBytes } from "@/lib/moreUtils/combined"
 import { useGetDeploymentFilesQuery } from "@/store/services/deploymentApi"
 
 import { FaFolder, FaRegFileAlt, FaDownload } from "react-icons/fa";

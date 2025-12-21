@@ -1,4 +1,5 @@
-import { cn, getStatusBg } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { getStatusBg } from "@/lib/moreUtils/combined";
 import { Fragment } from "react"
 export const SubtleProgressBar = ({ percentage, color = "bg-neutral-900 dark:bg-white" }: { percentage: number, color?: string }) => (
 	<div className="w-full bg-neutral-100 dark:bg-neutral-800 h-0.5 rounded-full mt-2 overflow-hidden relative">

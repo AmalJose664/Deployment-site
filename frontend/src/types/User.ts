@@ -4,6 +4,7 @@ export interface User {
 	name: string
 	profileImage: string
 	_id: string
+	plan: string
 }
 export interface UserDetailed {
 	name: string

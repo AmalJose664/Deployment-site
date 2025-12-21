@@ -12,9 +12,10 @@ class AnalyticsController implements IAnalyticsController {
 	async bandWidth(req: Request, res: Response, next: NextFunction): Promise<void> {
 		const { projectId } = req.params;
 		const { range, interval } = req.query;
+		const userPlan = req.user?.plan as string
 
 		try {
-			const [data, queryOptions] = await this.analyticsService.getBandwidthData(projectId, range as string, interval as string);
+			const [data, queryOptions] = await this.analyticsService.getBandwidthData(projectId, range as string, interval as string, userPlan);
 			const response = AnalyticsMapper.bandwidthResponseDTO(data, projectId, queryOptions);
 
 			res.json(response);
@@ -26,9 +27,9 @@ class AnalyticsController implements IAnalyticsController {
 	async overview(req: Request, res: Response, next: NextFunction): Promise<void> {
 		const { projectId } = req.params;
 		const { range, interval } = req.query;
-
+		const userPlan = req.user?.plan as string
 		try {
-			const [data, queryOptions] = await this.analyticsService.getOverView(projectId, range as string, interval as string);
+			const [data, queryOptions] = await this.analyticsService.getOverView(projectId, range as string, interval as string, userPlan);
 			const response = AnalyticsMapper.overviewResponse(data, projectId, queryOptions);
 
 			res.json(response);

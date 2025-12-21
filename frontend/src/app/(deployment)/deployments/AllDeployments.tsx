@@ -1,6 +1,6 @@
 "use client"
 import StatusIcon from "@/components/ui/StatusIcon"
-import { getStatusBg, getStatusColor, timeToSeconds } from "@/lib/utils"
+import { getStatusBg, getStatusColor, timeToSeconds } from "@/lib/moreUtils/combined"
 import Link from "next/link"
 import { IoIosCube, IoMdCloudDone, IoMdGitBranch } from "react-icons/io"
 import { MdAccessTime } from "react-icons/md"

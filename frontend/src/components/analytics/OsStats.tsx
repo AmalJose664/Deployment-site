@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select"
 import { useGetOsStatsQuery } from "@/store/services/analyticsApi"
 import { useState } from "react"
-import { BLUE_COLORS } from "@/lib/utils"
+import { BLUE_COLORS } from "@/lib/moreUtils/combined"
 
 const chartConfig = {
 } satisfies ChartConfig

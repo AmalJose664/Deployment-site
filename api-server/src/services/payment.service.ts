@@ -4,6 +4,7 @@ import { IPaymentService } from "../interfaces/service/IPaymentService.js";
 import { IUserRepository } from "../interfaces/repository/IUserRepository.js";
 import AppError from "../utils/AppError.js";
 import { SubscriptionStatus } from "../models/User.js";
+import { IPlans, PLANS } from "../constants/plan.js";
 
 class PaymentService implements IPaymentService {
 	private userRepo: IUserRepository;
@@ -100,7 +101,7 @@ class PaymentService implements IPaymentService {
 		const subscription = event.data.object as Stripe.Subscription;
 		const stripeUserId = subscription.customer as string;
 		if (stripeUserId) {
-			await this.userRepo.updateUserPlansWithStripe(stripeUserId as string, "PRO", {
+			await this.userRepo.updateUserPlansWithStripe(stripeUserId as string, PLANS.PRO.name as keyof IPlans, {
 				subscriptionStatus: SubscriptionStatus.active,
 				subscriptionId: subscription.id,
 			});
@@ -115,7 +116,7 @@ class PaymentService implements IPaymentService {
 		const user = await this.userRepo.findUserByCustomerId(stripeUserId);
 		if (user) {
 			await this.userRepo.updateUser(user._id, {
-				plan: "FREE",
+				plan: PLANS.FREE.name as keyof IPlans,
 				payment: { subscriptionId: null, subscriptionStatus: SubscriptionStatus.cancelled },
 			});
 		}

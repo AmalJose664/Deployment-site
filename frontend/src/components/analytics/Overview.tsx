@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts"
 import {
 	Card,
@@ -23,8 +23,11 @@ import {
 import { useGetOverviewQuery } from "@/store/services/analyticsApi"
 import { FiUsers } from "react-icons/fi"
 import { TiEye } from "react-icons/ti"
-import { MdAccessTime } from "react-icons/md"
+import { MdAccessTime, MdOutlineKeyboardArrowDown } from "react-icons/md"
 import { CiHardDrive } from "react-icons/ci"
+import { intervalsMap, IntervalsMapType } from "@/lib/moreUtils/analytics"
+import { PLANS } from "@/config/plan"
+import { IoMdLock } from "react-icons/io"
 
 
 const chartConfig = {
@@ -57,17 +60,26 @@ const unitMap = {
 }
 
 
-export default function OverviewChart({ projectId }: { projectId: string }) {
-	const [range, setRange] = useState("24h")
-	const [interval, setInterval] = useState("1h")
+export default function OverviewChart({ projectId, userPlan }: { projectId: string, userPlan: string }) {
+	const [range, setRange] = useState<keyof IntervalsMapType>("24h")
+	const [intervalA, setIntervalA] = useState<string>("1h")
 	const [activeChart, setActiveChart] = useState<keyof typeof chartConfig>("requests")
 
 	const { data: overviewData, isLoading: loading, error } = useGetOverviewQuery({
-		interval,
+		interval: intervalA,
 		projectId,
 		range
 	})
-
+	const isPremiumUser = userPlan === PLANS.PRO.name
+	useEffect(() => {
+		if (!isPremiumUser) return
+		if (range === "24h") {
+			setIntervalA(intervalsMap[range][1].value)
+		}
+		if (range !== "24h") {
+			setIntervalA(intervalsMap[range][0].value)
+		}
+	}, [range])
 	const totals = useMemo(
 		() => ({
 			requests: overviewData?.reduce((acc, curr) => acc + curr.requests, 0) || 0,
@@ -81,13 +93,13 @@ export default function OverviewChart({ projectId }: { projectId: string }) {
 	)
 
 	const handleRangeChange = (newRange: string) => {
-		setRange(newRange)
+		setRange(newRange as keyof IntervalsMapType)
 		if (newRange === "1h" || newRange === "24h") {
-			setInterval("1h")
+			setIntervalA("1h")
 		} else if (newRange === "7d") {
-			setInterval("1d")
+			setIntervalA("1d")
 		} else {
-			setInterval("1d")
+			setIntervalA("1d")
 		}
 	}
 
@@ -100,7 +112,6 @@ export default function OverviewChart({ projectId }: { projectId: string }) {
 			</Card>
 		)
 	}
-
 	if (error) {
 		return (
 			<Card>
@@ -151,18 +162,57 @@ export default function OverviewChart({ projectId }: { projectId: string }) {
 				</div>
 			</CardHeader>
 			<CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
-				<div className="mb-4 flex gap-2">
-					<Select value={range} onValueChange={handleRangeChange}>
-						<SelectTrigger className="w-[140px]">
-							<SelectValue placeholder="Select range" />
-						</SelectTrigger>
-						<SelectContent className="dark:bg-background">
-							<SelectItem value="1h">Last Hour</SelectItem>
-							<SelectItem value="24h">Last 24 Hours</SelectItem>
-							<SelectItem value="7d">Last 7 Days</SelectItem>
-							<SelectItem value="30d">Last 30 Days</SelectItem>
-						</SelectContent>
-					</Select>
+				<div className="mb-4 flex gap-2 border px-3 py-2 rounded-md w-fit">
+					<div>
+						<p className="text-xs ml-2">
+							Range
+						</p>
+						<Select value={range} onValueChange={(e) =>
+							isPremiumUser ? setRange(e as keyof IntervalsMapType) : handleRangeChange(e)
+						}>
+							<SelectTrigger className="w-[140px]">
+								<SelectValue placeholder="Select range" />
+							</SelectTrigger>
+							<SelectContent className="dark:bg-background">
+								<SelectItem value="1h">Last Hour</SelectItem>
+								<SelectItem value="24h">Last 24 Hours</SelectItem>
+								<SelectItem value="7d">Last 7 Days</SelectItem>
+								<SelectItem value="30d">Last 30 Days</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
+					<div>
+						<p className="text-xs ml-2">
+							Interval
+						</p>
+						{isPremiumUser ? (
+							<Select value={intervalA} onValueChange={(e) => setIntervalA(e)}>
+								<SelectTrigger className="w-[140px]">
+									<SelectValue placeholder="Select range" />
+								</SelectTrigger>
+								<SelectContent className="dark:bg-background">
+									{intervalsMap[range] && intervalsMap[range].map((i, index) => (
+										<SelectItem key={index} value={i.value}>{i.label}</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						) : (
+							<div className="relative group inline-flex gap-2 items-center border px-4 py-1 rounded-md cursor-not-allowed">
+								<IoMdLock size={20} className="text-some-less" />
+								<MdOutlineKeyboardArrowDown size={24} className="text-some-less" />
+								<div
+									className="absolute -top-16 left-1/2 -translate-x-1/2 w-44 px-3 py-2 text-sm text-secondary 
+									bg-white border rounded-md shadow-md 
+									opacity-0 invisible
+									group-hover:opacity-100 group-hover:visible
+									transition-opacity duration-200
+									delay-500
+									pointer-events-none
+									">Upgrade to Pro to unlock this option
+								</div>
+							</div>
+						)}
+					</div>
 				</div>
 				{(overviewData?.length === 0 || !overviewData) ? (
 					<Card className="dark:bg-background">

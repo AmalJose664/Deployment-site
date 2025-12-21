@@ -10,12 +10,11 @@ import { MdFileDownload } from "react-icons/md";
 import { GoTrash } from "react-icons/go";
 import { IoSearch } from "react-icons/io5";
 import { LuRotateCw } from "react-icons/lu";
-import { ansiConverter } from '@/lib/ansiToHtml';
+import { ansiConverter } from '@/lib/moreUtils/ansiToHtml';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
-import { addLogs, clearLogs } from '@/store/slices/logSlice';
-import { formatLogTime, getLevelColor } from '@/lib/utils';
-import { useGetDeploymentLogsQuery } from '@/store/services/logsApi';
+import { clearLogs } from '@/store/slices/logSlice';
+import { formatLogTime, getLevelColor } from '@/lib/moreUtils/combined';
 import { toast } from 'sonner';
 
 interface LogsComponentProps {

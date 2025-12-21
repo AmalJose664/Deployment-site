@@ -3,7 +3,7 @@ import { FiUser, FiMail, FiCalendar, FiClock } from 'react-icons/fi';
 import { useGetUserDetailedQuery, } from "@/store/services/authApi"
 
 import { IoIosCube, IoMdArrowRoundForward, IoMdCloudDone } from 'react-icons/io';
-import { formatBytes, formatDate, getElapsedTimeClean, getPercentage } from '@/lib/utils';
+import { formatBytes, formatDate, getElapsedTimeClean, getPercentage } from '@/lib/moreUtils/combined';
 import { MdOutlineStorage } from 'react-icons/md';
 import { PLANS } from '@/config/plan';
 import { GrPlan } from 'react-icons/gr';

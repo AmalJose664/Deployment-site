@@ -1,4 +1,4 @@
-import { queryOptions } from "../interfaces/repository/IAnalyticsRepository.js";
+import { QueryOptions } from "../interfaces/repository/IAnalyticsRepository.js";
 type meta = Record<string, string | number>;
 interface bandWidthType {
 	date: string;
@@ -39,7 +39,7 @@ export class AnalyticsMapper {
 	static bandwidthResponseDTO(
 		data: unknown[],
 		projectId: string,
-		meta: queryOptions,
+		meta: QueryOptions,
 	): {
 		projectId: string;
 		data: bandWidthType[];
@@ -60,7 +60,7 @@ export class AnalyticsMapper {
 	static overviewResponse(
 		data: unknown[],
 		projectId: string,
-		meta: queryOptions,
+		meta: QueryOptions,
 	): {
 		projectId: string;
 		data: overviewType[];
@@ -81,7 +81,7 @@ export class AnalyticsMapper {
 	static realtimeResponse(
 		data: any[],
 		projectId: string,
-		meta: queryOptions,
+		meta: QueryOptions,
 	): {
 		projectId: string;
 		data: realtimeType;
@@ -105,7 +105,7 @@ export class AnalyticsMapper {
 	static topPagesResponse(
 		data: any[],
 		projectId: string,
-		meta: queryOptions,
+		meta: QueryOptions,
 	): {
 		projectId: string;
 		data: topPagesType[];
@@ -127,7 +127,7 @@ export class AnalyticsMapper {
 	static osStatsResponse(
 		data: any[],
 		projectId: string,
-		meta: queryOptions,
+		meta: QueryOptions,
 	): {
 		projectId: string;
 		data: osDistTypes[];

@@ -1,5 +1,5 @@
 import StatusIcon from "@/components/ui/StatusIcon"
-import { getStatusBg, getStatusColor, timeToSeconds } from "@/lib/utils"
+import { getStatusBg, getStatusColor, timeToSeconds } from "@/lib/moreUtils/combined"
 import { useGetProjectDeploymentsQuery } from "@/store/services/deploymentApi"
 import Link from "next/link"
 

@@ -5,6 +5,7 @@ import { IPaymentService } from "../interfaces/service/IPaymentService.js";
 import { stripe } from "../config/stripe.js";
 import { HTTP_STATUS_CODE } from "../utils/statusCodes.js";
 import AppError from "../utils/AppError.js";
+import { issueAuthAccessCookies, issueAuthRefreshCookies } from "../utils/authUtils.js";
 
 class PaymentController implements IPaymentController {
 	private paymentService: IPaymentService;
@@ -30,6 +31,8 @@ class PaymentController implements IPaymentController {
 		try {
 			const userId = req.user?.id as string;
 			await this.paymentService.handleCancelSubscription(userId);
+			issueAuthAccessCookies(res, { id: userId, plan: "FREE" })
+			issueAuthRefreshCookies(res, { id: userId, plan: "FREE" })
 			res.json({
 				message: "Subscription cancelled successfully",
 				status: true,

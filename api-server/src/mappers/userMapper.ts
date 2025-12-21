@@ -3,6 +3,7 @@ interface UserResponseDTO {
 	name: string;
 	profileImage: string;
 	_id: string;
+	plan: string;
 }
 interface UserResponseDetailedDTO {
 	name: string;
@@ -23,6 +24,7 @@ export class UserMapper {
 				_id: user._id.toString(),
 				name: user.name,
 				profileImage: user.profileImage,
+				plan: user.plan
 			},
 		};
 	}

@@ -4,7 +4,7 @@ import { IoMdGitBranch } from "react-icons/io";
 import { LiaExternalLinkAltSolid } from "react-icons/lia";
 import { MdAccessTime } from "react-icons/md";
 import { Deployment } from "@/types/Deployment";
-import { getElapsedTime, getGithubBranchUrl, getGithubCommitUrl, getStatusColor, shortHash, timeToSeconds } from "@/lib/utils";
+import { getElapsedTime, getGithubBranchUrl, getGithubCommitUrl, getStatusColor, shortHash, timeToSeconds } from "@/lib/moreUtils/combined";
 import Link from "next/link";
 import StatusIcon from "@/components/ui/StatusIcon";
 import { useRouter } from "next/navigation";

@@ -12,7 +12,7 @@ import { User } from "@/types/User";
 import { Project, ProjectStatus } from "@/types/Project";
 import Link from "next/link";
 import TechStack from "@/components/project/TechStack";
-import { getGithubBranchUrl, getGithubCommitUrl, getStatusColor, parseGitHubRepo, timeToSeconds } from "@/lib/utils";
+import { getGithubBranchUrl, getGithubCommitUrl, getStatusColor, parseGitHubRepo, timeToSeconds } from "@/lib/moreUtils/combined";
 import StatusIcon, { AnimationBuild } from "@/components/ui/StatusIcon";
 import { toast } from "sonner"
 import { Deployment } from "@/types/Deployment";
