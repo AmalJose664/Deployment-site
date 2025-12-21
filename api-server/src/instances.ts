@@ -16,7 +16,7 @@ import DeploymentController from "./controllers/deploymentController.js";
 import LogsController from "./controllers/logsController.js";
 import AnalyticsController from "./controllers/analyticsController.js";
 
-import { client } from "./config/clickhouse.js";
+import { client } from "./config/clickhouse.config.js";
 import PaymentService from "./services/payment.service.js";
 import PaymentController from "./controllers/paymentController.js";
 

@@ -2,7 +2,7 @@ import Stripe from "stripe";
 import { Request, Response, NextFunction } from "express";
 import { IPaymentController } from "../interfaces/controller/IPaymentController.js";
 import { IPaymentService } from "../interfaces/service/IPaymentService.js";
-import { stripe } from "../config/stripe.js";
+import { stripe } from "../config/stripe.config.js";
 import { HTTP_STATUS_CODE } from "../utils/statusCodes.js";
 import AppError from "../utils/AppError.js";
 import { issueAuthAccessCookies, issueAuthRefreshCookies } from "../utils/authUtils.js";

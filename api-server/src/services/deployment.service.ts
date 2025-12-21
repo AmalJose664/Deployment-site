@@ -6,7 +6,7 @@ import { DeploymentStatus, IDeployment } from "../models/Deployment.js";
 import AppError from "../utils/AppError.js";
 import { IProject, ProjectStatus } from "../models/Projects.js";
 import { RunTaskCommand } from "@aws-sdk/client-ecs";
-import { config, ecsClient, s3Client } from "../config/awsClient.js";
+import { config, ecsClient, s3Client } from "../config/aws.config.js";
 import { rm } from "fs/promises";
 
 import { spawn } from "child_process";
@@ -15,7 +15,7 @@ import { BUILD_SERVER_PATH, BUILD_SERVER_RUN_SCRIPT, LOCAL_TEST_SERVER_USER_FILE
 import { _Object, DeleteObjectCommand, DeleteObjectsCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import getNessesaryEnvs from "../utils/getNessesaryEnvs.js";
 import { IUserSerivce } from "../interfaces/service/IUserService.js";
-// import { redisClient } from "../config/redis.js";
+// import { redisClient } from "../config/redis.config.js";
 
 class DeploymentService implements IDeploymentService {
 	private deploymentRepository: IDeploymentRepository;

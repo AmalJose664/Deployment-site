@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { stripe } from "../config/stripe.js";
+import { stripe } from "../config/stripe.config.js";
 import { IPaymentService } from "../interfaces/service/IPaymentService.js";
 import { IUserRepository } from "../interfaces/repository/IUserRepository.js";
 import AppError from "../utils/AppError.js";

@@ -7,7 +7,7 @@ import cookieParser from "cookie-parser";
 import passport from "passport";
 import "./config/passport.js";
 
-import connectDB from "./config/db.js";
+import connectDB from "./config/mongo.config.js";
 import authRouter from "./routes/authRoutes.js";
 import { errorHandler } from "./middlewares/globalErrorHandler.js";
 import projectRouter from "./routes/projectRoutes.js";
