@@ -6,25 +6,24 @@ yarn-debug.log*
 yarn-error.log*
 
 
-test-server/src/config/kafka.ts
 test-server/public/user-projects/
 
 test-grounds/
 test-grounds/*
 .vscode/
 
-nginx-1.28.0/conf/fastcgi_params
-nginx-1.28.0/conf/fastcgi.conf
-nginx-1.28.0/conf/koi-win
-nginx-1.28.0/conf/koi-utf
-nginx-1.28.0/conf/fastcgi.conf
-nginx-1.28.0/conf/scgi_params
-nginx-1.28.0/conf/win-utf
-nginx-1.28.0/conf/uwsgi_params
+**/nginx/conf/fastcgi_params
+**/nginx/conf/fastcgi.conf
+**/nginx/conf/koi-win
+**/nginx/conf/koi-utf
+**/nginx/conf/fastcgi.conf
+**/nginx/conf/scgi_params
+**/nginx/conf/win-utf
+**/nginx/conf/uwsgi_params
 
-nginx-1.28.0/logs/
-nginx-1.28.0/temp/
-nginx-1.28.0/*.pid
-nginx-1.28.0/*.lock
-nginx-1.28.0/*.exe
+**/nginx/logs/
+**/nginx/temp/
+**/nginx/*.pid
+**/nginx/*.lock
+**/nginx/*.exe
 
