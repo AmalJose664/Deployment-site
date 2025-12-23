@@ -147,73 +147,83 @@ export default function ProjectContent() {
 						</div>
 					) : (
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
-							{filteredProjects && filteredProjects.map((project) => (
-								<div onClick={() => router.push("/projects/" + project._id)}
-									key={project._id}
-									className={cn("dark:bg-neutral-900 bg-white border dark:border-gray-800 border-gray-300 shadow-gray-200 shadow dark:shadow-none  rounded-md p-5 hover:border-blue-500 dark:hover:border-blue-900 transition-all duration-200 group cursor-pointer leading-5", project.isDisabled && "dark:hover:border-red-300 hover:border-red-300")}
-								>
-									<div className="flex items-start justify-between mb-4">
+							{filteredProjects && filteredProjects.map((project) => {
+								const projectLink = `${window.location.protocol}//${project.subdomain}.${process.env.NEXT_PUBLIC_PROXY_SERVER}`
+								return (
+									<div onClick={() => router.push("/projects/" + project._id)}
+										key={project._id}
+										className={cn("dark:bg-neutral-900 bg-white border dark:border-gray-800 border-gray-300 shadow-gray-200 shadow dark:shadow-none  rounded-md p-5 hover:border-blue-500 dark:hover:border-blue-900 transition-all duration-200 group cursor-pointer leading-5", project.isDisabled && "dark:hover:border-red-300 hover:border-red-300")}
+									>
+										<div className="flex items-start justify-between mb-4">
 
-										<div className="flex-1">
-											<h3 className="text-lg text-primary  font-semibold mb-1 transition-colors">
-												{project.name}
-											</h3>
-											<div className="flex items-center gap-2 text-sm ">
-												<IoMdGlobe size={18} className='text-less' />
-												<span className="hover:underline text-less">{project.subdomain}</span>
+											<div className="flex-1">
+												<h3 className="text-lg text-primary  font-semibold mb-1 transition-colors">
+													{project.name}
+												</h3>
+												<div className="flex items-center gap-2 text-sm ">
+													<IoMdGlobe size={18} className='text-less' />
+													<span className="hover:underline text-less">{project.subdomain}</span>
+												</div>
+											</div>
+											{project.isDisabled && <div className='text-xs border mt-1 px-2 py-1 rounded-md text-red-400'>
+												Disabled
+											</div>
+											}
+											<div onClick={(e) => e.stopPropagation()}>
+												<OptionsComponent parentClassName="" options={[
+													{
+														title: "Site",
+														actionFn: () => window.open(projectLink),
+														className: "",
+														Svg: IoMdGlobe
+													},
+													{
+														title: "Settings",
+														actionFn: () => router.push(`/projects/${project._id}?tab=settings`),
+														className: "",
+														Svg: IoSettingsOutline
+													},
+													{
+														title: "View Repository",
+														actionFn: () => window.open(project.repoURL),
+														className: "",
+														Svg: FiGithub
+													},
+													{
+														title: "Delete Project",
+														actionFn: () => router.push(`/projects/${project._id}?tab=settings#danger`),
+														className: "text-red-400",
+														Svg: IoTrashOutline
+													},
+
+												]} />
 											</div>
 										</div>
-										{project.isDisabled && <div className='text-xs border mt-1 px-2 py-1 rounded-md text-red-400'>
-											Disabled
-										</div>
-										}
-										<div onClick={(e) => e.stopPropagation()}>
-											<OptionsComponent parentClassName="" options={[
-												{
-													title: "Settings",
-													actionFn: () => router.push(`/projects/${project._id}?tab=settings`),
-													className: "",
-													Svg: IoSettingsOutline
-												},
-												{
-													title: "View Repository",
-													actionFn: () => window.open(project.repoURL),
-													className: "",
-													Svg: FiGithub
-												},
-												{
-													title: "Delete Project",
-													actionFn: () => router.push(`/projects/${project._id}?tab=settings#danger`),
-													className: "text-red-400",
-													Svg: IoTrashOutline
-												},
 
-											]} />
+										<div className="flex items-center gap-4 text-sm text-less mb-4">
+											<div className="flex items-center gap-1.5">
+												<IoMdGitBranch size={14} />
+												<span>{project.branch}</span>
+											</div>
+											<div className="flex items-center gap-1.5">
+												<CiClock1 size={14} />
+												<span>{new Date(project.lastDeployedAt || "").toDateString()}</span>
+											</div>
+										</div>
+
+										<div className="flex items-center justify-between pt-4 border-t text-less border-gray-800">
+											<div className="flex items-center gap-2">
+												<div className={`w-2 h-2 rounded-full ${getStatusBg(project.status)[0]}`}></div>
+												<span className="text-sm ">{project.status}</span>
+											</div>
+											<span className="text-xs border rounded-full  px-2.5 py-1  text-some-less">
+												{project.techStack}
+											</span>
 										</div>
 									</div>
-
-									<div className="flex items-center gap-4 text-sm text-less mb-4">
-										<div className="flex items-center gap-1.5">
-											<IoMdGitBranch size={14} />
-											<span>{project.branch}</span>
-										</div>
-										<div className="flex items-center gap-1.5">
-											<CiClock1 size={14} />
-											<span>{new Date(project.lastDeployedAt || "").toDateString()}</span>
-										</div>
-									</div>
-
-									<div className="flex items-center justify-between pt-4 border-t text-less border-gray-800">
-										<div className="flex items-center gap-2">
-											<div className={`w-2 h-2 rounded-full ${getStatusBg(project.status)[0]}`}></div>
-											<span className="text-sm ">{project.status}</span>
-										</div>
-										<span className="text-xs border rounded-full  px-2.5 py-1  text-some-less">
-											{project.techStack}
-										</span>
-									</div>
-								</div>
-							))}
+								)
+							}
+							)}
 						</div>
 					)}
 

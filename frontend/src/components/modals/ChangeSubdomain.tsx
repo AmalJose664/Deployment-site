@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils"
 import { IoClose } from "react-icons/io5"
 import { IoMdCheckmark } from "react-icons/io"
 
-export function ChangeProjectSubdomainDialog({ projectName, projectId }: { projectName: string, projectId: string }) {
+export function ChangeProjectSubdomainDialog({ projectName, projectId, currentSubdomain }: { projectName: string, projectId: string, currentSubdomain: string }) {
 	const [confirmText, setConfirmText] = useState("")
 	const [subdomain, setSubdomain] = useState("")
 	const [available, setAvailable] = useState(true)
@@ -56,10 +56,11 @@ export function ChangeProjectSubdomainDialog({ projectName, projectId }: { proje
 				const result = await changeProject({ projectId, newSubdomain: debouncedValue }).unwrap()
 				console.log("Update:", result)
 				toast.success(`Project ${projectName} has been updated.`)
-				router.push("/projects")
+				router.push("/projects/" + projectId)
 			} catch (err: any) {
 				if (err.status !== 400) console.error("Update failed:", err)
 				toast.error("Failed to Update project")
+			} finally {
 				ref.current?.click()
 			}
 
@@ -104,7 +105,7 @@ export function ChangeProjectSubdomainDialog({ projectName, projectId }: { proje
 						</label>
 						<div className="relative">
 							<Input
-								placeholder="Type a word..."
+								placeholder={currentSubdomain}
 								value={subdomain}
 								onChange={(e) => setSubdomain(e.target.value)}
 								className="font-mono mt-2"

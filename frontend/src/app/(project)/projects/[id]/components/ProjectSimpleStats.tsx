@@ -4,9 +4,11 @@ import { MdOutlineCheckCircle, MdAccessTime, MdErrorOutline } from "react-icons/
 import { Project } from "@/types/Project";
 import RightFadeComponent from "@/components/RightFadeComponent";
 import { useGetProjectsSimpleStatsQuery } from "@/store/services/projectsApi";
-import { formatBytes, getElapsedTimeClean } from "@/lib/moreUtils/combined";
+import { formatBytes, getElapsedTimeClean, getStatusColor } from "@/lib/moreUtils/combined";
 import { StatusHistory, SubtleProgressBar, ThinSparkline } from "@/components/SimpleStatsCompnts";
 import { LuHistory } from "react-icons/lu";
+import { HiOutlineArrowLongRight } from "react-icons/hi2";
+import { cn } from "@/lib/utils";
 const ProjectSimpleStats = ({ project }: { project: Project }) => {
 
 	const { data } = useGetProjectsSimpleStatsQuery(project._id)
@@ -27,7 +29,7 @@ const ProjectSimpleStats = ({ project }: { project: Project }) => {
 		<RightFadeComponent delay={.1} inView >
 			<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
 
-				<div className="border rounded-lg p-3 dark:bg-neutral-950 bg-white h-22 flex flex-col justify-between relative overflow-hidden">
+				<div className="border rounded-lg p-3 dark:bg-zinc-900/50 bg-white h-22 flex flex-col justify-between relative overflow-hidden">
 					<div className="flex items-center gap-1.5">
 						<BsActivity className="text-neutral-400" size={13} />
 						<span className="text-[11px] font-medium text-less uppercase tracking-wider">Deploys</span>
@@ -40,7 +42,7 @@ const ProjectSimpleStats = ({ project }: { project: Project }) => {
 					</div>
 				</div>
 
-				<div className="border  rounded-lg p-3 dark:bg-neutral-950 bg-white h-22 flex flex-col justify-between">
+				<div className="border  rounded-lg p-3 dark:bg-zinc-900/50 bg-white h-22 flex flex-col justify-between">
 					<div className="flex justify-between items-start">
 						<div className="flex items-center gap-1.5">
 							<MdOutlineCheckCircle className="text-emerald-400" size={14} />
@@ -55,7 +57,7 @@ const ProjectSimpleStats = ({ project }: { project: Project }) => {
 						<SubtleProgressBar percentage={mockStats.successRate} color="bg-emerald-500/80" />
 					</div>
 				</div>
-				<div className="border  rounded-lg p-3 dark:bg-neutral-950 bg-white h-22 flex flex-col justify-between">
+				<div className="border  rounded-lg p-3 dark:bg-zinc-900/50 bg-white h-22 flex flex-col justify-between">
 					<div className="flex justify-between items-start">
 						<div className="flex items-center gap-1.5">
 							<MdErrorOutline className="text-red-400" size={14} />
@@ -70,7 +72,7 @@ const ProjectSimpleStats = ({ project }: { project: Project }) => {
 						<SubtleProgressBar percentage={mockStats.failureRate} color="bg-red-600/80" />
 					</div>
 				</div>
-				<div className="border  rounded-lg p-3 dark:bg-neutral-950 bg-white h-22 flex flex-col justify-between">
+				<div className="border  rounded-lg p-3 dark:bg-zinc-900/50 bg-white h-22 flex flex-col justify-between">
 					<div className="flex justify-between items-start">
 						<div className="flex items-center gap-1.5">
 							<MdErrorOutline className="text-neutral-400" size={14} />
@@ -84,7 +86,7 @@ const ProjectSimpleStats = ({ project }: { project: Project }) => {
 				</div>
 
 
-				<div className="border  rounded-lg p-3 dark:bg-neutral-950 bg-white h-22 flex flex-col justify-between">
+				<div className="border  rounded-lg p-3 dark:bg-zinc-900/50 bg-white h-22 flex flex-col justify-between">
 					<div className="flex items-center gap-1.5">
 						<BsHddNetwork className="text-neutral-400" size={13} />
 						<span className="text-[11px] font-medium text-less uppercase tracking-wider">Bandwidth</span>
@@ -94,7 +96,7 @@ const ProjectSimpleStats = ({ project }: { project: Project }) => {
 					</div>
 				</div>
 
-				<div className="border  rounded-lg p-3 dark:bg-neutral-950 bg-white h-22 flex flex-col justify-between">
+				<div className="border  rounded-lg p-3 dark:bg-zinc-900/50 bg-white h-22 flex flex-col justify-between">
 					<div className="flex items-center gap-1.5">
 						<MdAccessTime className="text-neutral-400" size={14} />
 						<span className="text-[11px] font-medium text-less uppercase tracking-wider">Avg Build Time</span>
@@ -107,7 +109,7 @@ const ProjectSimpleStats = ({ project }: { project: Project }) => {
 					</div>
 				</div>
 
-				<div className="border rounded-lg p-3 dark:bg-neutral-950 bg-white h-22 flex flex-col justify-between">
+				<div className="border rounded-lg p-3 dark:bg-zinc-900/50 bg-white h-22 flex flex-col justify-between">
 					<div className="flex items-center gap-1.5">
 						<BsGlobe2 className="text-neutral-400" size={13} />
 						<span className="text-[11px] font-medium text-less uppercase tracking-wider">Latest Deploy</span>
@@ -115,14 +117,15 @@ const ProjectSimpleStats = ({ project }: { project: Project }) => {
 					<p className="text-base font-mono font-medium text-primary">{mockStats.lastDeployed} ago</p>
 				</div>
 
-				<div className="border rounded-lg p-3 dark:bg-neutral-950 bg-white h-22 flex flex-col">
+				<div className="border rounded-lg p-3 dark:bg-zinc-900/50 bg-white h-22 flex flex-col">
 					<div className="flex justify-between items-start">
 						<div className="flex items-center gap-1.5">
 							<LuHistory className="text-neutral-400" size={14} />
 							<span className="text-[11px] font-medium text-less uppercase tracking-wider">Builds History</span>
 						</div>
 					</div>
-					<div className="mt-5">
+					<div className="mt-5 flex flex-col items-center">
+						<HiOutlineArrowLongRight className={cn("animate-pulse", getStatusColor(project.status))} />
 						<StatusHistory statuses={mockStats.buildHistory || []} />
 					</div>
 				</div>

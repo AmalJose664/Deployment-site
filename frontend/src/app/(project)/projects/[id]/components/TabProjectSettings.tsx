@@ -532,7 +532,7 @@ const ProjectSettings = ({ project, reDeploy, setTabs }: { project: Project, reD
 									Change the subdomain.
 								</p>
 							</div>
-							<ChangeProjectSubdomainDialog projectId={project._id} projectName={project.name} />
+							<ChangeProjectSubdomainDialog projectId={project._id} projectName={project.name} currentSubdomain={project.subdomain} />
 						</div>
 					</div>
 					<div
