@@ -7,6 +7,7 @@ export interface IRedisCache {
 	): Promise<void>
 	del(key: string): Promise<void>
 	exists(key: string): Promise<boolean>
+	subscribeToInvalidations(callback: (msg: unknown) => void): void
 	disconnect(): Promise<void>
 }
 

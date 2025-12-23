@@ -19,6 +19,11 @@ export type RequestWithProject = Request & {
 
 export async function checkProject(req: Request, res: Response, next: NextFunction) {
 	const ownDomain = process.env.OWN_DOMAIN
+	console.log(req.subdomains, " < < < < <")
+	console.log(req.hostname, " < < < < <")
+
+
+
 	try {
 		if (breaker.isOpen) {
 			next(new AppError("Service temporarily unavailable", 503));

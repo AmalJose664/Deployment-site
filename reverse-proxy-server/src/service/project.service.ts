@@ -33,7 +33,7 @@ class ProjectService implements IProjectService {
 		console.log("db calls ====>")
 		const project = await this.projectRepository.getProjectBySlugWithUser(slug)
 		if (!project) {
-			throw new AppError("project not found   => " + slug, 404)
+			return null
 		}
 		const bw = await this.projectBandwidthRepo.getUserMonthlyBandwidth(project?.user._id)
 		const userPlan = (project.user as any)?.plan || "FREE"

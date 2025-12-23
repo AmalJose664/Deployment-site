@@ -43,7 +43,7 @@ export const onProxyRes = async (proxyRes: IncomingMessage, req: RequestWithProj
 		isBot: (req as any).isBot,
 		referer: req.headers['referer'] || ""
 	}
-	console.log(data, "--- --`Levele data")
+	// console.log(data, "--- --`Levele data")
 	analyticsService.sendAnalytics(data)
 
 }
