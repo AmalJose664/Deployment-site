@@ -19,6 +19,8 @@ import AnalyticsController from "./controllers/analyticsController.js";
 import { client } from "./config/clickhouse.config.js";
 import PaymentService from "./services/payment.service.js";
 import PaymentController from "./controllers/paymentController.js";
+import RedisService from "./cache/redisCache.js";
+import { redisClient } from "./config/redis.config.js";
 
 export const userRepo = new UserRepo();
 export const projectRepo = new ProjectRepo();
@@ -28,7 +30,10 @@ export const projectBandwidthRepo = new ProjectBandwidthRepository();
 export const logRepo = new LogRepo(client);
 export const analyticsRepo = new AnalyticsRepo(client);
 
-export const projectService = new ProjectService(projectRepo, userRepo, projectBandwidthRepo, deploymentRepo);
+
+export const redisCacheService = new RedisService(redisClient)
+
+export const projectService = new ProjectService(projectRepo, userRepo, projectBandwidthRepo, deploymentRepo, redisCacheService);
 export const logsService = new LogsService(logRepo, deploymentRepo);
 export const analyticsService = new AnalyticsService(analyticsRepo, projectBandwidthRepo);
 export const userService = new UserService(userRepo, projectService);
@@ -40,3 +45,4 @@ export const deploymentController = new DeploymentController(deploymentService);
 export const logsController = new LogsController(logsService);
 export const analyticsController = new AnalyticsController(analyticsService);
 export const paymentController = new PaymentController(paymentService);
+

@@ -12,23 +12,28 @@ import { PLANS } from "../constants/plan.js";
 import { IProjectBandwidthRepository } from "../interfaces/repository/IProjectBandwidthRepository.js";
 import { IDeploymentRepository } from "../interfaces/repository/IDeploymentRepository.js";
 import { DeploymentStatus, IDeployment } from "../models/Deployment.js";
+import { IRedisCache } from "../interfaces/cache/IRedisCache.js";
+
 
 class ProjectService implements IProjectService {
 	private projectRepository: IProjectRepository;
 	private deploymentRepository: IDeploymentRepository;
 	private userRepository: IUserRepository;
 	private projectBandwidthRepo: IProjectBandwidthRepository;
+	private cacheInvalidator: IRedisCache
 
 	constructor(
 		projectRepo: IProjectRepository,
 		userRepo: IUserRepository,
 		projectBandwidthRepo: IProjectBandwidthRepository,
 		deploymentRepo: IDeploymentRepository,
+		cacheInvalidator: IRedisCache
 	) {
 		this.projectRepository = projectRepo;
 		this.userRepository = userRepo;
 		this.projectBandwidthRepo = projectBandwidthRepo;
 		this.deploymentRepository = deploymentRepo;
+		this.cacheInvalidator = cacheInvalidator
 	}
 	async createProject(dto: CreateProjectDTO, userId: string): Promise<IProject | null> {
 		const projectData: Partial<Omit<IProject, keyof Document>> = {
@@ -104,6 +109,7 @@ class ProjectService implements IProjectService {
 			return false;
 		}
 		await this.userRepository.decrementProjects(userId);
+		await this.cacheInvalidator.publishInvalidation("project", result.subdomain)
 		return true;
 	}
 
@@ -128,15 +134,19 @@ class ProjectService implements IProjectService {
 		return true;
 	}
 	async changeProjectSubdomain(userId: string, projectId: string, newSubdomain: string): Promise<IProject | null> {
-		const project = await this.projectRepository.findProject(projectId, userId);
+
+		const [project, isAvailable] = await Promise.all(
+			[this.projectRepository.findProject(projectId, userId), this.checkSubdomainAvaiable(newSubdomain)]
+		)
 		if (!project) {
 			throw new AppError("Project not found", 404);
 		}
-		const isAvailable = await this.checkSubdomainAvaiable(newSubdomain);
 		if (!isAvailable) {
 			throw new AppError("Subdomain already taken", 409);
 		}
-		return await this.projectRepository.updateProject(project._id, userId, { subdomain: newSubdomain });
+		const result = await this.projectRepository.updateProject(project._id, userId, { subdomain: newSubdomain });
+		if (result) await this.cacheInvalidator.publishInvalidation("project", project.subdomain)
+		return result
 	}
 	async changeProjectDeployment(userId: string, projectId: string, newDeploymentId: string): Promise<IProject | null> {
 		const [project, deployment] = await Promise.all([
@@ -161,11 +171,12 @@ class ProjectService implements IProjectService {
 		if (deployment.status !== DeploymentStatus.READY) {
 			throw new AppError(`Cannot promote to deployment with status: ${deployment.status}. Only successful deployments can be activated.`, 400);
 		}
-
-		return this.projectRepository.updateProject(project._id, userId, {
+		const result = await this.projectRepository.updateProject(project._id, userId, {
 			lastDeployment: project.currentDeployment,
 			currentDeployment: deployment._id.toString(),
 		});
+		if (result) await this.cacheInvalidator.publishInvalidation("project", result.subdomain);
+		return result
 	}
 	async findProjectSimpleStats(
 		userId: string,
