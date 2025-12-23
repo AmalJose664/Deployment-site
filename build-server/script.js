@@ -14,8 +14,8 @@ import archiver from "archiver";
 import FormData from "form-data";
 import axios from 'axios';
 
-let DEPLOYMENT_ID = process.env.DEPLOYMENT_ID || "693c6bd1d1f5cc40415cd522"   // Received from env by apiserver or use backup for local testing
-let PROJECT_ID = process.env.PROJECT_ID || "69246647869c614a349015fc"   // Received from env by apiserver or use backup for local testing
+let DEPLOYMENT_ID = process.env.DEPLOYMENT_ID || "-----------------"   // Received from env by apiserver or use backup for local testing
+let PROJECT_ID = process.env.PROJECT_ID || "-----------------"   // Received from env by apiserver or use backup for local testing
 
 const kafka = new Kafka({
 	clientId: `docker-build-server-${PROJECT_ID}`,
