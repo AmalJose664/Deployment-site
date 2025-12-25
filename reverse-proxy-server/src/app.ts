@@ -1,5 +1,5 @@
 import express from "express"
-import connectDB from "./config/db.js"
+import connectDB from "./config/mongo.config.js"
 import { proxy } from "./middleware/proxy.js"
 import { checkProject } from "./middleware/projectChecker.js"
 import { errorHandler } from "./middleware/globalErrorHandler.js"

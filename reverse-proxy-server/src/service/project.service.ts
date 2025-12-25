@@ -27,7 +27,6 @@ class ProjectService implements IProjectService {
 		const dataFromCache = this.projectCache.get(slug) || null
 
 		if (dataFromCache) {
-			console.log("from cache ←←←")
 			return dataFromCache as IProject
 		}
 		console.log("db calls ====>")

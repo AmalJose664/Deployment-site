@@ -1,11 +1,12 @@
 import { createProxyMiddleware, } from "http-proxy-middleware"
-import { STORAGE_SERVER_URL } from "../constants/paths.js";
+
 import { proxyTimeouts } from "../config/proxy.config.js";
 import { Request } from "express";
+import { STORAGE_BASE_URL } from "../constants/paths.js";
 
 
 export const extraProxy = createProxyMiddleware({
-	target: STORAGE_SERVER_URL,
+	target: STORAGE_BASE_URL,
 	changeOrigin: true,
 	pathRewrite: (path, req: Request) => {
 		const projectId = req.params.projectId

@@ -1,19 +1,50 @@
-const USE_NON_AWS_STORAGE = true
 
-const AWS_SERVER_FILES_ENDPOINT = "__app_build_outputs/"
-const NON_AWS_SERVER_FILES_ENDPOINT = "projects/"
+export const BUCKET_NAME = process.env.CLOUD_STORAGE_BUCKET_NAME
 
-export const BUCKET_NAME = process.env.AWS_STORAGE_BUCKET_NAME //                             FILL HERE
-export const AWS_STORAGE_SERVER_URL = `https://${BUCKET_NAME}.s3.us-east-1.amazonaws.com`
+// --------------------------------------------------
+// Storage mode
+// --------------------------------------------------
+export const STORAGE_MODE =
+	process.env.STORAGE_MODE === "cloud" ? "cloud" : "local"
 
-export const NON_AWS_STORAGE_SERVER_URL = process.env.NON_AWS_STORAGE_SERVER_URL
+// --------------------------------------------------
+// Base URLs (provided via environment variables)
+// --------------------------------------------------
+export const CLOUD_STORAGE_BASE_URL =
+	process.env.CLOUD_STORAGE_BASE_URL
 
+export const LOCAL_STORAGE_BASE_URL =
+	process.env.LOCAL_STORAGE_BASE_URL
 
+// --------------------------------------------------
+// Storage paths
+// --------------------------------------------------
+export const CLOUD_STORAGE_PATH = "__app_build_outputs"
+export const LOCAL_STORAGE_PATH = "projects"
 
+// --------------------------------------------------
+// Resolved storage server URL (common)
+// --------------------------------------------------
+export const STORAGE_BASE_URL =
+	STORAGE_MODE === "cloud"
+		? CLOUD_STORAGE_BASE_URL
+		: LOCAL_STORAGE_BASE_URL
 
-export const STORAGE_SERVER_URL = USE_NON_AWS_STORAGE
-	? NON_AWS_STORAGE_SERVER_URL
-	: AWS_STORAGE_SERVER_URL
-export const STORAGE_SERVER_FILES_ENDPOINT = `${STORAGE_SERVER_URL}/${USE_NON_AWS_STORAGE
-	? NON_AWS_SERVER_FILES_ENDPOINT
-	: AWS_SERVER_FILES_ENDPOINT}`
+// --------------------------------------------------
+// Resolved files endpoint (common)
+// --------------------------------------------------
+export const STORAGE_FILES_ENDPOINT = `${STORAGE_BASE_URL}/${STORAGE_MODE === "cloud"
+	? CLOUD_STORAGE_PATH
+	: LOCAL_STORAGE_PATH
+	}`
+export const STORAGE_FILES_PATH = `${STORAGE_MODE === "cloud"
+	? CLOUD_STORAGE_PATH
+	: LOCAL_STORAGE_PATH
+	}`
+// --------------------------------------------------
+// Safety checks (fail fast)
+// --------------------------------------------------
+
+console.log("\n\n\n VARIBLES--------------\n\n\n")
+console.log({ STORAGE_FILES_PATH, STORAGE_FILES_ENDPOINT, STORAGE_MODE })
+console.log("\n\n\n VARIBLES--------------\n\n\n")

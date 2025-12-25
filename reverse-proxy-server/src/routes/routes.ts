@@ -1,18 +1,18 @@
 import { Router } from "express";
 import { validateObjectId } from "../middleware/validate.js";
 import { extraProxy } from "../middleware/proxy.js";
-import { invalidateSlugs, trackCacheAnalytics } from "../controller/extrasController.js";
+import { downloadFilesCloud, trackCacheAnalytics } from "../controller/extrasController.js";
+import { STORAGE_MODE } from "../constants/paths.js";
+
 
 const router = Router()
 
 router.get("/track", trackCacheAnalytics)
 
-router.get("/invalidate/:slug", invalidateSlugs)
-
 router.get(
 	"/download-file/:projectId/:deploymentId/",
 	validateObjectId("projectId"),
 	validateObjectId("deploymentId"),
-	extraProxy
+	STORAGE_MODE === "cloud" ? downloadFilesCloud : extraProxy
 )
 export default router
