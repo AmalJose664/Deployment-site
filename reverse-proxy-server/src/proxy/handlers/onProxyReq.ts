@@ -6,7 +6,7 @@ export const onProxyReq = (
 	proxyReq: ClientRequest,
 	req: Request
 ) => {
-	proxyReq.setHeader("Host", STORAGE_BASE_URL || "")
+	proxyReq.setHeader("Host", (STORAGE_BASE_URL || "").split("://")[1])
 	proxyReq.setHeader("X-Forwarded-Host", req.headers.host || "");
 
 	(req as any).isBot = isbot(req.headers["user-agent"] || "");
