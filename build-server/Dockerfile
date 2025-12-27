@@ -12,8 +12,7 @@ RUN npm install
 COPY main.sh main.sh
 COPY script.js script.js
 
-RUN chmod +x main.sh
-RUN chmod +x script.js
+COPY --chmod=755 main.sh script.js ./
 
 
 ENTRYPOINT ["/home/app/main.sh"]

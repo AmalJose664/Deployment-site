@@ -18,7 +18,7 @@ let DEPLOYMENT_ID = process.env.DEPLOYMENT_ID || "-----------------"   // Receiv
 let PROJECT_ID = process.env.PROJECT_ID || "-----------------"   // Received from env by apiserver or use backup for local testing
 
 const kafka = new Kafka({
-	clientId: `docker-build-server-${PROJECT_ID}`,
+	clientId: `docker-build-server-${PROJECT_ID}-${DEPLOYMENT_ID}`,
 	brokers: ["pkc-l7pr2.ap-south-1.aws.confluent.cloud:9092"],
 	ssl: true, // or key
 	sasl: {
@@ -33,13 +33,15 @@ const producer = kafka.producer()
 
 
 const s3Client = new S3Client({
-	region: "us-east-1",
+	region: "auto",
 	credentials: {
-		accessKeyId: process.env.AWS_ACCESSKEY,
-		secretAccessKey: process.env.AWS_SECRETKEY,
-	}
+		accessKeyId: process.env.CLOUD_ACCESSKEY,
+		secretAccessKey: process.env.CLOUD_SECRETKEY,
+	},
+	endpoint: process.env.CLOUD_ENDPOINT,
+	forcePathStyle: true
 })
-const AWS_BUCKET_NAME = process.env.AWS_S3_BUCKET
+const BUCKET_NAME = process.env.CLOUD_BUCKET
 
 console.log("Starting file..")
 const git = simpleGit();
@@ -67,13 +69,13 @@ const deploymentStatus = {
 }
 
 const settings = {
-	customBuildPath: true,
-	sendKafkaMessage: !true,
-	deleteSourcesAfter: !true,
-	sendLocalDeploy: true,
-	localDeploy: true,
-	runCommands: !true,            // for testing only 
-	cloneRepo: !true            // for testing only 
+	customBuildPath: !true,
+	sendKafkaMessage: true,
+	deleteSourcesAfter: true,
+	sendLocalDeploy: !true,
+	localDeploy: !true,
+	runCommands: true,            // for testing only 
+	cloneRepo: true            // for testing only 
 }
 
 console.log(DEPLOYMENT_ID, PROJECT_ID, "<<<<<")
@@ -91,8 +93,8 @@ const deleteEnvs = () => {
 
 	delete process.env.KAFKA_USERNAME;
 	delete process.env.KAFKA_PASSWORD;
-	delete process.env.AWS_SECRETKEY;
-	delete process.env.AWS_ACCESSKEY;
+	delete process.env.CLOUD_SECRETKEY;
+	delete process.env.CLOUD_ACCESSKEY;
 	delete process.env.CONTAINER_API_TOKEN;
 }
 
@@ -183,7 +185,7 @@ const publishUpdates = async (updateData = {}) => {
 
 async function cloneGitRepoAndValidate(taskDir, runDir, projectData) {
 
-	if (settings.localDeploy && settings.cloneRepo) {
+	if (settings.cloneRepo) {
 		await git.clone(projectData.repoURL, taskDir, [
 			'--filter=blob:none',
 			'--branch', projectData.branch,
@@ -584,15 +586,15 @@ async function validateAnduploadFiles(sourceDir, targetDir) {
 					// await rename(fullPath, targetPath);
 					console.log("Moved " + relPath)
 				} else {
-					console.log("Uploading " + relPath);
+					console.log("Uploading " + relPath, "--cloud");
 
-					// const command = new PutObjectCommand({
-					// 	Bucket: AWS_BUCKET_NAME,
-					// 	Key: `__app_build_outputs/${PROJECT_ID}/${DEPLOYMENT_ID}/${relPath.replaceAll("\\", "/")}`,
-					// 	Body: createReadStream(fullPath),
-					// 	ContentType: mime.lookup(fullPath)
-					// });
-					// await s3Client.send(command);
+					const command = new PutObjectCommand({
+						Bucket: BUCKET_NAME,
+						Key: `__app_build_outputs/${PROJECT_ID}/${DEPLOYMENT_ID}/${relPath.replaceAll("\\", "/")}`,
+						Body: createReadStream(fullPath),
+						ContentType: mime.lookup(fullPath)
+					});
+					await s3Client.send(command);
 				}
 			}
 		}
