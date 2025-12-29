@@ -7,7 +7,7 @@ justify-content: center; gap: 20px">
   <img src=".\frontend\src\app\public\icon.svg" alt="Lynfera"  width="40" height="39"/>
 </div>
 
-A platform to host, build, and deploy frontend applications — similar to a lightweight self-hosted Vercel/Netlify workflow.
+A platform to host, build, and deploy frontend applications, similar to a lightweight self-hosted Vercel/Netlify workflow.
 
 This repository contains multiple coordinated services that handle builds, routing, storage, UI, and deployment automation.
 
@@ -24,8 +24,6 @@ Deployment-site
 │
 ├───frontend-server/
 │
-├───nginx-1.28.0/
-│
 ├───reverse-proxy-server/
 │
 ├───test-server/
@@ -39,7 +37,6 @@ Deployment-site
 -   **[frontend-server](./frontend)**
 -   **[reverse-proxy-server](./reverse-proxy-server)**
 -   **[test-server](./test-server)**
--   **[nginx configs](./nginx-1.28.0)**
 
 ---
 
@@ -48,14 +45,13 @@ Deployment-site
 
 ## 🧩 Service Roles
 
-| Directory              | Description                               |
-| ---------------------- | ----------------------------------------- |
-| `api-server`           | API endpoints, logs and analytics.        |
-| `frontend`             | Nextjs frontend.                          |
-| `reverse-proxy-server` | Express-based reverse proxy pointer.      |
-| `build-server`         | Docker container files.                   |
-| `test-server`          | Testing api, Mocks s3 for local.          |
-| `nginx`                | Caching of static files for reverse proxy |
+| Directory              | Description                          |
+| ---------------------- | ------------------------------------ |
+| `api-server`           | API endpoints, logs and analytics.   |
+| `frontend`             | Nextjs frontend.                     |
+| `reverse-proxy-server` | Express-based reverse proxy pointer. |
+| `build-server`         | Docker container files.              |
+| `test-server`          | Testing api, Mocks s3 for local.     |
 
 ---
 
