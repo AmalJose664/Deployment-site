@@ -20,13 +20,15 @@ const envSchema = z.object({
 	CONTAINER_API_TOKEN: z.string(),
 	SUBNETS_STRING: z.string(), //subnets seperated by comma
 
-	AWS_ACCESSKEY: z.string(),
-	AWS_SECRETKEY: z.string(),
+	CLOUD_ACCESSKEY: z.string(),
+	CLOUD_SECRETKEY: z.string(),
+	CLOUD_ENDPOINT: z.url(),
+
 
 	CLUSTER_ARN: z.string(),
 	TASK_ARN: z.string(),
 	SECURITY_GROUPS: z.string(), // groups seperated by comma
-	AWS_S3_BUCKET: z.string(),
+	CLOUD_BUCKET: z.string(),
 
 	KAFKA_USERNAME: z.string(),
 	KAFKA_PASSWORD: z.string(),
@@ -39,6 +41,7 @@ const envSchema = z.object({
 	STRIPE_PUBLISHABLE_KEY: z.string(),
 	STRIPE_WEBHOOK_SECRET: z.string(),
 	REDIS_URL: z.url(),
+	BUILD_DISPATCH_PAT_TOKEN: z.string(),
 });
 
 export function validateEnv() {

@@ -4,17 +4,19 @@ import { S3Client } from "@aws-sdk/client-s3";
 export const ecsClient = new ECSClient({
 	region: "us-east-1",
 	credentials: {
-		accessKeyId: process.env.AWS_ACCESSKEY as string,
-		secretAccessKey: process.env.AWS_SECRETKEY as string,
+		accessKeyId: process.env.CLOUD_ACCESSKEY as string,
+		secretAccessKey: process.env.CLOUD_SECRETKEY as string,
 	},
 });
 
 export const s3Client = new S3Client({
-	region: "us-east-1",
+	region: "auto",
 	credentials: {
-		accessKeyId: process.env.AWS_ACCESSKEY as string,
-		secretAccessKey: process.env.AWS_SECRETKEY as string,
+		accessKeyId: process.env.CLOUD_ACCESSKEY as string,
+		secretAccessKey: process.env.CLOUD_SECRETKEY as string,
 	},
+	endpoint: process.env.CLOUD_ENDPOINT,
+	forcePathStyle: true
 });
 
 export const config = {

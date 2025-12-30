@@ -58,7 +58,9 @@ class LogsController implements ILogsController {
 		});
 	}
 	async test(req: Request, res: Response, next: NextFunction): Promise<void> {
-		// await deploymentService.deployLocal("53443424242424", "69246647869c614a349015fc")
+		await deploymentService.deployLocal("53443424242424", "69246647869c614a349015fc")
+
+
 		res.json({ done: true });
 		return;
 	}

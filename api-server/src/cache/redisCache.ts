@@ -33,8 +33,26 @@ class RedisService implements IRedisCache {
 	async exists(key: string): Promise<boolean> {
 		return (await this.client.exists(key)) === 1;
 	}
+
+	async setAdd(key: string, value: string): Promise<number> {
+		return await this.client.sadd(key, value)
+	}
+	async setRemove(key: string, value: string): Promise<number> {
+		return await this.client.srem(key, value)
+	}
+	async getSetLength(key: string): Promise<number> {
+		return await this.client.scard(key)
+	}
+
 	async publishInvalidation(type: string, slug: string): Promise<number> {
 		return this.client.publish('cache:invalidate', JSON.stringify({ type, slug }));
+	}
+	async publishBuild(data: {
+		deploymentId: string;
+		projectId: string;
+		envs: { name: string, value: string }[];
+	}): Promise<number> {
+		return this.client.publish('build:start', JSON.stringify(data));
 	}
 	async disconnect(): Promise<void> {
 		await this.client.quit();

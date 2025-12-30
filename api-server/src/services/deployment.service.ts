@@ -6,25 +6,33 @@ import { DeploymentStatus, IDeployment } from "../models/Deployment.js";
 import AppError from "../utils/AppError.js";
 import { IProject, ProjectStatus } from "../models/Projects.js";
 import { RunTaskCommand } from "@aws-sdk/client-ecs";
-import { config, ecsClient, s3Client } from "../config/aws.config.js";
-import { rm } from "fs/promises";
+import { config, ecsClient, s3Client } from "../config/cloud.config.js";
 
-import { spawn } from "child_process";
 import { QueryDeploymentDTO } from "../dtos/deployment.dto.js";
-import { BUILD_SERVER_PATH, BUILD_SERVER_RUN_SCRIPT, LOCAL_TEST_SERVER_USER_FILES, S3_OUTPUTS_DIR } from "../constants/paths.js";
-import { _Object, DeleteObjectCommand, DeleteObjectsCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
+import { S3_OUTPUTS_DIR } from "../constants/paths.js";
+import { _Object, DeleteObjectsCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import getNessesaryEnvs from "../utils/getNessesaryEnvs.js";
 import { IUserSerivce } from "../interfaces/service/IUserService.js";
-// import { redisClient } from "../config/redis.config.js";
+import { dispatchBuild } from "../utils/dispatchBuild.js";
+import { IRedisCache } from "../interfaces/cache/IRedisCache.js";
+
 
 class DeploymentService implements IDeploymentService {
+
+
 	private deploymentRepository: IDeploymentRepository;
 	private projectRepository: IProjectRepository;
 	private userService: IUserSerivce;
-	constructor(deploymentRepo: IDeploymentRepository, projectRepo: IProjectRepository, userService: IUserSerivce) {
+	private MAX_CONCURRENT_RUNNABLE_DPYMNTS = 20;
+	private DEPLOYMENTS_SET_KEY = "deployments:running"
+	private redisCache: IRedisCache
+
+
+	constructor(deploymentRepo: IDeploymentRepository, projectRepo: IProjectRepository, userService: IUserSerivce, redisCache: IRedisCache) {
 		this.deploymentRepository = deploymentRepo;
 		this.projectRepository = projectRepo;
 		this.userService = userService;
+		this.redisCache = redisCache
 	}
 	async newDeployment(deploymentData: Partial<IDeployment>, userId: string, projectId: string): Promise<IDeployment | null> {
 		const canDeploy = await this.userService.userCanDeploy(userId);
@@ -39,6 +47,9 @@ class DeploymentService implements IDeploymentService {
 		if (correspondindProject.status === ProjectStatus.BUILDING) {
 			throw new AppError("Project deployment already in progress", 400);
 		}
+		if (correspondindProject.status === ProjectStatus.QUEUED) {
+			throw new AppError("Project deployment already in progress", 400);
+		}
 		if (correspondindProject.isDeleted) {
 			throw new AppError("Project not available for deployment", 400);
 		}
@@ -49,17 +60,24 @@ class DeploymentService implements IDeploymentService {
 		deploymentData.s3Path = correspondindProject._id.toString();
 		deploymentData.project = new Types.ObjectId(correspondindProject._id);
 		deploymentData.user = correspondindProject.user;
+		await this.incrementRunningDeplymnts(correspondindProject._id)
 
-		const deployment = await this.deploymentRepository.createDeployment(deploymentData);
+		try {
+			const deployment = await this.deploymentRepository.createDeployment(deploymentData);
 
-		await Promise.all([
-			this.projectRepository.pushToDeployments(correspondindProject.id, userId, deployment?.id),
-			this.userService.incrementDeployment(correspondindProject.user.toString()),
-		]);
-		if (deployment?._id) {
-			this.deployLocal(deployment._id, projectId);
+			await Promise.all([
+				this.projectRepository.pushToDeployments(correspondindProject.id, userId, deployment?.id),
+				this.userService.incrementDeployment(correspondindProject.user.toString()),
+			]);
+
+			if (deployment?._id) {
+				await this.deployLocal(deployment._id, projectId);
+			}
+			return deployment;
+		} catch (error) {
+			await this.decrementRunningDeplymnts(projectId)
+			throw error
 		}
-		return deployment;
 	}
 
 	async getDeploymentById(id: string, userId: string, includesField?: string): Promise<IDeployment | null> {
@@ -105,7 +123,7 @@ class DeploymentService implements IDeploymentService {
 			}
 		}
 
-		await this.deleteLocal(deploymentId, project._id);
+		await this.deleteCloud(deploymentId, project._id);
 		const [_, deleteResult] = await Promise.all([
 			this.projectRepository.pullDeployments(
 				projectId,
@@ -118,54 +136,22 @@ class DeploymentService implements IDeploymentService {
 		return deleteResult;
 	}
 
-	async __getDeploymentById(id: string): Promise<IDeployment | null> {
-		//container
-		return this.deploymentRepository.__findDeployment(id);
-	}
 
-	async __updateDeployment(projectId: string, deploymentId: string, updateData: Partial<IDeployment>): Promise<IDeployment | null> {
-		return await this.deploymentRepository.__updateDeployment(projectId, deploymentId, updateData);
-	}
 
 	async deployLocal(deploymentId: string, projectId: string): Promise<void> {
 		try {
 			const envs = getNessesaryEnvs();
-			// const message = {
-			// 	deploymentId,
-			// 	projectId,
-			// 	envs
-			// }
-			// await redisClient.publish("deployment", JSON.stringify(message))
-			// return
-			const command = spawn("node", [BUILD_SERVER_RUN_SCRIPT], {
-				cwd: BUILD_SERVER_PATH,
-				env: {
-					...process.env,
-					DEPLOYMENT_ID: deploymentId,
-					PROJECT_ID: projectId,
-				},
-			});
+			const result = await dispatchBuild(deploymentId, projectId)
+			console.log(result, " - - - ")
 
-			command.stdout?.on("data", (data) => {
-				console.log(`[stdout]: -----data-----from----deployLocal`);
-			});
-
-			command.stderr?.on("data", (data) => {
-				console.error(`[stderr]: ${data.toString().trim()}`);
-			});
-
-			command.on("exit", (code) => {
-				console.log(`Process exited with code ${code}`);
-			});
-
-			command.on("error", (err) => {
-				console.error("Failed to start process:", err);
-			});
 		} catch (error: any) {
-			await this.__updateDeployment(projectId, deploymentId, { status: DeploymentStatus.FAILED, error_message: error.message });
+			console.log("Error on build")
+			await this.__updateDeployment(projectId, deploymentId, { status: DeploymentStatus.FAILED, error_message: "Error on starting deployment" });
+			await this.decrementRunningDeplymnts(projectId)
+			throw error
 		}
 	}
-	async deployAws(project: IProject, deployment: IDeployment): Promise<void> {
+	async deployCloud(project: IProject, deployment: IDeployment): Promise<void> {
 		try {
 			const command = new RunTaskCommand({
 				cluster: config.CLUSTER,
@@ -194,23 +180,18 @@ class DeploymentService implements IDeploymentService {
 			});
 			await ecsClient.send(command);
 		} catch (error: any) {
-			await this.__updateDeployment(project._id, deployment._id, { status: DeploymentStatus.FAILED, error_message: error.message });
+			await this.__updateDeployment(project._id, deployment._id, { status: DeploymentStatus.FAILED, error_message: "Error on starting deployment" });
+			throw error
 		}
 	}
 
 	async deleteLocal(deploymentId: string, projectId: string): Promise<void> {
-		const path = `${LOCAL_TEST_SERVER_USER_FILES}/${projectId}/${deploymentId}/`;
-		console.log("deleting files at ", path);
-
-		await rm(path, {
-			recursive: true,
-			force: true,
-		});
+		// Make a delete files api call to the mock s3 server.
 	}
 
-	async deleteAws(deploymentId: string, projectId: string): Promise<void> {
+	async deleteCloud(deploymentId: string, projectId: string): Promise<void> {
 		const prefix = `${S3_OUTPUTS_DIR}/${projectId}/${deploymentId}/`;
-		const APP_FILES_BUCKET = process.env.AWS_S3_BUCKET;
+		const APP_FILES_BUCKET = process.env.CLOUD_BUCKET;
 		const listCommand = new ListObjectsV2Command({
 			Bucket: APP_FILES_BUCKET,
 			Prefix: prefix,
@@ -226,6 +207,30 @@ class DeploymentService implements IDeploymentService {
 			},
 		});
 		await s3Client.send(deleteCommand);
+	}
+
+
+	async incrementRunningDeplymnts(projectId: string) {
+		await this.redisCache.setAdd(this.DEPLOYMENTS_SET_KEY, projectId)
+		const currentRunningDpymnts = await this.redisCache.getSetLength(this.DEPLOYMENTS_SET_KEY)
+		if (currentRunningDpymnts > this.MAX_CONCURRENT_RUNNABLE_DPYMNTS) {
+			await this.redisCache.setRemove(this.DEPLOYMENTS_SET_KEY, projectId)
+			throw new AppError("Busy Runners", 503)
+		}
+	}
+	async decrementRunningDeplymnts(projectId: string) {
+		await this.redisCache.setRemove(this.DEPLOYMENTS_SET_KEY, projectId)
+	}
+
+
+
+	async __getDeploymentById(id: string): Promise<IDeployment | null> {
+		//container
+		return this.deploymentRepository.__findDeployment(id);
+	}
+
+	async __updateDeployment(projectId: string, deploymentId: string, updateData: Partial<IDeployment>): Promise<IDeployment | null> {
+		return await this.deploymentRepository.__updateDeployment(projectId, deploymentId, updateData);
 	}
 }
 

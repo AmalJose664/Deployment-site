@@ -30,8 +30,8 @@ export interface IDeploymentService {
 	__getDeploymentById(id: string): Promise<IDeployment | null>;
 	__updateDeployment(projectId: string, deploymentId: string, updateData: Partial<IDeployment>): Promise<IDeployment | null>;
 
-	deployAws(project: IProject, deployment: IDeployment): Promise<void>;
+	deployCloud(project: IProject, deployment: IDeployment): Promise<void>;
 	deployLocal(deploymentId: string, projectId: string): Promise<void>;
 	deleteLocal(deploymentId: string, projectId: string): Promise<void>;
-	deleteAws(deploymentId: string, projectId: string): Promise<void>;
+	deleteCloud(deploymentId: string, projectId: string): Promise<void>;
 }

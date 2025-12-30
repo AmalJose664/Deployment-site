@@ -6,9 +6,9 @@ import P_repo from "./src/repositories/project.repository";
 import D_repo from "./src/repositories/deployment.repository";
 import AnalyticsRepo from "./src/repositories/analytics.repository";
 import mongoose, { Types } from "mongoose";
-import connectDb from "./src/config/db";
+import connectDb from "./src/config/mongo.config";
 import { User } from "./src/models/User";
-import { client } from "./src/config/clickhouse";
+import { client } from "./src/config/clickhouse.config";
 import { exec } from "child_process";
 import path from "path";
 import { existsSync, lstatSync, readdirSync } from "fs";
@@ -42,13 +42,13 @@ async function mongodbData() {
 
 		const p = new P_repo();
 		const de = new D_repo();
-		// console.log(await Deployment.deleteMany())
-		// console.log(await Project.updateMany({}, {
-		// 	status: "NOT_STARTED", deployments: [],
-		// 	lastDeployment: null,
-		// 	tempDeployment: null,
-		// 	currentDeployment: null
-		// }))
+		console.log(await Deployment.deleteMany())
+		console.log(await Project.updateMany({}, {
+			status: "NOT_STARTED", deployments: [],
+			lastDeployment: null,
+			tempDeployment: null,
+			currentDeployment: null
+		}))
 		return;
 		const project = await Project.findById("691e1c418cb08e07e28986dc").populate("deployments", "commit_hash");
 
@@ -141,11 +141,12 @@ async function getClickhouseData() {
 	}
 
 	const data = await client.query({
-		query: `select * from log_events `,
+		query: `select * from log_events where event_id='b3f7a03e-203f-4bda-ae8b-e8a862d7879e'`,
 		// format: "JSON",
 	});
 	const datas = await data.json();
 	console.log(datas.data.length);
+	console.log(datas.data);
 	// await client.query({
 	// 	query: "TRUNCATE analytics"
 	// })

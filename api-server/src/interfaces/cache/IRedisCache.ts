@@ -7,6 +7,10 @@ export interface IRedisCache {
 	): Promise<void>
 	del(key: string): Promise<void>
 	exists(key: string): Promise<boolean>
+
+	setAdd(key: string, value: string): Promise<number>
+	setRemove(key: string, value: string): Promise<number>
+	getSetLength(key: string): Promise<number>
 	disconnect(): Promise<void>
 	publishInvalidation(type: string, slug: string): Promise<number>
 }
