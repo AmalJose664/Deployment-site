@@ -16,6 +16,7 @@ import { RootState } from '@/store/store';
 import { clearLogs } from '@/store/slices/logSlice';
 import { formatLogTime, getLevelColor } from '@/lib/moreUtils/combined';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface LogsComponentProps {
 	deploymentId: string,
@@ -88,7 +89,11 @@ export function Logs({ deploymentId, refetch, deploymentSpecificLogs }: LogsComp
 			<div
 				key={key}
 				style={style}
-				className="px-2 py-0.5 dark:hover:bg-neutral-800 hover:bg-neutral-300    active:bg-blue-100"
+				className={cn("px-2 py-0.5 dark:hover:bg-neutral-800 hover:bg-neutral-300 active:bg-blue-100",
+					log.level === "ERROR" && "border-l-2 border-l-red-500/50",
+					log.level === "SUCCESS" && "border-l-2 border-l-green-500",
+					log.level === "WARN" && "border-l-2 border-l-orange-300/50",
+				)}
 			>
 				<div className="flex items-start gap-2 dark:text-xs text-sm font-mono">
 					<span className="text-primary shrink-0 mt-[2px]">

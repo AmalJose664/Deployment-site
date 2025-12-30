@@ -54,8 +54,8 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, setTabs 
 									<div>
 										<span className="text-xs uppercase tracking-wider text-gray-500 font-semibold">Status</span>
 										<div className="mt-1  flex items-center gap-2">
-											<StatusIcon status={project.status} />
-											<p className={`text-sm font-bold rounded-xs px-1 ${getStatusColor(project.status)}`}>{project.status}</p>
+											<StatusIcon status={deployment?.status || project.status} />
+											<p className={`text-sm font-bold rounded-xs px-1 ${getStatusColor(deployment?.status || project.status)}`}>{deployment?.status || project.status}</p>
 											{(project.status === ProjectStatus.BUILDING || project.status === ProjectStatus.QUEUED) &&
 												<AnimationBuild />
 											}
@@ -66,7 +66,7 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, setTabs 
 											<span className="text-xs uppercase tracking-wider text-gray-500 font-semibold">Reason</span>
 											<div className="flex items-center gap-2">
 												<StatusIcon status={project.status} />
-												<p className="text-sm font-bold rounded-xs px-1 text-red-400 w-fit bg-red-800/30">{deployment?.errorMessage || "Unknown error"}</p>
+												<p className="text-sm font-semibold px-1 text-some-less w-fit bg-red-50 dark:bg-red-900/10  border border-red-200 dark:border-red-900  rounded-md">{deployment?.errorMessage || "Unknown error"}</p>
 											</div>
 										</div>
 									)}
@@ -75,11 +75,7 @@ const ProjectOverview = ({ project, deployment, reDeploy, setShowBuild, setTabs 
 										<div className="mt-1 flex items-center gap-2">
 											<IoMdGlobe className='size-4 text-less' />
 											<Link target="_blank"
-												href={
-													project.status === ProjectStatus.READY
-														? projectLink
-														: ""
-												}
+												href={projectLink}
 												className='flex gap-2 items-center text-sm font-medium '>
 												{`${window.location.protocol}//${project.subdomain}`}
 												<RxExternalLink />

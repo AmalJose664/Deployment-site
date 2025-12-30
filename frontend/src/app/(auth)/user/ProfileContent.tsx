@@ -110,7 +110,7 @@ const ProfileContent = () => {
 						<RightFadeComponent delay={.18} className="dark:bg-neutral-900 bg-white rounded-xl border  p-6 shadow-md hover:shadow-lg transition-shadow duration-200">
 							<div className="flex items-center justify-between">
 								<div>
-									<p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total BandWidth</p>
+									<p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Monthly BandWidth</p>
 									<p className="text-xl font-bold text-gray-900 dark:text-white">
 										{userDetailed &&
 											formatBytes(userDetailed?.bandwidthMonthly || 0)

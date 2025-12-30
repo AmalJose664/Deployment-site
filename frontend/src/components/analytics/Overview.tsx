@@ -83,7 +83,7 @@ export default function OverviewChart({ projectId, userPlan }: { projectId: stri
 	const totals = useMemo(
 		() => ({
 			requests: overviewData?.reduce((acc, curr) => acc + curr.requests, 0) || 0,
-			uniqueVisitors: Math.max(...(overviewData?.map((ovrview) => ovrview.uniqueVisitors) || [0])),
+			uniqueVisitors: Math.max(...(overviewData?.length ? overviewData.map(({ uniqueVisitors }) => uniqueVisitors) : [0])),
 			avgResponseTime: overviewData?.length
 				? (overviewData.reduce((acc, curr) => acc + curr.avgResponseTime, 0) / overviewData.length)
 				: 0,

@@ -122,7 +122,12 @@ export function useDeploymentSSE(project: Project | undefined, refetch: () => vo
 										</div>
 
 										<button
-											onClick={() => { toast.dismiss(t); toast.info("Current deployment unchanged — no update was applied") }}
+											onClick={() => {
+												toast.dismiss(t);
+												if (project && project.deployments && project.deployments?.length >= 2) {
+													toast.info("Current deployment unchanged, no update was applied")
+												}
+											}}
 											className="text-gray-400 hover:text-gray-600 transition"
 										>
 											✕
@@ -132,7 +137,9 @@ export function useDeploymentSSE(project: Project | undefined, refetch: () => vo
 									duration: 1000 * 10,
 									richColors: true,
 									onAutoClose(t) {
-										toast.info("Current deployment unchanged — no update was applied")
+										if (project && project.deployments && project.deployments?.length >= 2) {
+											toast.info("Current deployment unchanged, no update was applied")
+										}
 									},
 								});
 							refetch()
