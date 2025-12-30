@@ -1,9 +1,18 @@
 
+import { execa } from 'execa';
 import express from 'express';
 import { Redis } from 'ioredis';
-
+import PQueue from 'p-queue';
 const app = express();
+const concurrency = Number(process.env.CONCURRENCY_OF_PROCESS || 3) || 3
+const processQueue = new PQueue({ concurrency: concurrency });
+
+const MAX_PENDING = 5;
+
+processQueue.onIdle().then(() => console.log('All tasks done'));
 const listenChanel = 'build:start'
+
+
 app.use(express.json());
 const redis = new Redis(process.env.REDIS_URL);
 redis.on('connect', () => {
@@ -26,33 +35,38 @@ redis.on('ready', () => {
 		console.log(`👂 Listening for '${listenChanel}' messages...\n`);
 	});
 });
-redis.on('message', (channel, message) => {
+redis.on('message', async (channel, message) => {
 	if (channel === listenChanel) {
-		console.log('\n🚀 DEPLOYMENT MESSAGE RECEIVED');
 		console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-		console.log(`📅 Time: ${new Date().toISOString()}`);
 
 		try {
 			const data = JSON.parse(message);
-			handleDeployment(data);
+			await handleDeployment(data);
 		} catch (e) {
 			console.log('📝 Raw Message:', message);
 		}
 		console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 	}
 });
-function handleDeployment(data) {
-	console.log('⚙️  Processing deployment...');
 
-	console.log(data)
+async function handleDeployment(data) {
+	// if (processQueue.size + processQueue.pending >= MAX_PENDING) {
+	// 	console.log("returning MAX Reached");
+	// 	return
+	// }
+	// processQueue.add(() =>
+	// 	execa('node', ['test.js']).then(result => {
+	// 		console.log(`${result} finished`);
+	// 	}))
 
-	console.log('✅ Deployment processed successfully');
+
+	console.log('\n------');
 }
 
 console.log('╔════════════════════════════════════════╗');
 console.log('║   Redis Deployment Subscriber Started  ║');
 console.log('╚════════════════════════════════════════╝');
-console.log('Press Ctrl+C to stop\n');
+
 
 app.get('/health', (req, res) => {
 	res.json({ status: 'ok', service: 'redis-publisher' });
@@ -63,6 +77,7 @@ const PORT = process.env.PORT || 6000;
 
 app.listen(PORT, () => {
 	console.log(`🚀 local runner server running on port ${PORT}`);
+	console.log(`Runner running with concorrency of ${concurrency}`);
 });
 
 

@@ -1,5 +1,4 @@
-import { spawn } from "child_process"
-
+import { execa } from 'execa';
 import { existsSync, } from "fs"
 import { readdir, stat, rename, mkdir, rm, readFile } from 'fs/promises';
 import { createWriteStream, createReadStream } from "fs"
@@ -14,8 +13,8 @@ import archiver from "archiver";
 import FormData from "form-data";
 import axios from 'axios';
 
-let DEPLOYMENT_ID = process.env.DEPLOYMENT_ID || "-----------------"   // Received from env by apiserver or use backup for local testing
-let PROJECT_ID = process.env.PROJECT_ID || "-----------------"   // Received from env by apiserver or use backup for local testing
+let DEPLOYMENT_ID = process.env.DEPLOYMENT_ID || "694cf50d4347fb01a283c80b"   // Received from env by apiserver or use backup for local testing
+let PROJECT_ID = process.env.PROJECT_ID || "694cf184342e333344ab521d"   // Received from env by apiserver or use backup for local testing
 
 const kafka = new Kafka({
 	clientId: `docker-build-server-${PROJECT_ID}-${DEPLOYMENT_ID}`,
@@ -70,12 +69,12 @@ const deploymentStatus = {
 
 const settings = {
 	customBuildPath: !true,
-	sendKafkaMessage: true,
+	sendKafkaMessage: !true,
 	deleteSourcesAfter: true,
 	sendLocalDeploy: !true,
 	localDeploy: !true,
 	runCommands: true,            // for testing only 
-	cloneRepo: true            // for testing only 
+	cloneRepo: !true            // for testing only 
 }
 
 console.log(DEPLOYMENT_ID, PROJECT_ID, "<<<<<")
@@ -404,6 +403,7 @@ function killProcess(proc) {
 }
 
 
+let currentProcess = null
 /**
  * Runs a system command as a child process.
  *
@@ -413,7 +413,6 @@ function killProcess(proc) {
  * @param {{name: string, value: string}[]} [env=[]] - Additional environment variables to include as array of object with name and value as strings.
  * @returns {Promise<void>} Resolves when the command finishes, rejects on error.
  */
-let currentProcess = null
 async function runCommand(command, args, cwd, env = []) {
 	if (!settings.runCommands) {
 		console.log("Skipping run command")
@@ -421,80 +420,89 @@ async function runCommand(command, args, cwd, env = []) {
 	}
 	const envVars = Object.fromEntries(env.map((e) => [e.name, e.value]))
 	console.log(env, args)
-	return new Promise(async (resolve, reject) => {
-		const runnerProcess = spawn(command, args, {
+	try {
+		const subprocess = execa(command, args, {
 			cwd,
-			timeout: 60 * 1000 * 15,
 			env: {
 				...process.env,
-				...envVars
+				...envVars,
 			},
 			shell: process.platform === "win32",
-		})
-		currentProcess = runnerProcess;
-
-		const timeoutId = setTimeout(() => {
-			console.log(`Killing process due to timeout: ${command}`);
-			killProcess(runnerProcess);
-			reject(new ContainerError(`${command} timed out after 15 minutes`, "stderr"));
-		}, 15 * 60 * 1000);
-
-		runnerProcess.stdout.on("data", (data) => {
-			console.log(data.toString(), "--")
+			timeout: 15 * 60 * 1000,
+			all: false,
+		});
+		currentProcess = subprocess;
+		subprocess.stdout?.on("data", (data) => {
+			console.log(data.toString(), "--");
 			publishLogs({
 				DEPLOYMENT_ID, PROJECT_ID,
 				level: "INFO",
 				message: data.toString(), stream: "stdout"
-			})
-		})
-		runnerProcess.stderr.on("data", (data) => {
-			console.log(data.toString())
+			});
+		});
+
+		subprocess.stderr?.on("data", (data) => {
+			console.error(data.toString());
 			publishLogs({
 				DEPLOYMENT_ID, PROJECT_ID,
 				level: "ERROR",
 				message: data.toString(), stream: "stderr"
-			})
-
-		})
-		runnerProcess.on("error", (err) => {
-			console.log(err)
+			});
+		});
+		await subprocess;
+		currentProcess = null;
+	} catch (error) {
+		currentProcess = null;
+		console.log(error)
+		if (error.timedOut) {
 			publishLogs({
 				DEPLOYMENT_ID, PROJECT_ID,
 				level: "ERROR",
-				message: err.message, stream: "stderr"
+				message: `${command} timed out`, stream: "stderr"
 			})
-			reject(new ContainerError("Failed to start " + command + " " + err.message, "stderr"))
-			//logs
-		})
-		runnerProcess.on("close", (code, signal) => {
-			clearTimeout(timeoutId);
-			currentProcess = null;
-			console.log(`[CLOSE] Code: ${code}, Signal: ${signal}`);
-			if (code === 0) {
-				resolve()
-			}
-			else {
-				publishLogs({
-					DEPLOYMENT_ID, PROJECT_ID,
-					level: "ERROR",
-					message: `${command} exited with code ${code}`, stream: "stderr"
-				})
-				reject(new ContainerError(`${command} exited with code ${code}`, "stderr"))
-			}
-		})
-		runnerProcess.on('exit', (code, signal) => {
-			if (signal === 'SIGTERM') {
-				publishLogs({
-					DEPLOYMENT_ID, PROJECT_ID,
-					level: "ERROR",
-					message: `${command} timed out`, stream: "stderr"
-				})
-				reject(new ContainerError(`${command} timed out`, "stderr"));
-			}
+			throw new ContainerError(
+				`${command} timed out after 15 minutes`,
+				"stderr"
+			);
+		}
+
+		if (error.signal) {
+			publishLogs({
+				DEPLOYMENT_ID,
+				PROJECT_ID,
+				level: "ERROR",
+				message: `${command} terminated by ${error.signal}`,
+				stream: "stderr",
+			});
+			throw new ContainerError(
+				`${command} was terminated by signal ${error.signal}`,
+				"stderr"
+			);
+		}
+
+		if (typeof error.exitCode === "number") {
+			publishLogs({
+				DEPLOYMENT_ID, PROJECT_ID,
+				level: "ERROR",
+				message: `${command} exited with code ${code}`, stream: "stderr"
+			})
+			throw new ContainerError(
+				`${command} exited with code ${error.exitCode}`,
+				"stderr"
+			);
+		}
+		publishLogs({
+			DEPLOYMENT_ID,
+			PROJECT_ID,
+			level: "ERROR",
+			message: error.message,
+			stream: "stderr",
 		});
-
-
-	})
+		throw new ContainerError(
+			`Failed to start ${command}: ${error.message}`,
+			"stderr"
+		);
+	}
 }
 
 async function uploadNonAws(dir, fileName) {
@@ -639,6 +647,7 @@ async function init() {
 	try {
 		//logs
 		console.log("Executing script.js")
+
 		console.log("fetching project data")
 		const taskDir = path.join(__dirname, "../test-grounds/")             // UPDATE THIS ON DEPLOYMENT !!!!!!!!!!!!!!!!!
 		const [projectData, deploymentData] = await fetchProjectData(DEPLOYMENT_ID)
@@ -691,12 +700,18 @@ async function init() {
 				publishLogs({
 					DEPLOYMENT_ID, PROJECT_ID,
 					level: "WARN",
-					message: `Failed to install with command ${installCommand}\n retrying install ${installTries}`, stream: "system"
+					message: `Failed to install with command npm ${installCommand}`, stream: "system"
+				})
+				publishLogs({
+					DEPLOYMENT_ID, PROJECT_ID,
+					level: "WARN",
+					message: `---------------Retrying install no. ${installTries}-------------`, stream: "system"
 				})
 				if (installTries >= 3) throw error;
 				await new Promise(r => setTimeout(r, 2000));
 			}
 		}
+
 		const installEndTimer = performance.now()
 
 		console.log('Dependencies installed successfully in ', (installEndTimer - installTimer).toFixed(2), " ms");
@@ -770,6 +785,11 @@ async function init() {
 			commit_hash: gitCommitData,
 			complete_at: new Date().toISOString(),
 			file_structure: { files: fileStructure, totalSize }
+		})
+		publishLogs({
+			DEPLOYMENT_ID, PROJECT_ID,
+			level: "INFO",
+			message: `Site live at \x1B[1;36mhttps://${projectData.subdomain}.....\x1B[39m 🎉🎉🎉`, stream: "system"
 		})
 
 		console.log("Time taken ", durationMs.toFixed(2), "logs number ", logsNumber)
