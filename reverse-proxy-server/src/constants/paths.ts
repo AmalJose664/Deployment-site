@@ -44,7 +44,3 @@ export const STORAGE_FILES_PATH = `${STORAGE_MODE === "cloud"
 // --------------------------------------------------
 // Safety checks (fail fast)
 // --------------------------------------------------
-
-console.log("\n\n\n VARIBLES--------------\n\n\n")
-console.log({ STORAGE_FILES_PATH, STORAGE_FILES_ENDPOINT, STORAGE_MODE, STORAGE_BASE_URL })
-console.log("\n\n\n VARIBLES--------------\n\n\n")

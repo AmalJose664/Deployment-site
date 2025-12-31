@@ -1,3 +1,4 @@
+import { readFileSync } from "fs";
 import { redisService } from "../../cache/redis.js";
 import { exemptedRegex, MAX_CACHE_LIMIT_MB } from "../../constants/proxyCacheValues.js";
 import { RequestWithProject } from "../../middleware/projectChecker.js";
@@ -33,12 +34,12 @@ export const onProxyRes = async (proxyRes: IncomingMessage, req: RequestWithProj
 	const startTime = (req as any).startTime || endTime;
 	const responseTime = (endTime - startTime).toFixed(2);
 	const ua = parseUA(req.headers['user-agent'] || "")
-	const toCache = {
-		projectId: req.project?._id,
-		responseSize,
-		responseTime,
-	}
-	await redisService.set(req.project?.subdomain + req.path as string, toCache, 1200)
+	// const toCache = {
+	// 	projectId: req.project?._id,
+	// 	responseSize,
+	// 	responseTime,
+	// }
+	// await redisService.set(req.project?.subdomain + req.path as string, toCache, 1200)
 	const data: IAnalytics = {
 		projectId: req.project?._id || "",
 		subdomain: req.project?.subdomain || "",
@@ -48,7 +49,7 @@ export const onProxyRes = async (proxyRes: IncomingMessage, req: RequestWithProj
 		responseSize,
 		responseTime: parseFloat(responseTime),
 		ip: req.socket.remoteAddress || "0.0.0.0",
-		statusCode: res.statusCode || proxyRes.statusCode || 0,
+		statusCode: proxyRes.statusCode || res.statusCode || 0,
 		uaBrowser: ua.browser,
 		uaOs: ua.os,
 		isMobile: ua.isMobile,
@@ -57,5 +58,10 @@ export const onProxyRes = async (proxyRes: IncomingMessage, req: RequestWithProj
 	}
 	// console.log(data, "--- --`Levele data")
 	analyticsService.sendAnalytics(data)
+	if (proxyRes.statusCode === 404) {
+		res.writeHead(404, { 'Content-Type': 'text/html' });
+		res.end(readFileSync('src/views/path404.html'));
+		return;
+	}
 
 }

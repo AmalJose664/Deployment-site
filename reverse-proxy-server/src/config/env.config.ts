@@ -8,6 +8,7 @@ export function validateEnv() {
 		// eg "https://github.com/AmalJose664/Deployment-site/tree/main/test-server"
 		// Or use cloud storage like s3 or cloduflare r2 or any other
 		"REDIS_URL",
+		"FRONTEND_URL"
 	];
 
 	const cloudRequired = [

@@ -7,7 +7,7 @@ import { STORAGE_MODE } from "../constants/paths.js";
 
 const router = Router()
 
-router.get("/track", trackCacheAnalytics)
+// router.get("/track", trackCacheAnalytics)
 
 router.get(
 	"/download-file/:projectId/:deploymentId/",
