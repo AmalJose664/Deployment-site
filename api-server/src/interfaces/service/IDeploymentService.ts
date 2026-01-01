@@ -13,7 +13,8 @@ export interface IDeploymentService {
 		},
 	): Promise<{ deployments: IDeployment[]; total: number }>;
 
-	getDeploymentById(id: string, userId: string, includesField?: string): Promise<IDeployment | null>;
+	getDeploymentById(id: string, userId: string, includes?: string): Promise<IDeployment | null>;
+	getDeploymentFiles(id: string, userId: string, includes?: string): Promise<IDeployment | null>
 	getProjectDeployments(
 		userId: string,
 		projectId: string,

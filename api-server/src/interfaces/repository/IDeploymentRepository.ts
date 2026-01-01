@@ -3,7 +3,7 @@ import { DeploymentStatus, IDeployment } from "../../models/Deployment.js";
 
 export interface IDeploymentRepository {
 	createDeployment(deploymentData: Partial<IDeployment>): Promise<IDeployment | null>;
-	findDeploymentById(id: string, userId: string, includesField?: string): Promise<IDeployment | null>;
+	findDeploymentById(id: string, userId: string, options?: { includes?: string, exclude?: string[] }): Promise<IDeployment | null>;
 
 	findAllDeployments(userId: string, query: QueryDeploymentDTO): Promise<{ deployments: IDeployment[]; total: number }>;
 	findProjectDeployments(userId: string, projectId: string, query: QueryDeploymentDTO): Promise<{ deployments: IDeployment[]; total: number }>;

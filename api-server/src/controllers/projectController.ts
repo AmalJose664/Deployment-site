@@ -28,7 +28,7 @@ class ProjectController implements IProjectController {
 			if (!dbResult) {
 				throw new AppError("Cannot create project", HTTP_STATUS_CODE.BAD_REQUEST);
 			}
-			const response = ProjectMapper.toProjectResponse(dbResult);
+			const response = ProjectMapper.toProjectResponse(dbResult, "full");
 
 			res.status(HTTP_STATUS_CODE.CREATED).json(response);
 		} catch (error) {
@@ -40,7 +40,7 @@ class ProjectController implements IProjectController {
 			const userId = req.user?.id as string;
 			const query = req.validatedQuery as unknown as QueryProjectDTO;
 			const result = await this.projectService.getAllProjects(userId, query);
-			const response = ProjectMapper.toProjectsResponse(result.projects, result.total, query.page, query.limit);
+			const response = ProjectMapper.toProjectsResponse(result.projects, result.total, query.page, query.limit, query.full ? "full" : "overview");
 
 			res.status(HTTP_STATUS_CODE.OK).json(response);
 		} catch (err) {
@@ -58,7 +58,42 @@ class ProjectController implements IProjectController {
 				res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ project: null });
 				return;
 			}
-			const response = ProjectMapper.toProjectResponse(result);
+			const response = ProjectMapper.toProjectResponse(result, "overview");
+			res.status(HTTP_STATUS_CODE.OK).json(response);
+		} catch (err) {
+			next(err);
+		}
+	}
+	async getProjectComplete(req: Request, res: Response, next: NextFunction): Promise<void> {
+		try {
+			const userId = req.user?.id as string;
+			const projectId = req.params.projectId;
+			const include = req.query.include as string;
+
+			const result = await this.projectService.getProjectById(projectId, userId, include, true);
+			if (!result) {
+				res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ project: null });
+				return;
+			}
+			const response = ProjectMapper.toProjectResponse(result, "full");
+			res.status(HTTP_STATUS_CODE.OK).json(response);
+		} catch (err) {
+			next(err);
+		}
+	}
+
+	async getProjectSettings(req: Request, res: Response, next: NextFunction): Promise<void> {
+		try {
+			const userId = req.user?.id as string;
+			const projectId = req.params.projectId;
+			const include = req.query.include as string;
+
+			const result = await this.projectService.getProjectSettings(projectId, userId, include);
+			if (!result) {
+				res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ project: null });
+				return;
+			}
+			const response = ProjectMapper.toProjectResponse(result, "setting");
 			res.status(HTTP_STATUS_CODE.OK).json(response);
 		} catch (err) {
 			next(err);
@@ -75,7 +110,7 @@ class ProjectController implements IProjectController {
 				res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ project: null });
 				return;
 			}
-			const response = ProjectMapper.toProjectResponse(result);
+			const response = ProjectMapper.toProjectResponse(result, "update");
 			res.status(HTTP_STATUS_CODE.OK).json(response);
 		} catch (err) {
 			next(err);
@@ -90,7 +125,7 @@ class ProjectController implements IProjectController {
 				res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ project: null });
 				return;
 			}
-			const response = ProjectMapper.toProjectResponse(updatedProject);
+			const response = ProjectMapper.toProjectResponse(updatedProject, "update");
 			res.status(HTTP_STATUS_CODE.OK).json(response);
 		} catch (error) {
 			next(error);
@@ -115,7 +150,7 @@ class ProjectController implements IProjectController {
 				res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ project: null });
 				return;
 			}
-			const response = ProjectMapper.toProjectResponse(updatedProject);
+			const response = ProjectMapper.toProjectResponse(updatedProject, "update");
 			res.status(HTTP_STATUS_CODE.OK).json(response);
 		} catch (error) {
 			next(error);
@@ -151,7 +186,7 @@ class ProjectController implements IProjectController {
 			const projectId = req.params.id;
 			const project = await this.projectService.__getProjectById(projectId);
 			if (project) {
-				const response = ProjectMapper.toProjectResponse(project);
+				const response = ProjectMapper.toProjectResponse(project, "full");
 				res.json(response);
 				return;
 			}

@@ -3,6 +3,7 @@ import { QueryDeploymentDTO } from "../dtos/deployment.dto.js";
 import { IDeploymentRepository } from "../interfaces/repository/IDeploymentRepository.js";
 import { Deployment, DeploymentStatus, IDeployment } from "../models/Deployment.js";
 import { BaseRepository } from "./base/base.repository.js";
+import { DEPLOYMENT_POPULATE_MAP } from "../constants/populates/deployment.populate.js";
 
 class DeploymentRepository extends BaseRepository<IDeployment> implements IDeploymentRepository {
 	constructor() {
@@ -14,14 +15,17 @@ class DeploymentRepository extends BaseRepository<IDeployment> implements IDeplo
 		return savedDeployment;
 	}
 
-	async findDeploymentById(id: string, userId: string, includesField?: string): Promise<IDeployment | null> {
+	async findDeploymentById(id: string, userId: string, options?: { includes?: string, exclude?: string[] }): Promise<IDeployment | null> {
 		let dbQuery: FilterQuery<IDeployment> = { user: userId, _id: id };
 		let deploymentQuery = this.findOne(dbQuery);
-		if (includesField?.includes("project")) {
-			deploymentQuery = deploymentQuery.populate("project", "name branch subdomain repoURL");
+		if (options?.exclude?.length) {
+			deploymentQuery = deploymentQuery.select(options.exclude.map((f) => "-" + f).join(" "))
 		}
-		if (includesField?.includes("user")) {
-			deploymentQuery = deploymentQuery.populate("user", "name email profileImage");
+		if (options?.includes?.includes("project")) {
+			deploymentQuery = deploymentQuery.populate(DEPLOYMENT_POPULATE_MAP.project.path, DEPLOYMENT_POPULATE_MAP.project.select);
+		}
+		if (options?.includes?.includes("user")) {
+			deploymentQuery = deploymentQuery.populate(DEPLOYMENT_POPULATE_MAP.user.path, DEPLOYMENT_POPULATE_MAP.user.select);
 		}
 		return await deploymentQuery.exec();
 	}
@@ -38,10 +42,10 @@ class DeploymentRepository extends BaseRepository<IDeployment> implements IDeplo
 			.skip((query.page - 1) * query.limit);
 
 		if (query.include?.includes("project")) {
-			deploymentsQuery = deploymentsQuery.populate("project", "name branch subdomain repoURL");
+			deploymentsQuery = deploymentsQuery.populate(DEPLOYMENT_POPULATE_MAP.project.path, DEPLOYMENT_POPULATE_MAP.project.select);
 		}
 		if (query.include?.includes("user")) {
-			deploymentsQuery = deploymentsQuery.populate("user", "name email profileImage");
+			deploymentsQuery = deploymentsQuery.populate(DEPLOYMENT_POPULATE_MAP.user.path, DEPLOYMENT_POPULATE_MAP.user.select);
 		}
 		const [deployments, total] = await Promise.all([deploymentsQuery.sort("-createdAt").exec(), this.count(dbQuery)]);
 
@@ -64,10 +68,10 @@ class DeploymentRepository extends BaseRepository<IDeployment> implements IDeplo
 			.limit(query.limit)
 			.skip((query.page - 1) * query.limit);
 		if (query.include?.includes("project")) {
-			deploymentsQuery = deploymentsQuery.populate("project", "name branch subdomain");
+			deploymentsQuery = deploymentsQuery.populate(DEPLOYMENT_POPULATE_MAP.project.path, DEPLOYMENT_POPULATE_MAP.project.select);
 		}
 		if (query.include?.includes("user")) {
-			deploymentsQuery = deploymentsQuery.populate("user", "name email profileImage");
+			deploymentsQuery = deploymentsQuery.populate(DEPLOYMENT_POPULATE_MAP.user.path, DEPLOYMENT_POPULATE_MAP.user.select);
 		}
 		const [deployments, total] = await Promise.all([deploymentsQuery.sort("-createdAt").exec(), this.count(dbQuery)]);
 		return { deployments, total };

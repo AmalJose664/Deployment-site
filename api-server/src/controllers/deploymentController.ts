@@ -34,6 +34,7 @@ class DeploymentController implements IDeploymentController {
 			const deploymentId = req.params.deploymentId;
 			const includesField = req.query.include as string;
 
+
 			const result = await this.deploymentService.getDeploymentById(deploymentId, userId, includesField);
 			if (result) {
 				const response = DeploymentMapper.toDeploymentResponse(result);
@@ -61,12 +62,12 @@ class DeploymentController implements IDeploymentController {
 		}
 	}
 
-	async getAllDeploymentFilesData(req: Request, res: Response, next: NextFunction): Promise<void> {
+	async getDeploymentFilesData(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
 			const userId = req.user?.id as string;
 			const deploymentId = req.params.deploymentId;
 
-			const result = await this.deploymentService.getDeploymentById(deploymentId, userId);
+			const result = await this.deploymentService.getDeploymentFiles(deploymentId, userId);
 			if (!result) {
 				res.status(HTTP_STATUS_CODE.NOT_FOUND).json({ status: 404, error: "not_found" });
 				return;

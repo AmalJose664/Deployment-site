@@ -52,20 +52,20 @@ export class DeploymentMapper {
 				_id: deployment._id,
 				project: this.isPopulatedObject(deployment.project, ["branch", "_id", "name"])
 					? {
-							name: (deployment.project as any).name,
-							_id: (deployment.project as any)._id,
-							subdomain: (deployment.project as any).subdomain,
-							branch: (deployment.project as any).branch,
-							repoURL: (deployment.project as any).repoURL,
-						}
+						name: (deployment.project as any).name,
+						_id: (deployment.project as any)._id,
+						subdomain: (deployment.project as any).subdomain,
+						branch: (deployment.project as any).branch,
+						repoURL: (deployment.project as any).repoURL,
+					}
 					: deployment.project.toString(),
 				commit: { msg: deployment.commit_hash.split("||")[1], id: deployment.commit_hash.split("||")[0] },
 				user: this.isPopulatedObject(deployment.user, ["profileImage", "email", "name"])
 					? {
-							name: (deployment.user as any).name,
-							profileImage: (deployment.user as any).profileImage,
-							email: (deployment.user as any).email,
-						}
+						name: (deployment.user as any).name,
+						profileImage: (deployment.user as any).profileImage,
+						email: (deployment.user as any).email,
+					}
 					: deployment.user.toString(),
 				status: deployment.status,
 				performance: {

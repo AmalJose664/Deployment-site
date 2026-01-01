@@ -5,7 +5,7 @@ export interface IDeploymentController {
 	getDeployment(req: Request, res: Response, next: NextFunction): Promise<void>;
 	getDeploymentsByProject(req: Request, res: Response, next: NextFunction): Promise<void>;
 	getAllDeployments(req: Request, res: Response, next: NextFunction): Promise<void>;
-	getAllDeploymentFilesData(req: Request, res: Response, next: NextFunction): Promise<void>;
+	getDeploymentFilesData(req: Request, res: Response, next: NextFunction): Promise<void>;
 
 	deleteDeployment(req: Request, res: Response, next: NextFunction): Promise<void>;
 	__getDeployment(req: Request, res: Response, next: NextFunction): Promise<void>;

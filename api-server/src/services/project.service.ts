@@ -64,17 +64,70 @@ class ProjectService implements IProjectService {
 	}
 
 	async getAllProjects(userId: string, query: QueryProjectDTO): Promise<{ projects: IProject[]; total: number }> {
-		return await this.projectRepository.getAllProjects(userId, query);
+		return await this.projectRepository.getAllProjects(userId, {
+			...query, ...(!query.full && {
+				fields:
+					["name",
+						"branch",
+						"repoURL",
+						"techStack",
+						"status",
+						"currentDeployment",
+						"tempDeployment",
+						"lastDeployment",
+						"subdomain",
+						"user",
+						"deployments",
+						"lastDeployedAt",
+						"createdAt",]
+			})
+		});
 	}
-	async getProjectById(id: string, userId: string, include?: string): Promise<IProject | null> {
+
+
+
+	async getProjectById(id: string, userId: string, include?: string, full?: boolean): Promise<IProject | null> {
 		const user = await this.userRepository.findByUserId(userId);
 		if (!user) {
 			throw new AppError("User not found", 404);
 		}
-		const project = await this.projectRepository.findProject(id, userId, include);
+		const project = await this.projectRepository.findProject(id, userId, {
+			include: include, ...(!full && {
+				fields:
+					["name",
+						"branch",
+						"repoURL",
+						"techStack",
+						"status",
+						"currentDeployment",
+						"tempDeployment",
+						"lastDeployment",
+						"subdomain",
+						"user",
+						"deployments",
+						"lastDeployedAt",
+						"createdAt",]
+			})
+		});
+		return project;
+	}
+	async getProjectSettings(id: string, userId: string, include?: string): Promise<IProject | null> {
+		const user = await this.userRepository.findByUserId(userId);
+		if (!user) {
+			throw new AppError("User not found", 404);
+		}
+		const project = await this.projectRepository.findProject(id, userId, {
+			include: include, fields: [
+				"_id", "name", "branch", "repoURL", "status", "subdomain", "user",
+				"createdAt", "buildCommand", "env", "outputDirectory", "rootDir", "isDisabled", "isDeleted", "rewriteNonFilePaths"
+			]
+		});
 
 		return project;
 	}
+
+
+
 	async updateProject(id: string, userId: string, dto: Partial<IProject>): Promise<IProject | null> {
 		const user = await this.userRepository.findByUserId(userId);
 		if (!user) {

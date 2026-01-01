@@ -32,6 +32,8 @@ projectRouter.patch(
 	validateBody(UpdateProjectSchema),
 	projectController.updateProject.bind(projectController),
 );
+projectRouter.get("/:projectId/full", authenticateToken, validateObjectId("projectId"), projectController.getProjectComplete.bind(projectController));
+projectRouter.get("/:projectId/settings", authenticateToken, validateObjectId("projectId"), projectController.getProjectSettings.bind(projectController));
 projectRouter.patch(
 	"/:projectId/subdomain",
 	authenticateToken,

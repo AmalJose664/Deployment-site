@@ -4,7 +4,8 @@ import { IProject, Project, ProjectStatus } from "../models/Projects.js";
 import { IUser, User } from "../models/User.js";
 import { BaseRepository } from "./base/base.repository.js";
 import { QueryProjectDTO } from "../dtos/project.dto.js";
-import { IDeployment } from "../models/Deployment.js";
+import { PROJECT_POPULATE_MAP } from "../constants/populates/project.populate.js";
+
 
 class ProjectRepository extends BaseRepository<IProject> implements IProjectRepository {
 	constructor() {
@@ -16,39 +17,65 @@ class ProjectRepository extends BaseRepository<IProject> implements IProjectRepo
 		const savedProject = await project.save();
 		return savedProject;
 	}
-	async findProject(projectId: string, userId: string, include?: string): Promise<IProject | null> {
-		if (include?.includes("user")) {
-			return await Project.findOne({ _id: projectId, user: userId, isDeleted: false }).populate("user", "name email profileImage");
+	async findProject(projectId: string, userId: string, options?: { include?: string, fields?: string[] }): Promise<IProject | null> {
+		let query = Project.findOne({
+			_id: projectId,
+			user: userId,
+			isDeleted: false
+		})
+
+		if (options?.fields?.length) {
+			query = query.select(options.fields.join(" "))
 		}
-		return await Project.findOne({ _id: projectId, user: userId, isDeleted: false }); //
+
+		if (options?.include?.includes('user')) {
+			query.populate(PROJECT_POPULATE_MAP.user.path, PROJECT_POPULATE_MAP.user.select)
+		}
+		if (options?.include?.includes('deployment')) {
+			query.populate(PROJECT_POPULATE_MAP.deployments.path, PROJECT_POPULATE_MAP.deployments.select)
+		}
+		return query.exec()
+
 	}
 	async findProjectsBySubdomain(subdomain: string): Promise<IProject[]> {
 		return await Project.find({ subdomain, isDeleted: false }); //
 	}
 
-	async getAllProjects(userId: string, query: QueryProjectDTO): Promise<{ projects: IProject[]; total: number }> {
+
+
+
+	async getAllProjects(userId: string, options: QueryProjectDTO & { fields?: string[] },): Promise<{ projects: IProject[]; total: number }> {
 		const dbQuery: FilterQuery<IProject> = { user: userId, isDeleted: false };
-		if (query.search) {
-			dbQuery.$or = [{ name: { $regex: query.search, $options: "i" } }, { subdomain: { $regex: query.search, $options: "i" } }];
+		if (options.search) {
+			dbQuery.$or = [{ name: { $regex: options.search, $options: "i" } }, { subdomain: { $regex: options.search, $options: "i" } }];
 		}
-		if (query.status) {
-			dbQuery.status = { $eq: query.status };
+		if (options.status) {
+			dbQuery.status = { $eq: options.status };
 		}
 		let findQuery = this.findMany(dbQuery)
-			.limit(query.limit)
-			.skip((query.page - 1) * query.limit);
-		if (query.include?.includes("user")) {
-			findQuery = findQuery.populate("user", "name email profileImage");
+			.limit(options.limit)
+			.skip((options.page - 1) * options.limit);
+		if (options?.fields?.length) {
+			findQuery = findQuery.select(options.fields.join(" "))
+		}
+		if (options.include?.includes("user")) {
+			findQuery = findQuery.populate(PROJECT_POPULATE_MAP.user.path, PROJECT_POPULATE_MAP.user.select)
+		}
+		if (options.include?.includes("deployment")) {
+			findQuery = findQuery.populate(PROJECT_POPULATE_MAP.deployments.path, PROJECT_POPULATE_MAP.deployments.select)
 		}
 		const [projects, total] = await Promise.all([findQuery.sort("-createdAt").exec(), this.count(dbQuery)]);
 		return { projects, total };
 	}
 
+
+
+
 	async deleteProject(projectId: string, userId: string): Promise<IProject | null> {
 		return await Project.findOneAndUpdate({ _id: projectId, user: userId, isDeleted: false }, { isDeleted: true }, { new: true });
 	}
 	async updateProject(projectId: string, userId: string, updateData: Partial<IProject>): Promise<IProject | null> {
-		return await Project.findOneAndUpdate({ _id: projectId, user: userId }, { $set: { ...updateData } }, { new: true });
+		return await Project.findOneAndUpdate({ _id: projectId, user: userId }, { $set: { ...updateData } }, { new: true, select: "name _id" });
 	}
 
 	async pushToDeployments(projectId: string, userId: string, newDeployment: string | Types.ObjectId): Promise<IProject | null> {
@@ -60,7 +87,7 @@ class ProjectRepository extends BaseRepository<IProject> implements IProjectRepo
 				lastDeployment: newDeployment.toString(),
 				$addToSet: { deployments: newDeployment },
 			},
-			{ new: true },
+			{ new: true, select: "name _id" },
 		);
 	}
 
@@ -76,7 +103,7 @@ class ProjectRepository extends BaseRepository<IProject> implements IProjectRepo
 				currentDeployment: backUpDeployment,
 				$pull: { deployments: deployment },
 			},
-			{ new: true },
+			{ new: true, select: "name _id" },
 		);
 	}
 
@@ -86,7 +113,7 @@ class ProjectRepository extends BaseRepository<IProject> implements IProjectRepo
 	}
 	async __updateProject(projectId: string, updateData: Partial<IProject>): Promise<IProject | null> {
 		// container
-		return await Project.findOneAndUpdate({ _id: projectId }, { $set: { ...updateData } }, { new: true });
+		return await Project.findOneAndUpdate({ _id: projectId }, { $set: { ...updateData } }, { new: true, select: "name _id" });
 	}
 }
 export default ProjectRepository;

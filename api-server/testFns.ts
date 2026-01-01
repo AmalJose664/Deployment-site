@@ -69,7 +69,7 @@ async function mongodbData() {
 		process.exit(0);
 	}
 }
-mongodbData();
+// mongodbData();
 
 async function commitAllMessages() {
 	const kafka = new Kafka({
@@ -141,7 +141,7 @@ async function getClickhouseData() {
 	}
 
 	const data = await client.query({
-		query: `select * from log_events where event_id='b3f7a03e-203f-4bda-ae8b-e8a862d7879e'`,
+		query: `select * from log_events`,
 		// format: "JSON",
 	});
 	const datas = await data.json();
@@ -151,4 +151,4 @@ async function getClickhouseData() {
 	// 	query: "TRUNCATE analytics"
 	// })
 }
-// getClickhouseData().then(() => process.exit(0))
+getClickhouseData().then(() => process.exit(0))

@@ -80,8 +80,16 @@ class DeploymentService implements IDeploymentService {
 		}
 	}
 
-	async getDeploymentById(id: string, userId: string, includesField?: string): Promise<IDeployment | null> {
-		return await this.deploymentRepository.findDeploymentById(id, userId, includesField);
+	async getDeploymentById(id: string, userId: string, includes?: string): Promise<IDeployment | null> {
+		return await this.deploymentRepository.findDeploymentById(id, userId, { includes, exclude: ["file_structure"] });
+	}
+	async getDeploymentFiles(id: string, userId: string, includes?: string): Promise<IDeployment | null> {
+		return await this.deploymentRepository.findDeploymentById(id, userId, {
+			exclude: [
+				"commit_hash", "overWrite", "s3Path", "error_message", "updatedAt",
+				"install_ms", "build_ms", "duration_ms", "status", "user", "project"
+			]
+		});
 	}
 
 	async getAllDeployments(userId: string, query: QueryDeploymentDTO): Promise<{ deployments: IDeployment[]; total: number }> {

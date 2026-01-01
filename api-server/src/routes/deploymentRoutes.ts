@@ -24,7 +24,7 @@ deploymentRouter.get(
 	"/:deploymentId/files",
 	authenticateToken,
 	validateObjectId("deploymentId"),
-	deploymentController.getAllDeploymentFilesData.bind(deploymentController),
+	deploymentController.getDeploymentFilesData.bind(deploymentController),
 );
 
 deploymentRouter.get(
