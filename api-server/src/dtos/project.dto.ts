@@ -29,11 +29,11 @@ export const CreateProjectSchema = z.object({
 		.regex(/^[a-zA-Z0-9_\-./ ]+$/, "Build command contains invalid characters")
 		.optional()
 		.default("build"),
-	installCommand: z
-		.string()
-		.regex(/^[a-zA-Z0-9_\-./ ]+$/, "Install command contains invalid characters")
-		.optional()
-		.default("install"),
+	// installCommand: z
+	// 	.string()
+	// 	.regex(/^[a-zA-Z0-9_\-./ ]+$/, "Install command contains invalid characters")
+	// 	.optional()
+	// 	.default("install"),
 	rootDir: z
 		.string()
 		.trim()

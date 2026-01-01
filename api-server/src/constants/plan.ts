@@ -1,3 +1,4 @@
+
 export interface IPlans {
 	FREE: {
 		name: string;
@@ -5,8 +6,7 @@ export interface IPlans {
 		pricePerMonth: number;
 		maxProjects: number;
 		maxDailyDeployments: number;
-		subDomains: boolean;
-		totalBandwidthGB: number;
+		totalBandwidthGB: number
 		features: string[];
 	};
 	PRO: {
@@ -15,8 +15,7 @@ export interface IPlans {
 		pricePerMonth: number;
 		maxProjects: number;
 		maxDailyDeployments: number;
-		subDomains: boolean;
-		totalBandwidthGB: number;
+		totalBandwidthGB: number
 		features: string[];
 	};
 }
@@ -25,27 +24,31 @@ export const PLANS: IPlans = {
 		name: "FREE",
 		slug: "Starter",
 		pricePerMonth: 0,
-		maxProjects: 4,
-		maxDailyDeployments: 12,
-		totalBandwidthGB: 200,
-		subDomains: false,
-		features: ["Basic hosting", "Up to 4 projects", "Max 12 deployments daily", "200GB Total Bandwidth", "No custom sub domains"],
+		maxProjects: 8,
+		maxDailyDeployments: 8,
+		totalBandwidthGB: 100,
+		features: [
+			"Basic hosting",
+			"Up to 8 projects",
+			"Max 8 deployments daily",
+			"100GB Total Bandwidth",
+			"No custom sub domains"
+		],
 	},
 	PRO: {
 		name: "PRO",
 		slug: "Pro",
-		pricePerMonth: 15,
+		pricePerMonth: 5,
 		maxProjects: 20,
-		maxDailyDeployments: 100,
+		maxDailyDeployments: 40,
 		totalBandwidthGB: 1000,
-		subDomains: true,
 		features: [
 			"Priority builds",
 			"Custom sub domains",
 			"Up to 20 projects",
-			"Max 100 deployments daily",
+			"Max 40 deployments daily",
 			"1TB Total Bandwidth",
-			"More resources",
+			"More resources"
 		],
 	},
 } as const;

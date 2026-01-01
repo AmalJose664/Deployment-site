@@ -1,6 +1,6 @@
 /// <reference types="node" />
 
-import connectDB from "../src/config/db.ts";
+import connectDB from "../src/config/mongo.config.ts";
 import { User } from "../src/models/User.ts";
 import { Project } from "../src/models/Projects.ts";
 import { Deployment } from "../src/models/Deployment.ts";

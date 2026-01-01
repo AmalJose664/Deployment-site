@@ -43,7 +43,7 @@ class ProjectService implements IProjectService {
 			branch: dto.branch,
 			buildCommand: dto.buildCommand,
 			env: dto.env || [],
-			installCommand: dto.installCommand,
+			installCommand: "install", //dto.installCommand,
 			outputDirectory: dto.outputDirectory,
 			rootDir: dto.rootDir,
 			subdomain: `${generateSlug()}-${Math.floor(Math.random() * 10000)}`,
@@ -83,7 +83,7 @@ class ProjectService implements IProjectService {
 		const newData: Partial<IProject> = {
 			...(dto.name && { name: dto.name }),
 			...(dto.branch && { branch: dto.branch }),
-			...(dto.installCommand && { installCommand: dto.installCommand }),
+			// ...(dto.installCommand && { installCommand: dto.installCommand }),
 			...(dto.buildCommand && { buildCommand: dto.buildCommand }),
 			...(dto.rootDir && { rootDir: dto.rootDir }),
 			...(dto.outputDirectory && { outputDirectory: dto.outputDirectory }),
