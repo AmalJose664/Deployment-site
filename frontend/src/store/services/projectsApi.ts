@@ -29,6 +29,20 @@ export const projectApis = createApi({
 			},
 			providesTags: (result, error, { id }) => [{ type: 'Projects', id }]
 		}),
+		getProjectFull: builder.query<Project, { id: string, params: { include?: string } }>({
+			query: ({ id, params }) => ({ url: `/projects/${id}/full`, method: 'get', params }),
+			transformResponse(baseQueryReturnValue: any, meta) {
+				return baseQueryReturnValue.project as Project
+			},
+			providesTags: (result, error, { id }) => [{ type: 'Projects', id }]
+		}),
+		getProjectSettings: builder.query<Project, { id: string }>({
+			query: ({ id }) => ({ url: `/projects/${id}/settings`, method: 'get' }),
+			transformResponse(baseQueryReturnValue: any, meta) {
+				return baseQueryReturnValue.project as Project
+			},
+			providesTags: (result, error, { id }) => [{ type: 'Projects', id }]
+		}),
 		createProject: builder.mutation<Project, ProjectFormType>({
 			query: (project) => ({
 				url: "/projects",
@@ -121,6 +135,8 @@ export const {
 	useGetProjectByIdQuery,
 	useDeleteProjectMutation,
 	useUpdateProjectMutation,
+	useGetProjectFullQuery,
+	useGetProjectSettingsQuery,
 	useChangeProjectSubdomainMutation,
 	useChangeProjectDeploymentMutation,
 	useGetProjectsSimpleStatsQuery

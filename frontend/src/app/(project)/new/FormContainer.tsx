@@ -29,7 +29,7 @@ function ProjectForm() {
 		defaultValues: {
 			name: '',
 			repoURL: '',
-			branch: "main",
+			branch: "",
 			installCommand: "install",
 			buildCommand: "build",
 			rootDir: "/",
@@ -97,7 +97,7 @@ function ProjectForm() {
 				</div>
 			</header>
 
-			<main className="max-w-7xl mx-auto px-8 py-3">
+			<main className="max-w-[1320px] mx-auto px-8 py-3">
 				<div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
 					<motion.form
 						className="mt-6 border p-2 rounded-md border-blue-600/30"

@@ -92,7 +92,6 @@ export function AdvancedSettings({ form }: {
 
 			<motion.div
 				initial={{ opacity: 0, height: 0 }}
-
 				animate={{ opacity: 1, height: "auto" }}
 				exit={{ opacity: 0, height: 0 }}
 				transition={{ duration: 0.4, ease: "easeInOut" }}
@@ -116,12 +115,23 @@ export function AdvancedSettings({ form }: {
 					</p>
 				</div>
 
-				<div className="mb-3 px-3 py-2 relative">
+				<div className="mb-3 px-3 py-2 relative group border border-transparent 
+				hover:border-neutral-300 dark:hover:border-neutral-700 rounded-md delay-500">
 					<label className="flex items-center gap-2  mb-1 font-medium text-sm" htmlFor="">
 						<FiTerminal />{" "}<span className="text-primary">Install Command </span>
 					</label>
 					<span className="absolute top-[38px] left-6">npm</span>
-					<Input maxLength={20} {...register("installCommand")} className="text-primary pl-13" />
+					<Input maxLength={20} {...register("installCommand")} className="text-primary pl-13" disabled />
+					<div
+						className="absolute -top-16 left-1/2 -translate-x-1/2 w-44 px-3 py-2 text-sm text-secondary 
+								bg-accent-foreground border rounded-md shadow-md 
+								opacity-0 invisible
+								group-hover:opacity-100 group-hover:visible
+								transition-opacity duration-200
+								delay-500
+								pointer-events-none
+								">Install command is currently disabled
+					</div>
 					{errors.installCommand && <p className="text-sm text-red-500 mt-1">{errors.installCommand.message}</p>}
 					<p className="text-xs text-gray-500 mt-2">
 						Command to install dependencies (e.g., npm install, yarn)

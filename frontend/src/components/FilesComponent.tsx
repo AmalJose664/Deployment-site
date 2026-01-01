@@ -122,7 +122,7 @@ const FilesComponent = ({ projectId, deploymentId, children }: FilesProps) => {
 						{files.map((file, index) => (
 							<div
 								key={index}
-								className="flex items-center justify-between gap-4 py-2 px-3 hover:bg-secondary rounded"
+								className="flex items-center justify-between gap-4 py-1 px-3 hover:bg-secondary rounded"
 							>
 								<div className="flex items-center gap-2 flex-1 min-w-0">
 									<FaRegFileAlt size={16} className="text-less shrink-0" />
@@ -154,7 +154,7 @@ const FileTreeNode = memo(({ node, depth = 0, downloadFile }: FileTreeNodeProps)
 		<div>
 			{node.name !== 'root' && (
 				<button
-					className="flex w-full items-center gap-2 py-1.5 px-2 hover:bg-secondary rounded cursor-pointer"
+					className="flex w-full items-center gap-2 py-1.5 px-2 hover:bg-secondary duration-0! rounded cursor-pointer"
 					style={{ paddingLeft: `${depth * 20 + 8}px` }}
 					onClick={() => setIsOpen(!isOpen)}
 				>
@@ -170,16 +170,14 @@ const FileTreeNode = memo(({ node, depth = 0, downloadFile }: FileTreeNodeProps)
 
 			{isOpen && (
 				<>
-					{/* Render subdirectories */}
 					{Object.values(node.children).map((child: any) => (
 						<FileTreeNode key={child.name} node={child} depth={depth + 1} downloadFile={downloadFile} />
 					))}
 
-					{/* Render files */}
 					{node.files && node.files.map((file: any) => (
 						<div
 							key={file.fullPath}
-							className="flex items-center justify-between gap-2 py-1.5 px-2 hover:bg-secondary rounded"
+							className="flex items-center justify-between gap-2 py-1 px-2 hover:bg-secondary rounded"
 							style={{ paddingLeft: `${(depth + 1) * 20 + 8}px` }}
 						>
 							<div className="flex items-center gap-2 flex-1 min-w-0">

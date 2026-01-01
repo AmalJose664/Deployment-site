@@ -3,7 +3,7 @@
 import { ProjectFormInput } from "@/types/Project"
 import { UseFormReturn } from "react-hook-form"
 
-import { LuFolderTree, LuRocket } from "react-icons/lu";
+import { LuFolderTree, LuGithub, LuRocket } from "react-icons/lu";
 import { FiTerminal } from "react-icons/fi";
 import { IoIosGitBranch } from "react-icons/io";
 import { VscFileCode } from "react-icons/vsc";
@@ -19,8 +19,12 @@ export function ConfigPreview({ form }: { form: UseFormReturn<ProjectFormInput> 
 			hasValue: data.name
 		},
 		{
-			icon: IoIosGitBranch, title: "Repository", desc: `${data.repoURL || "----"} (${data.branch || "main"})`,
-			hasValue: data.branch && data.repoURL
+			icon: LuGithub, title: "Repository", desc: `${data.repoURL || "----"}`,
+			hasValue: data.repoURL
+		},
+		{
+			icon: IoIosGitBranch, title: "Branch", desc: `${data.branch || "main"}`,
+			hasValue: data.branch
 		},
 		{
 			icon: LuFolderTree, title: "Directories", desc: `Root: ${data.rootDir}, Output: ${data.outputDirectory}`,
@@ -36,7 +40,7 @@ export function ConfigPreview({ form }: { form: UseFormReturn<ProjectFormInput> 
 		},
 		{
 			icon: LuRocket,
-			title: "Ready to Launch",
+			title: "Ready to Deploy",
 			desc: "Your project is configured for deployment.",
 			hasValue: form.formState.isValid,
 		},

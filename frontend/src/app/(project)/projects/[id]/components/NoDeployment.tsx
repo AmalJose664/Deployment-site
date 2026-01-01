@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
+import { BsFillCloudPlusFill } from "react-icons/bs"
 import { HiMiniArrowUpRight } from "react-icons/hi2"
-import { LuFolderCode } from "react-icons/lu"
+import { IoMdCloudDone } from "react-icons/io"
+
 
 interface NoDeploymentProps {
 	buttonAction: () => void
@@ -15,11 +17,11 @@ interface NoDeploymentProps {
 const NoDeployment = ({ buttonAction, buttonText, descriptionText, learnMoreUrl, titleText, buttonIcon }: NoDeploymentProps) => {
 
 	return (
-		<div className="border rounded-md  flex items-center justify-center mb-4">
-			<Empty>
+		<div className="border rounded-md  flex items-center justify-center mb-4 relative">
+			<Empty className="z-10 mt-5">
 				<EmptyHeader>
 					<EmptyMedia variant="default">
-						<LuFolderCode />
+						<BsFillCloudPlusFill />
 					</EmptyMedia>
 					<EmptyTitle className="text-primary">{titleText}</EmptyTitle>
 					<EmptyDescription>
@@ -42,6 +44,9 @@ const NoDeployment = ({ buttonAction, buttonText, descriptionText, learnMoreUrl,
 					</a>
 				</Button>
 			</Empty>
+			<div className="absolute">
+				<IoMdCloudDone size={450} className="dark:text-neutral-900/50 text-neutral-200" />
+			</div>
 		</div>
 	)
 }

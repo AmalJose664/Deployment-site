@@ -240,10 +240,20 @@ const Configurations = ({ project, form }: { project: Project, form: UseFormRetu
 									<Input {...register("buildCommand")} />
 									{errors.buildCommand && <p className="text-sm text-red-500 mt-1">{errors.buildCommand.message}</p>}
 								</div>
-								<div className="px-2">
-									<label htmlFor="">Install Command</label>
-									<Input {...register("installCommand")} />
+								<div className="px-2 relative group">
+									<label htmlFor="">Install Commands</label>
+									<Input {...register("installCommand")} disabled />
 									{errors.installCommand && <p className="text-sm text-red-500 mt-1">{errors.installCommand.message}</p>}
+									<div
+										className="absolute -top-16 left-1/6 -translate-x-1/2 w-44 px-3 py-2 text-sm text-secondary 
+								bg-accent-foreground border rounded-md shadow-md 
+								opacity-0 invisible
+								group-hover:opacity-100 group-hover:visible
+								transition-opacity duration-200
+								delay-500
+								pointer-events-none
+								">Editing Install command is currently disabled
+									</div>
 								</div>
 								<div className="px-2">
 									<label htmlFor="">Outputs Directory</label>
@@ -421,7 +431,7 @@ const EnvVariables = ({ project, form }: { project: Project, form: UseFormReturn
 					Update Fields
 				</Button>}
 			</div>
-		</RightFadeComponent >
+		</RightFadeComponent>
 	)
 }
 

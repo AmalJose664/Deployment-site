@@ -179,7 +179,7 @@ export default function BandwidthChart({ projectId, userPlan }: { projectId: str
 								<MdOutlineKeyboardArrowDown size={24} className="text-some-less" />
 								<div
 									className="absolute -top-16 left-1/2 -translate-x-1/2 w-44 px-3 py-2 text-sm text-secondary 
-								bg-white border rounded-md shadow-md 
+								bg-accent-foreground border rounded-md shadow-md 
 								opacity-0 invisible
 								group-hover:opacity-100 group-hover:visible
 								transition-opacity duration-200

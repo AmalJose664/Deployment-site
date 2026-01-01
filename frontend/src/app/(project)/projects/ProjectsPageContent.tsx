@@ -111,7 +111,9 @@ export default function ProjectContent() {
 									/>
 								</nav>
 							</div>
-							<Button onClick={() => router.push("/new")} className="px-4 py-2 rounded-md  text-sm  font-medium flex items-center gap-2 ">
+							<Button onClick={() => router.push("/new")}
+								className="px-4 py-2 rounded-md  text-sm dark:bg-neutral-900 bg-white font-medium flex items-center gap-2 dark:hover:bg-zinc-700 hover:bg-zinc-300 duration-100! 
+								text-primary border hover:border-primary">
 								<FaPlus size={16} />
 								Add New
 							</Button>
@@ -152,7 +154,7 @@ export default function ProjectContent() {
 								return (
 									<div onClick={() => router.push("/projects/" + project._id)}
 										key={project._id}
-										className={cn("dark:bg-neutral-900 bg-white border dark:border-gray-800 border-gray-300 shadow-gray-200 shadow dark:shadow-none  rounded-md p-5 hover:border-blue-500 dark:hover:border-blue-900 transition-all duration-200 group cursor-pointer leading-5", project.isDisabled && "dark:hover:border-red-300 hover:border-red-300")}
+										className={cn("dark:bg-neutral-900 bg-white border dark:border-gray-800 border-gray-300 shadow-gray-200 shadow dark:shadow-none  rounded-sm p-5 hover:border-blue-500 dark:hover:border-blue-900 transition-all duration-200 group cursor-pointer leading-5", project.isDisabled && "dark:hover:border-red-300 hover:border-red-300")}
 									>
 										<div className="flex items-start justify-between mb-4">
 

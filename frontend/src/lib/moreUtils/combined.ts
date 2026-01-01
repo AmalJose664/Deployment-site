@@ -4,7 +4,7 @@ export const timeToSeconds = (time: number | undefined) => {
 	return (time / 1000).toFixed(2) + " s";
 }
 
-export const formatDate = (date: Date | undefined) => {
+export const formatDate = (date: Date | undefined) => { //chat gpt code
 	return new Date(date || 0).toLocaleDateString('en-US', {
 		year: 'numeric',
 		month: 'long',
@@ -12,19 +12,26 @@ export const formatDate = (date: Date | undefined) => {
 	});
 };
 
-export const getElapsedTimeClean = (createdAt: Date | undefined) => {
+export const getElapsedTimeClean = (createdAt: Date | undefined) => { //chat gpt code
 	const now = new Date();
 	const created = new Date(createdAt || 0);
-	const diffTime = Math.abs((now as any) - (created as any));
-	const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-	const diffMonths = Math.floor(diffDays / 30);
 
-	if (diffMonths < 1) return `${diffDays} days`;
-	if (diffMonths < 12) return `${diffMonths} months`;
-	return `${Math.floor(diffMonths / 12)} years`;
+	const diffMs = Math.abs(now.getTime() - created.getTime());
+
+	const minutes = Math.floor(diffMs / (1000 * 60));
+	const hours = Math.floor(diffMs / (1000 * 60 * 60));
+	const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+	const months = Math.floor(days / 30);
+	const years = Math.floor(months / 12);
+
+	if (minutes < 60) return `${minutes} min${minutes !== 1 ? 's' : ''}`;
+	if (hours < 24) return `${hours} hour${hours !== 1 ? 's' : ''}`;
+	if (days < 30) return `${days} day${days !== 1 ? 's' : ''}`;
+	if (months < 12) return `${months} month${months !== 1 ? 's' : ''}`;
+	return `${years} year${years !== 1 ? 's' : ''}`;
 };
 
-export const getElapsedTime = (oldTime: Date | string): string => {
+export const getElapsedTime = (oldTime: Date | string): string => { //chat gpt code
 	const diff = Date.now() - new Date(oldTime).getTime();
 
 	const seconds = Math.floor(diff / 1000);
@@ -39,14 +46,14 @@ export const getElapsedTime = (oldTime: Date | string): string => {
 };
 
 
-export const getGithubBranchUrl = (repoUrl: string, branch: string) => {
+export const getGithubBranchUrl = (repoUrl: string, branch: string) => { //chat gpt code
 	if (repoUrl.includes(".git")) {
 		repoUrl = repoUrl.replace(/\.git$/, "");
 	}
 	return `${repoUrl.replace(/\/$/, '')}/tree/${branch}`;
 }
 
-export const getGithubCommitUrl = (repoUrl: string, commitId: string) => {
+export const getGithubCommitUrl = (repoUrl: string, commitId: string) => { //chat gpt code
 	if (repoUrl.endsWith(".git")) {
 		repoUrl = repoUrl.replace(/\.git$/, "");
 	}
@@ -99,7 +106,7 @@ export const getLevelColor = (level: string) => {
 };
 
 
-export const formatLogTime = (time: string | Date) => {
+export const formatLogTime = (time: string | Date) => {  //chat gpt code
 	const date = new Date(time)
 	let hours = date.getHours()
 	const minutes = date.getMinutes().toString().padStart(2, "0")
@@ -131,7 +138,7 @@ export const BLUE_COLORS = [
 ]
 
 
-export const formatBytes = (size: number): string => {
+export const formatBytes = (size: number): string => { //chat gpt code
 	if (size === 0) return "0 B"
 	const k = 1024;
 	const sizes = ["B", "KB", "MB", "GB"]
@@ -139,7 +146,7 @@ export const formatBytes = (size: number): string => {
 	return `${(size / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
 }
 
-export function parseGitHubRepo(input: string): string[] {
+export function parseGitHubRepo(input: string): string[] { //chat gpt code
 	let str = input.trim();
 	if (str.endsWith("/")) {
 		str = str.slice(0, -1);

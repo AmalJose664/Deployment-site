@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 
-import { projectApis, useGetProjectByIdQuery } from "@/store/services/projectsApi"
+import { projectApis, useGetProjectFullQuery } from "@/store/services/projectsApi"
 import { useCreateDeploymentMutation, useGetDeploymentByIdQuery } from "@/store/services/deploymentApi"
 
 import ErrorComponent from "../../../../components/ErrorComponent"
@@ -30,7 +30,7 @@ export function ProjectPageContainer({ projectId, tab }: ProjectPageContainerPro
 		isError,
 		error,
 		refetch,
-	} = useGetProjectByIdQuery({ id: projectId, params: { include: "user" } })
+	} = useGetProjectFullQuery({ id: projectId, params: { include: "user" } })
 
 	const [createDeployment, { }] = useCreateDeploymentMutation()
 	const [showBuild, setShowBuild] = useState(false)

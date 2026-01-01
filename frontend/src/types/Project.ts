@@ -23,6 +23,7 @@ export interface Project {
 	tempDeployment: string | null;
 	lastDeployment: string | null;
 	isDisabled: boolean;
+	rewriteNonFilePaths: boolean
 	techStack: string;
 	env: {
 		name: string
