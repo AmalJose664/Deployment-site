@@ -33,6 +33,7 @@ export interface IProject extends Document {
 	deployments?: Types.ObjectId[];
 	isDeleted: boolean;
 	isDisabled: boolean;
+	rewriteNonFilePaths: boolean;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -56,6 +57,10 @@ const projectSchema = new Schema<IProject>(
 		lastDeployedAt: { type: Date, default: Date.now() },
 		isDeleted: { type: Boolean, default: false },
 		isDisabled: { type: Boolean, default: false },
+		rewriteNonFilePaths: {
+			type: Boolean,
+			default: false
+		},
 		status: {
 			type: String,
 			required: true,

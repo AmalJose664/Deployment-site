@@ -46,12 +46,14 @@ export const downloadFilesCloud = async (req: Request, res: Response, next: Next
 
 		if (stream instanceof Readable || 'pipe' in stream) {
 			(stream as Readable).pipe(res);
+			console.log("pipe file")
 		} else {
 			const chunks: Uint8Array[] = [];
 			for await (const chunk of stream as AsyncIterable<Uint8Array>) {
 				chunks.push(chunk);
 			}
 			res.send(Buffer.concat(chunks));
+			console.log("Send file")
 		}
 	} catch (error) {
 		if (error instanceof NoSuchKey) {

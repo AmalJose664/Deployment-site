@@ -16,15 +16,7 @@ export const proxy = createProxyMiddleware({
 	agent: (STORAGE_BASE_URL || "").startsWith('https://') ? httpsAgent : httpAgent,
 	...proxyTimeouts,
 	target: STORAGE_BASE_URL,
-	pathRewrite: (path: string, req: Request) => {
-		const { project } = req
-		const reWriteBaseUrl = `${STORAGE_FILES_ENDPOINT}/${project?._id}/${project?.currentDeployment}`
-		console.log(`${reWriteBaseUrl}/index.html`, "-----")
-		if (path === "/" || path === "") {
-			return `${reWriteBaseUrl}/index.html`;
-		}
-		return `${reWriteBaseUrl}${path}`
-	},
+	pathRewrite: proxyRewriteCloud,
 	on: {
 		proxyReq: onProxyReq,
 		proxyRes: onProxyRes,

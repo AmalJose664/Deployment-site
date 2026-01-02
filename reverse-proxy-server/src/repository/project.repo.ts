@@ -18,6 +18,7 @@ class ProjectRepository implements IProjectRepo {
 				isDisabled: 1,
 				currentDeployment: 1,
 				tempDeployment: 1,
+				rewriteNonFilePaths: 1
 			}
 		)
 	}
@@ -31,6 +32,7 @@ class ProjectRepository implements IProjectRepo {
 				isDisabled: 1,
 				currentDeployment: 1,
 				tempDeployment: 1,
+				rewriteNonFilePaths: 1,
 				user: 1
 			}
 		).populate("user", "plan")

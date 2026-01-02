@@ -48,6 +48,7 @@ class ProjectService implements IProjectService {
 			tempDeployment: project?.tempDeployment,
 			isDeleted: project.isDeleted,
 			isDisabled: project.isDisabled,
+			rewriteNonFilePaths: project.rewriteNonFilePaths
 		}
 		this.projectCache.set(slug, projectRefined)
 		return projectRefined as IProject
