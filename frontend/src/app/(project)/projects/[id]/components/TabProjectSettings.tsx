@@ -2,7 +2,6 @@ import { LuEye } from "react-icons/lu";
 import { IoClipboardOutline } from "react-icons/io5";
 import { IoIosClose } from "react-icons/io";
 import { FaPlus } from "react-icons/fa";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 import { Input } from "@/components/ui/input"
 import { Project, ProjectFormInput } from "@/types/Project"
@@ -14,7 +13,7 @@ import { DeleteProjectDialog } from "@/components/modals/DeleteProject";
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button";
 import { AnimatePresence, motion } from "motion/react"
-import { ProjectFormSchema } from "@/lib/schema/project";
+import { ProjectUpdateFormSchema, ProjectUpdateFormType } from "@/lib/schema/project";
 import { Controller, useFieldArray, useForm, UseFormReturn, useFormState, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -55,7 +54,7 @@ const DetailRow = ({ label = "", value = "", isLink = false }: { label?: string,
 );
 
 
-const Details = ({ project, form, branches }: { project: Project, form: UseFormReturn<Omit<ProjectFormInput, "repoURL">>, branches: string[] | null }) => {
+const Details = ({ project, form, branches, }: { project: Project, form: UseFormReturn<ProjectUpdateFormType>, branches: string[] | null }) => {
 	const { errors } = useFormState({
 		control: form.control,
 		name: ['name', 'branch']
@@ -173,7 +172,7 @@ const Details = ({ project, form, branches }: { project: Project, form: UseFormR
 							Save
 						</Button>
 					</>
-				) : <Button onClick={() => changeMode(!isUpdateMode)} className="border ml-4 text-sm px-3 py-1 rounded-md " size="sm">
+				) : <Button onClick={() => changeMode(!isUpdateMode)} className="border ml-4 text-sm px-3 py-1 rounded-md" size="sm">
 					Update Fields
 				</Button>}
 			</div>
@@ -181,7 +180,7 @@ const Details = ({ project, form, branches }: { project: Project, form: UseFormR
 	)
 }
 
-const Configurations = ({ project, form }: { project: Project, form: UseFormReturn<Omit<ProjectFormInput, "repoURL">>, }) => {
+const Configurations = ({ project, form }: { project: Project, form: UseFormReturn<ProjectUpdateFormType>, }) => {
 	const { errors } = useFormState({
 		control: form.control,
 		name: ['rootDir', 'buildCommand', 'installCommand', 'outputDirectory']
@@ -304,12 +303,13 @@ const Configurations = ({ project, form }: { project: Project, form: UseFormRetu
 	)
 }
 
-const EnvVariables = ({ project, form }: { project: Project, form: UseFormReturn<Omit<ProjectFormInput, "repoURL">>, }) => {
+const EnvVariables = ({ project, form }: { project: Project, form: UseFormReturn<ProjectUpdateFormType>, }) => {
 	const { errors } = useFormState({
 		control: form.control,
 		name: ['env']
 	})
 	const { register, control } = form
+
 	const [isUpdateMode, setIsUpdateMode] = useState(false)
 
 	const { fields, append, remove } = useFieldArray({
@@ -435,12 +435,12 @@ const EnvVariables = ({ project, form }: { project: Project, form: UseFormReturn
 	)
 }
 
-const SaveBar = memo(({ control, handleSubmit, saveAndDeploy }: { control: any, handleSubmit: (data: any) => any, saveAndDeploy: (data: Omit<ProjectFormInput, "repoURL">) => void }) => {
+const SaveBar = memo(({ control, handleSubmit, saveAndDeploy }: { control: any, handleSubmit: (data: any) => any, saveAndDeploy: (data: ProjectUpdateFormType) => void }) => {
 	const isDirty = useFormState({ control }).isDirty
-
 	return isDirty ? (
-		<div className="flex ml-auto mr-2 gap-3 items-center">
+		<div className="flex justify-end gap-3 items-center sticky top-0 z-50 bg-background px-6 py-4">
 			{isDirty && <p className="text-sm text-red-300"> unsaved changes</p>}
+
 			<Button
 				type="button"
 				onClick={handleSubmit(saveAndDeploy)}
@@ -462,7 +462,7 @@ const ProjectSettings = ({ project, reDeploy, setTabs }: { project: Project, reD
 	useEffect(() => {
 		getBranches(project.repoURL, setBranches)
 	}, [project.repoURL])
-	const form = useForm<Omit<ProjectFormInput, "repoURL">>({
+	const form = useForm<ProjectUpdateFormType>({
 		defaultValues: {
 			name: project.name,
 			branch: project.branch,
@@ -471,13 +471,14 @@ const ProjectSettings = ({ project, reDeploy, setTabs }: { project: Project, reD
 			rootDir: project.rootDir,
 			outputDirectory: project.outputDirectory,
 			env: project.env,
+			rewriteNonFilePaths: project.rewriteNonFilePaths
 		},
 		resolver: zodResolver(
-			ProjectFormSchema.omit({ repoURL: true })
+			ProjectUpdateFormSchema
 		),
 	});
 	const [updateProject, { isLoading, error, }] = useUpdateProjectMutation()
-	const { handleSubmit, formState: { dirtyFields } } = form
+	const { handleSubmit, formState: { dirtyFields }, register } = form
 
 	function getDirtyValues<T extends Record<string, any>>(
 		dirty: Partial<Record<keyof T, boolean>>,
@@ -492,29 +493,35 @@ const ProjectSettings = ({ project, reDeploy, setTabs }: { project: Project, reD
 				)
 				.filter((entry): entry is [string, T[keyof T]] => entry !== null)
 		) as Partial<T>;
-		if (values?.env?.length !== 0) {
+		// console.log(fields, "fields found --- ",)
+		// console.log(dirty, "dirty ><<<>><<>> ")
+		// console.log(" ANalyse", Object.fromEntries(Object.keys(dirty).map((key) =>
+		// 	dirty[key as keyof T] === true
+		// 		? [key, values[key as keyof T]]
+		// 		: null
+		// ).filter((entry): entry is [string, T[keyof T]] => entry !== null)))
+		if (dirty?.env) {
 			(fields as any).env = values.env
 		}
 		return fields
 	}
 
-	const saveData = async (data: Omit<ProjectFormInput, "repoURL">) => {
+	const saveData = async (data: ProjectUpdateFormType) => {
 		try {
-			const changed = getDirtyValues<Omit<ProjectFormInput, "repoURL">>(dirtyFields as any, data)
-			console.log({ changed, dirtyFields, data })
-
+			const changed = getDirtyValues<ProjectUpdateFormType>(dirtyFields as any, data)
 			await updateProject({ _id: project._id, ...changed }).unwrap()
 			toast.success("Settings saved!")
 			form.reset(data)
 		} catch (error: any) {
 			toast.error("Failed to save ", error.data.message || error.message)
+			console.log(error)
 		}
 	}
 
-	const saveAndDeploy = async (data: Omit<ProjectFormInput, "repoURL">) => {
+	const saveAndDeploy = async (data: ProjectUpdateFormType) => {
 		await saveData(data)
 		await reDeploy()
-		setTabs("project")
+		setTabs("overview")
 	}
 	return (
 		<div className="">
@@ -522,11 +529,9 @@ const ProjectSettings = ({ project, reDeploy, setTabs }: { project: Project, reD
 				<form className="flex flex-col gap-3 p-4" noValidate onSubmit={handleSubmit(saveData)}>
 					<LoadingSpinner2 isLoading={isLoading} />
 					<SaveBar control={form.control} handleSubmit={handleSubmit} saveAndDeploy={saveAndDeploy} />
-
 					<Details project={project} form={form} branches={branches} />
 					<Configurations project={project} form={form} />
 					<EnvVariables project={project} form={form} />
-
 
 					<div
 						id="subdomain"
@@ -543,6 +548,32 @@ const ProjectSettings = ({ project, reDeploy, setTabs }: { project: Project, reD
 								</p>
 							</div>
 							<ChangeProjectSubdomainDialog projectId={project._id} projectName={project.name} currentSubdomain={project.subdomain} />
+						</div>
+					</div>
+					<div
+						id="subdomain"
+						className="dark:bg-neutral-900 bg-white rounded-md py-3 px-5 border mb-3"
+					>
+						<h2 className="text-xl mb-3 font-semibold text-primary">Rewrites</h2>
+						<div className="flex border items-start justify-between p-4 rounded-md">
+							<div>
+								<p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+									Force non file paths to root path
+								</p>
+								<p className="text-xs text-gray-500">
+									Automatically rewrite all routes that don’t match a static file to your app’s root (/).
+									This enables client-side routing for single-page applications (React, Vue, etc.).
+									Requests without a file extension will be served index.html, allowing your frontend router to handle navigation.
+									<br />
+									eg: /dashboard/settings <span className="text-base mx-6">&#8680;</span> /
+								</p>
+							</div>
+							<div className="ml-6 mt-6">
+								<label className="inline-flex items-center cursor-pointer">
+									<input {...(register("rewriteNonFilePaths"))} type="checkbox" className="" />
+								</label>
+							</div>
+
 						</div>
 					</div>
 					<div

@@ -140,8 +140,10 @@ class ProjectService implements IProjectService {
 			...(dto.buildCommand && { buildCommand: dto.buildCommand }),
 			...(dto.rootDir && { rootDir: dto.rootDir }),
 			...(dto.outputDirectory && { outputDirectory: dto.outputDirectory }),
+			...(dto.hasOwnProperty("rewriteNonFilePaths") && { rewriteNonFilePaths: dto.rewriteNonFilePaths }),
 			...(dto.hasOwnProperty("isDisabled") && { isDisabled: dto.isDisabled }),
 			...(dto.env?.length && { env: dto.env.map((en) => ({ name: en.name, value: en.value })) }),
+
 		};
 		console.log(newData, dto);
 		if (!newData || Object.keys(newData).length === 0) {

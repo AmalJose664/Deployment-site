@@ -84,6 +84,7 @@ export const UpdateProjectSchema = z.object({
 		)
 		.catch("/")
 		.optional(),
+	rewriteNonFilePaths: z.boolean().optional(),
 	outputDirectory: z.string().optional(),
 	env: z.array(envSchema).max(100).optional(),
 	isDisabled: z.boolean().optional(),

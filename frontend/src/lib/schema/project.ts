@@ -72,4 +72,6 @@ export const ProjectFormSchema = z.object({
 		.default([])
 		.optional(),
 });
+export const ProjectUpdateFormSchema = ProjectFormSchema.omit({ repoURL: true }).extend({ rewriteNonFilePaths: z.boolean() })
 export type ProjectFormType = z.infer<typeof ProjectFormSchema>
+export type ProjectUpdateFormType = z.infer<typeof ProjectUpdateFormSchema>
