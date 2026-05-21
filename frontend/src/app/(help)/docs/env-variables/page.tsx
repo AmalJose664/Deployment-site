@@ -13,7 +13,7 @@ const page = () => {
 	return (
 		<main className="px-4 space-y-16">
 			<div className="w-full border-b pb-2">
-				<h2 className="text-4xl">Enviroment Variables</h2>
+				<h2 className="text-4xl">Environment Variables</h2>
 			</div>
 			<section id="env-varibles" className="space-y-12">
 				<section id="env-intro" className="scroll-mt-12 border rounded-md overflow-hidden dark:bg-[#101010]/60 bg-white">
@@ -75,7 +75,7 @@ const page = () => {
 				</section>
 
 
-				<section id="env-security" className="scroll-mt-12 border rounded-md overflow-hidden dark:bg-[#101010]/60 bg-white">
+				<section id="env-security" className="scroll-mt-12 border dark:border-amber-500/70 border-amber-500 rounded-md overflow-hidden dark:bg-amber-500/10 bg-amber-500/10">
 					<div className="overflow-x-auto ">
 						<div className="px-4 py-4">
 							<div>
@@ -87,7 +87,7 @@ const page = () => {
 					</div>
 				</section>
 
-				<section className="border px-4 py-2 rounded-md dark:bg-neutral-900 bg-white p-4">
+				<section id="user-configurable" className="border px-4 py-2 rounded-md dark:bg-neutral-900 bg-white p-4">
 					<h2 className="mb-6 text-2xl font-bold tracking-tight text-primary">
 						User-Configurable Environment Variables
 					</h2>

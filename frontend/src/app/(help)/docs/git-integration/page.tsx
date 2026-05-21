@@ -32,11 +32,14 @@ const page = () => {
 						<div className="px-4 py-4">
 							<h2 className="text-xl font-semibold">Supported GitHub Products</h2>
 							<p className="text-sm text-primary mt-4">
-								{SITE_NAME} supports both personal GitHub accounts and organizations. While organization integrations are supported, some configurations may require additional setup and could have limitations.
+								{SITE_NAME} supports both personal GitHub accounts and organizations. However, {SITE_NAME} is optimized for small to medium-sized projects and individual developers.
 							</p>
-							<p className="text-sm text-primary mt-4">{SITE_NAME} currently allows git support for: </p>
+							<p className="text-sm text-primary mt-4">
+								<strong>Organization Limitations:</strong> While you can connect organization repositories, some GitHub organization features may not work as expected. For example, repositories requiring admin approval or specific organization-level permissions may fail to connect or deploy. These are limitations imposed by GitHub's permission model, not {SITE_NAME}.
+							</p>
+							<p className="text-sm text-primary mt-4">{SITE_NAME} currently supports: </p>
 							<ul className="px-3 py-1 list-disc space-y-3 mt-3">
-								<li><LinkComponent href="https://github.com/pricing" newPage>GitHub Free</LinkComponent></li>
+								<li><LinkComponent href="https://github.com/pricing" newPage>GitHub Free (Personal & Organization)</LinkComponent></li>
 							</ul>
 						</div>
 					</div>
@@ -104,6 +107,7 @@ const page = () => {
 									<strong>Setting Enabled:</strong> <CodeComponent>AutoDeployEnabled</CodeComponent> is set to true in your settings.
 								</li>
 							</ul>
+							<p className="text-sm text-primary mt-4">To overide these condition view <LinkComponent href="#github-gi-override">Deploy Controls</LinkComponent></p>
 						</div>
 					</div>
 				</section>
@@ -140,10 +144,18 @@ const page = () => {
 					<div className="px-4 py-4">
 						<h2 className="text-xl font-semibold">Tracking Deployment Progress</h2>
 						<p className="text-sm text-primary mt-4">
-							{SITE_NAME} does not write data back to GitHub, build status icons (checkmarks or crosses) will not appear in your commit history.
+							{SITE_NAME} integrates with GitHub to show real-time deployment status directly in your commit history and pull requests.
 						</p>
 						<p className="text-sm text-primary mt-4">
-							To monitor your build, check the <strong>Deployments</strong> tab within your {SITE_NAME} dashboard. Every push that meets the deployment criteria will generate a new log entry there.
+							<strong>GitHub Status Checks:</strong>
+						</p>
+						<ul className="list-disc list-inside text-sm text-primary mt-2 space-y-1">
+							<li><span className="text-orange-500">●</span> Orange icon - Build in progress</li>
+							<li><span className="text-blue-500">✓</span> Blue checkmark - Deployment successful</li>
+							<li><span className="text-red-500">✗</span> Red X - Build failed</li>
+						</ul>
+						<p className="text-sm text-primary mt-4">
+							You can also monitor detailed build progress in the <strong>Deployments</strong> tab of your {SITE_NAME} dashboard, where you'll find logs, build output, and deployment history for every push.
 						</p>
 					</div>
 				</section>

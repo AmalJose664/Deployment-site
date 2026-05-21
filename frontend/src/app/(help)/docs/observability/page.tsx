@@ -181,7 +181,7 @@ const page = () => {
 									<li><strong>Bandwidth</strong> displays request and
 										response bandwidth usage.
 									</li>
-									<li><strong>Top Pages</strong> highlights the mostrequested paths.</li>
+									<li><strong>Top Pages</strong> highlights the most requested paths.</li>
 									<li><strong>OS Stats</strong> breaks down traffic by
 										operating system and device type.
 									</li>

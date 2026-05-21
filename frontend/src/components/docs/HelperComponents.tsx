@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils"
 import Link from "next/link"
 
 export const CodeComponent = ({ children }: { children: React.ReactNode }) => {
-	return <code className="mx-1 dark:bg-neutral-700 bg-neutral-300 px-1 rounded-xs py-[1px]">{children}</code>
+	return <code className="mx-1 dark:bg-neutral-700 bg-neutral-300 px-1.5 rounded-xs py-[1px] border">{children}</code>
 }
 export const LinkComponent = ({ href, children, newPage, className, asA }: { href: string, asA?: boolean, className?: string, newPage?: boolean, children: React.ReactNode }) => {
 	if (asA) {
