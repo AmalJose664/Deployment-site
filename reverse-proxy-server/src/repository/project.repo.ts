@@ -8,6 +8,35 @@ class ProjectRepository implements IProjectRepo {
 		this.model = projectModel
 	}
 
+	async getProjectById(id: string): Promise<IProject | null> {
+		return await this.model.findById(id,
+			{
+				subdomain: 1,
+				_id: 1,
+				isDeleted: 1,
+				isDisabled: 1,
+				status: 1,
+				currentDeployment: 1,
+				tempDeployment: 1,
+				rewriteNonFilePaths: 1
+			}
+		)
+	}
+	async getProjectByIdWithUser(id: string): Promise<IProject | null> {
+		return await this.model.findById(id,
+			{
+				subdomain: 1,
+				_id: 1,
+				isDeleted: 1,
+				isDisabled: 1,
+				status: 1,
+				currentDeployment: 1,
+				tempDeployment: 1,
+				rewriteNonFilePaths: 1,
+				user: 1
+			}
+		).populate("user", "plan")
+	}
 	async getProjectBySlug(slug: string): Promise<IProject | null> {
 		return await this.model.findOne(
 			{ subdomain: slug },

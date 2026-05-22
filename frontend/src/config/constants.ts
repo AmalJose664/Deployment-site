@@ -15,3 +15,5 @@ export const navbarLinks = [
 	{ name: "Docs", url: "/docs", isOtherLink: false, Icon: '' },
 	{ name: "Showcase", url: "/showcase", isOtherLink: true, hidden: true, Icon: '' },
 ]
+
+export const deploymentUrlPrefix = 'dep--'

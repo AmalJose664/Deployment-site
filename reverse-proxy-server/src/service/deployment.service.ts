@@ -2,7 +2,6 @@ import { redisService } from "../cache/redis.js";
 import { IRedisCache } from "../interfaces/cache/IRedis.js";
 import { IDeploymentRepository } from "../interfaces/repository/IDeploymentRepository.js";
 import { DeploymentResult, IDeploymentService } from "../interfaces/service/IDeploymentService.js";
-import { IDeployment } from "../models/Deployment.js";
 import { deploymentRepo } from "../repository/deployment.repo.js";
 
 // ←
@@ -16,7 +15,8 @@ class DeploymentService implements IDeploymentService {
 	}
 
 	async findDeploymentByPublicId(publicId: string): Promise<DeploymentResult | null> {
-		const dataFromCache = await this.redisCache.get<DeploymentResult>(publicId) || null
+		const cacheKey = `dep-${publicId}`
+		const dataFromCache = await this.redisCache.get<DeploymentResult>(cacheKey) || null
 
 		if (dataFromCache) {
 			return dataFromCache as DeploymentResult
@@ -30,11 +30,12 @@ class DeploymentService implements IDeploymentService {
 			_id: deployment._id.toString(),
 			projectId: deployment.project.toString(),
 		}
-		this.redisCache.set(publicId, deploymentRefined)
+		this.redisCache.set(cacheKey, deploymentRefined)
 		return deploymentRefined
 	}
 	invalidateSlug(publicId: string): boolean {
-		return Boolean(this.redisCache.del(publicId))
+		const cacheKey = `dep-${publicId}`
+		return Boolean(this.redisCache.del(cacheKey))
 	}
 }
 

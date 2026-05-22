@@ -9,4 +9,5 @@ export interface ProjectRefined {
 }
 export interface IProjectService {
 	findProjectBySlug(slug: string): Promise<ProjectRefined | null>
+	findProjectById(id: string): Promise<ProjectRefined | null>
 }

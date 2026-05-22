@@ -24,6 +24,39 @@ class ProjectService implements IProjectService {
 		this.redisCache = redisCache
 	}
 
+	async findProjectById(id: string): Promise<ProjectRefined | null> {
+		const dataFromCache = this.projectCache.get<ProjectRefined>(id) || null
+
+		if (dataFromCache) {
+			return dataFromCache
+		}
+		const project = await this.projectRepository.getProjectByIdWithUser(id)
+		if (!project) {
+			return null
+		}
+		const bw = await this.projectBandwidthRepo.getUserMonthlyBandwidth(project?.user._id)
+		const userPlan = (project.user as any)?.plan || "FREE"
+		const userPlanBw = PLANS[userPlan as keyof IPlans].totalBandwidthGB * (1024 * 1024 * 1024)
+		if (bw > userPlanBw) {
+			throw new AppError("Limit exceed on bandwidth", 403)
+		}
+
+		const projectRefined: ProjectRefined = {
+			_id: project._id.toString(),
+			subdomain: project.subdomain,
+			currentDeployment: project?.currentDeployment,
+			tempDeployment: project?.tempDeployment,
+			isDeleted: project.isDeleted,
+			isDisabled: project.isDisabled,
+			rewriteNonFilePaths: project.rewriteNonFilePaths
+		}
+		if ((project.status === ProjectStatus.BUILDING || project.status === ProjectStatus.QUEUED) && project.tempDeployment) {
+			this.projectCache.set(id, projectRefined, 50)
+			return projectRefined;
+		}
+		this.projectCache.set(id, projectRefined)
+		return projectRefined;
+	}
 	async findProjectBySlug(slug: string): Promise<ProjectRefined | null> {
 		const dataFromCache = this.projectCache.get<ProjectRefined>(slug) || null
 

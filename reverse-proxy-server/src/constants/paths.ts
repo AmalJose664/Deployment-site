@@ -46,4 +46,5 @@ export const STORAGE_FILES_PATH = `${STORAGE_MODE === "cloud"
 // --------------------------------------------------
 export const ownDomain = process.env.OWN_DOMAIN
 
-export const subdomainDelimeter = "--"
+export const deploymentUrlDelimeter = "--"
+export const DEPLOYMENT_PREFIX = `dep${deploymentUrlDelimeter}`;

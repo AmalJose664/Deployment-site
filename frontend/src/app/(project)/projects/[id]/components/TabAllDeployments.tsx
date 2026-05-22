@@ -20,6 +20,7 @@ import ChangeDeploymentModal from "@/components/modals/ChangeDeployment"
 import DeploymentStatusButtons from "@/components/DeploymentStatusButtons"
 import { LoadingSpinner2 } from "@/components/LoadingSpinner"
 import { FaGlobeAmericas } from "react-icons/fa"
+import { deploymentUrlPrefix } from "@/config/constants"
 
 interface AllDeploymentProps {
 	projectId: string;
@@ -170,7 +171,7 @@ const AllDeployments = ({ projectId, subdomain, currentDeployment, repoURL, setT
 								},
 								{
 									title: "Visit Deployment",
-									actionFn: () => window.open(`${window.location.protocol}//${subdomain}--${deployment.publicId}.${process.env.NEXT_PUBLIC_PROXY_SERVER}`),
+									actionFn: () => window.open(`${window.location.protocol}//${deploymentUrlPrefix}${deployment.publicId}.${process.env.NEXT_PUBLIC_PROXY_SERVER}`),
 									isDisabled: deployment.status != ProjectStatus.READY,
 									className: "",
 									Svg: FaGlobeAmericas

@@ -44,6 +44,7 @@ import DeleteDeploymentModal from "@/components/modals/DeleteDeployment";
 import { LinkComponent } from "@/components/docs/HelperComponents";
 import { SiGithub } from "react-icons/si";
 import { AiOutlineRedo } from "react-icons/ai";
+import { deploymentUrlPrefix } from "@/config/constants";
 
 const DeploymentPageContainer = ({ deploymentId }: { deploymentId: string }) => {
 	return (
@@ -195,7 +196,7 @@ const DeploymentPageContent = ({ deploymentId }: { deploymentId: string }) => {
 									)}
 									{!isFailed && deployment.status === ProjectStatus.READY && (
 										<Link
-											href={`${window.location.protocol}//${project.subdomain}--${deployment.publicId}.${process.env.NEXT_PUBLIC_PROXY_SERVER}`}
+											href={`${window.location.protocol}//${deploymentUrlPrefix}${deployment.publicId}.${process.env.NEXT_PUBLIC_PROXY_SERVER}`}
 											target="_blank"
 											className="flex items-center gap-2 px-4 py-1.5 bg-neutral-900 dark:bg-white text-white dark:text-black rounded-md text-xs md:text-sm font-medium hover:opacity-90 transition-opacity"
 										>

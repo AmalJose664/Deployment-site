@@ -25,7 +25,7 @@ class RedisService implements IRedisCache {
 		if (ttlSeconds) {
 			await this.client.set(key, data, 'EX', ttlSeconds);
 		} else {
-			await this.client.set(key, data, "EX", 1800);
+			await this.client.set(key, data, "EX", 900);
 		}
 	}
 

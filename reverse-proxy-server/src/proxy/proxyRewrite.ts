@@ -10,7 +10,7 @@ export const proxyRewriteLocal = (path: string, req: Request) => {
 
 
 export const proxyRewriteCloud = (path: string, req: Request) => {
-	const { project, isManualDeployment, manualDeploymentId } = req
+	const { project, isManualDeploymentSelection: isManualDeployment, manualDeploymentId } = req
 
 	const deploymentTobeSelected = isManualDeployment ? manualDeploymentId : project?.currentDeployment
 

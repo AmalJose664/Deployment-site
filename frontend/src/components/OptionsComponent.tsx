@@ -8,6 +8,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
+import { useState } from "react"
 import { FiMoreHorizontal } from "react-icons/fi"
 
 interface OptionsComponentProps {
@@ -23,11 +24,12 @@ interface OptionsComponentProps {
 	}[]
 }
 const OptionsComponent = ({ options, parentClassName, iconSize, className }: OptionsComponentProps) => {
+	const [open, setOpen] = useState(false)
 	return (
 		<div className={cn("mr-4", className)}>
-			<DropdownMenu>
+			<DropdownMenu open={open} onOpenChange={setOpen}>
 				<DropdownMenuTrigger asChild>
-					<button className="p-2 hover:bg-secondary rounded-lg transition-colors border !duration-150">
+					<button className={cn("p-2 hover:bg-secondary rounded-lg transition-colors border !duration-150", open && "dark:bg-neutral-600 bg-neutral-400")}>
 						<FiMoreHorizontal size={iconSize || 20} />
 					</button>
 				</DropdownMenuTrigger>
@@ -36,7 +38,10 @@ const OptionsComponent = ({ options, parentClassName, iconSize, className }: Opt
 					<DropdownMenuGroup className="space-y-1 m-1">
 						{options.map(({ Svg, ...opt }, index) => (
 							<DropdownMenuItem disabled={opt.isDisabled} key={index} className={cn(opt.className,
-								"cursor-pointer border border-transparent dark:hover:border-neutral-700 hover:border-neutral-300")} onClick={opt.actionFn}>
+								"cursor-pointer border border-transparent dark:hover:border-neutral-700 hover:border-neutral-300")} onClick={() => {
+									opt.actionFn?.()
+									setOpen(false)
+								}}>
 								{opt.title}
 								{Svg && <Svg />}
 							</DropdownMenuItem>
