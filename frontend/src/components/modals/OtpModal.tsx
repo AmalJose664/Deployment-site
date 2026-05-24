@@ -18,6 +18,7 @@ import axiosInstance from "@/lib/axios"
 import { showToast } from "../Toasts"
 const OtpModal = ({ userEmail, setShowOtpForm, showOtpForm }: { userEmail: string, showOtpForm: boolean, setShowOtpForm: Dispatch<SetStateAction<boolean>> }) => {
 	const [otp, setOtp] = useState<string>("");
+	const [isLoading, setIsLoading] = useState(false);
 	const resentSeconds = 50
 	const [resendCountdown, setResendCountdown] = useState(resentSeconds);
 
@@ -56,6 +57,7 @@ const OtpModal = ({ userEmail, setShowOtpForm, showOtpForm }: { userEmail: strin
 			if (!userEmail) {
 				showToast.error("Email not found")
 			}
+			setIsLoading(true)
 			const response = await axiosInstance.post("/auth/verify-otp", {
 				otp: Number(otp),
 				email: userEmail
@@ -66,6 +68,8 @@ const OtpModal = ({ userEmail, setShowOtpForm, showOtpForm }: { userEmail: strin
 			}
 		} catch (error: any) {
 			showToast.error("Error ", error.response.data.message)
+		} finally {
+			setIsLoading(false)
 		}
 	};
 	return (
@@ -122,10 +126,10 @@ const OtpModal = ({ userEmail, setShowOtpForm, showOtpForm }: { userEmail: strin
 						</Button>
 						<Button
 							onClick={handleVerify}
-							disabled={otp.length !== 6}
+							disabled={otp.length !== 6 || isLoading}
 							className="flex-1 sm:flex-none sm:min-w-24"
 						>
-							Continue
+							{isLoading ? "Loading" : "Continue"}
 						</Button>
 					</DialogFooter>
 				</DialogContent>

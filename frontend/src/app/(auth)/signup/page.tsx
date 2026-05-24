@@ -159,17 +159,25 @@ function EmailMethodBox({ setToggleEmail }: { setToggleEmail: Dispatch<SetStateA
 	const showOtpModalButn = useRef(false)
 	const onSubmit = async (data: SignUpUserType) => {
 		try {
+
+			setError(null)
 			const response = await axiosInstance.post("/auth/signup", data)
 			if (response.status === 201) {
 				setShowOtpForm(true)
 				showOtpModalButn.current = true
 			}
-			setError(null)
 			return
 		} catch (error: any) {
 			console.log("Error!", error)
 			setError(error.response.data.message)
 		}
+	}
+	let buttonText = "Sign Up";
+
+	if (isSubmitting) {
+		buttonText = "Loading...";
+	} else if (error) {
+		buttonText = "Try Again";
 	}
 	return (
 		<motion.div key={"inputs-component"} animate={{ y: 0 }} exit={{ y: 400 }} initial={{ y: 400 }} transition={{ duration: .8, ease: "backInOut" }}>
@@ -230,12 +238,12 @@ function EmailMethodBox({ setToggleEmail }: { setToggleEmail: Dispatch<SetStateA
 					</div>}
 
 					<div className="group mt-8">
-						<button type="submit" disabled={isSubmitting} className="dark:bg-background bg-white dark:hover:bg-gray-200  hover:bg-gray-800 border-zinc-300 dark:border-zinc-600 
+						<button type="submit" disabled={isSubmitting || (isSubmitSuccessful && !error)} className="dark:bg-background bg-white dark:hover:bg-gray-200  hover:bg-gray-800 border-zinc-300 dark:border-zinc-600 disabled:cursor-not-allowed!
 						hover:border-zinc-500   w-full inline-flex items-center justify-center px-4 py-3 border font-semibold rounded-lg shadow-md transition-colors duration-100 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 focus:ring-offset-gray-900 !transition-none">
 							<MdOutlineEmail className='mr-2 text-primary dark:group-hover:text-black group-hover:text-white' />
 							<span className="text-primary text-sm dark:group-hover:text-black group-hover:text-white"
 							>
-								{isSubmitSuccessful ? "Redirecting..." : ((isSubmitting) ? "Loading..." : "Sign Up")}</span>
+								{buttonText}</span>
 						</button>
 					</div>
 				</form>
