@@ -25,7 +25,7 @@ export const generateAccessToken = (user: Express.User | undefined) => {
 			plan: user?.plan,
 		},
 		ENVS.ACCESS_TOKEN_SECRET as string,
-		{ expiresIn: ENVS.NODE_ENV === "production" ? "15m" : "2h" },
+		{ algorithm: "HS256", expiresIn: ENVS.NODE_ENV === "production" ? "15m" : "2h" },
 	);
 	return token;
 };
@@ -45,7 +45,7 @@ export const generateRefreshToken = (user: Express.User | undefined, refreshToke
 			oIAT: refreshTokenOptions.originalIssuedAt,
 		},
 		ENVS.REFRESH_TOKEN_SECRET as string,
-		{ expiresIn: "1d" },
+		{ algorithm: "HS256", expiresIn: "1d" },
 	);
 	return token;
 };
@@ -60,7 +60,7 @@ export const generateOtpToken = (userId: string) => {
 			purpose: "OTP_resend",
 		},
 		ENVS.VERIFICATION_TOKEN_SECRET as string,
-		{ expiresIn: "20m" },
+		{ algorithm: "HS256", expiresIn: "20m" },
 	);
 	return token;
 };

@@ -79,7 +79,11 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
 		return;
 	}
 	try {
-		const decoded = jwt.verify(refreshToken, ENVS.REFRESH_TOKEN_SECRET as string) as RefresheTokenType;
+		const decoded = jwt.verify(refreshToken, ENVS.REFRESH_TOKEN_SECRET as string,
+			{
+				algorithms: ["HS256"],
+			}
+		) as RefresheTokenType;
 
 		console.log("Trying to decode refesh", decoded);
 		const user = await userService.getUser(decoded.id);
@@ -240,7 +244,11 @@ export const resendOtp = async (req: Request, res: Response, next: NextFunction)
 			res.status(STATUS_CODES.BAD_REQUEST).json({ message: "Cant send otp, insufficient data" });
 			return;
 		}
-		const decoded = jwt.verify(otpCookie, ENVS.VERIFICATION_TOKEN_SECRET as string) as { id: string };
+		const decoded = jwt.verify(otpCookie, ENVS.VERIFICATION_TOKEN_SECRET as string,
+			{
+				algorithms: ["HS256"],
+			}
+		) as { id: string };
 		const { id } = decoded;
 
 		const result = await userService.resentOtp(id || "---");

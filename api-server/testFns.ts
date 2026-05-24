@@ -192,4 +192,54 @@ async function gitPushStatusChanger() {
 	const check = await res.json();
 	console.log({ check });
 }
-gitPushStatusChanger();
+//gitPushStatusChanger();
+
+
+function generateOTP(length = 6) {
+	return Math.floor(10 ** (length - 1) + Math.random() * 9 * 10 ** (length - 1));
+}
+
+
+async function sendEmailOTP(email) {
+	const otp = generateOTP();
+
+	try {
+		const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				"api-key": ""
+			},
+			body: JSON.stringify({
+				sender: {
+					name: "Your App",
+					email: "callbackff200002@gmail.com"
+				},
+				to: [
+					{ email: email }
+				],
+				subject: "Your OTP Code",
+				htmlContent: `
+          <div style="font-family: Arial; padding: 10px;">
+            <h2>Your OTP Code</h2>
+            <p>Your OTP is:</p>
+            <h1 style="letter-spacing: 5px;">${otp}</h1>
+            <p>This code is valid for 5 minutes.</p>
+          </div>
+        `
+			})
+		});
+
+		const data = await response.json();
+
+		if (!response.ok) {
+			throw new Error(JSON.stringify(data));
+		}
+
+		console.log("OTP email sent:", data);
+		return otp; // store in DB/cache for verification
+	} catch (error) {
+		console.error("Error sending OTP:", error.message);
+	}
+}
+sendEmailOTP("renderstest446446@gmail.com")

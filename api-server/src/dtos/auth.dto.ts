@@ -1,7 +1,7 @@
 import z from "zod";
 
 export const SignUpSchema = z.object({
-	name: z.string().min(3).max(30),
+	name: z.string().min(3).max(30).regex(/^[^\p{Emoji_Presentation}\p{Extended_Pictographic}]*$/u, "Name cannot contain emojis"),
 	email: z.email(),
 	password: z.string().min(8).max(64).regex(/\d/, "Password must contain at least one number"),
 });

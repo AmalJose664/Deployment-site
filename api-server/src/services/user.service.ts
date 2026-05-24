@@ -94,7 +94,7 @@ class UserService implements IUserSerivce {
 		const otp = await this.otpService.createNew(newUser._id, OtpPurposes.SIGNUP);
 		const sendResult = await this.otpService.sendOtp(newUser.email, newUser.name, otp.otp);
 		if (!sendResult.ok) {
-			throw new AppError("OTP Sent Error", 500);
+			throw new AppError("Error on senting OTP; Please try other methods", 500);
 		}
 		const resultData = await sendResult.json();
 

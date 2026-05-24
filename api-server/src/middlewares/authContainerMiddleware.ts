@@ -14,7 +14,9 @@ export const authenticaContainerToken = (req: Request, res: Response, next: Next
 			return res.status(STATUS_CODES.UNAUTHORIZED).json({ message: USER_ERRORS.NO_TOKEN });
 		}
 
-		const decoded = jwt.verify(serviceToken, ENVS.SERVICE_JWT_SECRET) as { pId: string; dId: string };
+		const decoded = jwt.verify(serviceToken, ENVS.SERVICE_JWT_SECRET, {
+			algorithms: ["HS256"],
+		}) as { pId: string; dId: string };
 		// console.log(decoded);
 		const server_token = ENVS.CONTAINER_API_TOKEN;
 		if (containerToken !== server_token) {

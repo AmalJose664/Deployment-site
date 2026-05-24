@@ -13,7 +13,7 @@ interface DecodedUser {
 
 declare global {
 	namespace Express {
-		interface User extends DecodedUser {}
+		interface User extends DecodedUser { }
 		interface Request {
 			validatedQuery?: any;
 			validatedBody?: any;
@@ -30,7 +30,9 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
 		return;
 	}
 	try {
-		const decoded = jwt.verify(token, ENVS.ACCESS_TOKEN_SECRET as string) as DecodedUser;
+		const decoded = jwt.verify(token, ENVS.ACCESS_TOKEN_SECRET as string, {
+			algorithms: ["HS256"],
+		}) as DecodedUser;
 		req.user = decoded;
 		if (!req.user) {
 			res.status(STATUS_CODES.UNAUTHORIZED).json({ message: USER_ERRORS.LOGIN_REQUIRED });

@@ -15,7 +15,11 @@ export const decodeGhbStateValue = async (req: Request, res: Response, next: Nex
 		if (!stateValue) {
 			throw new WebhookError(WEBHOOK_ERRORS.INCOMPLE_DATA, STATUS_CODES.BAD_REQUEST);
 		}
-		const decoded = jwt.verify(stateValue, ENVS.GITHUB_CLIENT_ID + ENVS.GITHUB_WEBHOOK_SECRET);
+		const decoded = jwt.verify(stateValue, ENVS.GITHUB_CLIENT_ID + ENVS.GITHUB_WEBHOOK_SECRET,
+			{
+				algorithms: ["HS256"],
+			}
+		);
 		req.body = decoded;
 		next();
 	} catch (error: any) {

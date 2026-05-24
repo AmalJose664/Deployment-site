@@ -19,7 +19,7 @@ export const CreateProjectSchema = z.object({
 	ghRepoId: z.number().optional(),
 	provider: z.enum(ProjectProvider),
 	isPrivate: z.boolean(),
-	name: z.string().min(3, "Name should not exceed 3 charecters").max(50, "Name max 50 characters"),
+	name: z.string().min(3, "Name should not exceed 3 charecters").max(50, "Name max 50 characters").regex(/^[^\p{Emoji_Presentation}\p{Extended_Pictographic}]*$/u, "Name cannot contain emojis"),
 	repoURL: z
 		.string()
 		.regex(
