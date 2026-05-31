@@ -61,3 +61,9 @@ Deployment-site
 git clone https://github.com/AmalJose664/Deployment-site.git
 cd Deployment-site
 ```
+
+<br>
+<br><br><br><br>
+## 🛠 Understanding
+
+![Lynfera Architecture](./assets/understanding.lynfera.png)
