@@ -2,8 +2,10 @@ import { Kafka } from "kafkajs";
 
 export const kafka = new Kafka({
 	clientId: `reverse-proxy-server`,
-	brokers: ["pkc-l7pr2.ap-south-1.aws.confluent.cloud:9092"],
-	ssl: true,
+	brokers: process.env.KAFKA_BROKERS?.split(",").filter(Boolean) as string[],
+	ssl: {
+		ca: process.env.KAFKA_CA?.replace(/\\n/g, "\n")
+	},
 	sasl: {
 		mechanism: "plain",
 		username: process.env.KAFKA_USERNAME as string,

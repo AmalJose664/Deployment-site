@@ -30,8 +30,10 @@ const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 
 const kafkaClient = new Kafka({
 	clientId: `docker-build-server-tester-${PROJECT_ID}-${DEPLOYMENT_ID}`,
-	brokers: ["pkc-l7pr2.ap-south-1.aws.confluent.cloud:9092"],
-	ssl: true, // or key
+	brokers: ["kafka-lynfera-renderstest446446-7987.f.aivencloud.com:11100"],
+	ssl: {
+		ca: process.env.KAFKA_CA,
+	}, // or key
 	sasl: {
 		mechanism: "plain",
 		username: process.env.KAFKA_USERNAME,

@@ -31,13 +31,6 @@
  *   - INSTALLATION_ACCESS_TOKEN – GitHub App installation token (private repos).
  *   - GIT_COMMIT_DATA      – Pre-fetched commit hash + message ("hash||msg").
  *   - CLOUD_BUCKET         – S3 bucket name for build artifact storage.
- *   Secrets passed via stdin (see cleanEnv / main.sh):
- *   - CONTAINER_API_TOKEN  – Token for authenticating with the API server.
- *   - CLOUD_ACCESSKEY      – S3-compatible storage access key.
- *   - CLOUD_SECRETKEY      – S3-compatible storage secret key.
- *   - CLOUD_ENDPOINT       – S3-compatible storage endpoint URL.
- *   - KAFKA_USERNAME        – Kafka SASL username.
- *   - KAFKA_PASSWORD        – Kafka SASL password.
  *
  * User-controlled build settings (set via project environment variables):
  *   - LYNFERA_SETTING_SKIP_INSTALL          – Skip npm install entirely.
@@ -2078,12 +2071,14 @@ async function init() {
  * @param {{ token: string }} otherScrts - API server container token.
  */
 function createClients(input) {
-	const { kUid, kPass, aKey, aSecret, cldEndpoint } = input;
+	const { kUid, kPass, kCa, aKey, aSecret, cldEndpoint } = input;
 
 	const kafkaClient = new Kafka({
 		clientId: `docker-build-server-${PROJECT_ID}-${DEPLOYMENT_ID}`,
-		brokers: ["pkc-l7pr2.ap-south-1.aws.confluent.cloud:9092"],
-		ssl: true, // or key
+		brokers: ["kafka-lynfera-renderstest446446-7987.f.aivencloud.com:11100"],
+		ssl: {
+			ca: kCa
+		}, // or key
 		sasl: {
 			mechanism: "plain",
 			username: kUid,
@@ -2109,7 +2104,7 @@ function createClients(input) {
  * Wires up the Kafka producer and S3 client, scrubs credentials from memory,
  * then delegates to init() to run the build pipeline.
  *
- * @param {{ kUid: string, kPass: string, aKey: string, aSecret: string, cldEndpoint: string }} external
+ * @param {{ kUid: string, kPass: string, kCa: string, aKey: string, aSecret: string, cldEndpoint: string }} external
  * @param {{ token: string }} otherScrts
  */
 async function starterFunc(external, otherScrts) {
@@ -2118,8 +2113,6 @@ async function starterFunc(external, otherScrts) {
 	s3Client = s3;
 	external = null;
 	API_SERVER_CONTAINER_API_TOKEN = otherScrts.token;
-
-
 	deleteEnvs()
 	await init();
 	console.log("--------------END-------------")
@@ -2186,24 +2179,18 @@ function readStdin() {
  * Parses and validates the six newline-delimited secrets read from stdin.
  *
  * Expected order (matching main.sh printf output):
- *   1. CONTAINER_API_TOKEN
- *   2. CLOUD_ACCESSKEY
- *   3. CLOUD_SECRETKEY
- *   4. CLOUD_ENDPOINT
- *   5. KAFKA_USERNAME
- *   6. KAFKA_PASSWORD
  *
  * @param {string} input - Raw stdin string.
- * @returns {string[]} Array of exactly 6 secret strings.
- * @throws {Error} If the input does not contain exactly 6 non-empty lines.
+ * @returns {string[]} Array of exactly 7 secret strings.
+ * @throws {Error} If the input does not contain exactly 7 non-empty lines.
  */
 function cleanEnv(input = "") {
 	const scrts = input.trimEnd().split(/\r?\n/);
-
-	let [token, aKey, aSecret, cldEndpoint, kUid, kPass] = scrts
+	scrts[6] = scrts[6].replace(/\\n/g, "\n")
+	let [token, aKey, aSecret, cldEndpoint, kUid, kPass, kCa] = scrts
 	let isError = false
-	if (!scrts || scrts.length !== 6) {
-		throw new Error("Invalid configs given, required 6, given " + scrts.length)
+	if (!scrts || scrts.length !== 7) {
+		throw new Error("Invalid configs given, required 7, given " + scrts.length)
 	}
 	if (!token) {
 		isError = true
@@ -2228,6 +2215,10 @@ function cleanEnv(input = "") {
 	if (!kPass) {
 		isError = true
 		console.log(" kpass not found ")
+	}
+	if (!kCa) {
+		isError = true
+		console.log(" k CA Cert not found ")
 	}
 	if (isError) {
 		throw new Error("Some secrets missing")
@@ -2256,14 +2247,14 @@ function cleanEnv(input = "") {
 
 			const scrts = cleanEnv(input)
 
-			let [token, aKey, aSecret, cldEndpoint, kUid, kPass] = scrts
+			let [token, aKey, aSecret, cldEndpoint, kUid, kPass, kCa] = scrts
 
 			// const externalScrts = { aKey: process.env.CLOUD_ACCESSKEY, aSecret: process.env.CLOUD_SECRETKEY, kUid: process.env.KAFKA_USERNAME, kPass: process.env.KAFKA_PASSWORD }
 			// const otherScrts = { token: process.env.CONTAINER_API_TOKEN, cldEndpoint: process.env.CLOUD_ENDPOINT }
 			// console.log(scrts)
-			const externalScrts = { aKey, aSecret, kUid, kPass, cldEndpoint }
+			const externalScrts = { aKey, aSecret, kUid, kPass, kCa, cldEndpoint }
 			const otherScrts = { token }
-			scrts.length = 0; token = ""; aKey = ""; aSecret = ""; cldEndpoint = ""; kUid = ""; kPass = ""
+			scrts.length = 0; token = ""; aKey = ""; aSecret = ""; cldEndpoint = ""; kUid = ""; kPass = ""; kCa = "";
 
 			await starterFunc(externalScrts, otherScrts)
 			await shutdown(0, "completed");

@@ -73,8 +73,10 @@ async function mongodbData() {
 async function commitAllMessages() {
 	const kafka = new Kafka({
 		clientId: `api-server`,
-		brokers: ["pkc-l7pr2.ap-south-1.aws.confluent.cloud:9092"],
-		ssl: true,
+		brokers: ["kafka-lynfera-renderstest446446-7987.f.aivencloud.com:11100"],
+		ssl: {
+			ca: process.env.KAFKA_CA?.replace(/\\n/g, "\n")
+		},
 		sasl: {
 			mechanism: "plain",
 			username: process.env.KAFKA_USERNAME as string,
@@ -83,7 +85,7 @@ async function commitAllMessages() {
 	});
 
 	const topic = "deployment.logs";
-	const groupId = "vercel-logs-group";
+	const groupId = "lynfera-logs-group";
 	const admin = kafka.admin();
 	await admin.connect();
 
@@ -242,4 +244,4 @@ async function sendEmailOTP(email) {
 		console.error("Error sending OTP:", error.message);
 	}
 }
-sendEmailOTP("renderstest446446@gmail.com")
+// sendEmailOTP("renderstest446446@gmail.com")

@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import { kafka } from "../config/kafka.config.js";
 
 
-const DEPLOYMENT_IDS = ["69dd44ce0c263cbd29a2cc66"];
+const DEPLOYMENT_IDS = ["69f79d08fecb57b0ee0d62e6"];
 const PROJECT_IDS = ["69b692161c4fecb9419d4a79"];
 const LOG_LEVELS = ["info", "warn", "error", "decor"];
 const STREAMS = ["stdout", "stderr"];
@@ -46,7 +46,7 @@ export const producer = kafka.producer();
 async function connectFN() {
 	await producer.connect();
 }
-connectFN()
+connectFN().then(() => console.log("Connected"))
 export async function produceTestLogs(req: Request, res: Response) {
 
 
@@ -71,8 +71,6 @@ export async function produceTestLogs(req: Request, res: Response) {
 	} catch (err) {
 		console.error("Kafka produce error:", err);
 		res.status(500).json({ success: false, error: String(err) });
-	} finally {
-
 	}
 }
 

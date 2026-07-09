@@ -29,8 +29,10 @@ const projectId = process.env.PROJECT_ID;
 const deploymentId = process.env.DEPLOYMENT_ID;
 const kafka = new Kafka({
 	clientId: `build-server-error-handler-${projectId}-${deploymentId}`,
-	brokers: ["pkc-l7pr2.ap-south-1.aws.confluent.cloud:9092"],
-	ssl: true,
+	brokers: ["kafka-lynfera-renderstest446446-7987.f.aivencloud.com:11100"],
+	ssl: {
+		ca: process.env.KAFKA_CA
+	},
 	sasl: {
 		username: process.env.KAFKA_USERNAME,
 		password: process.env.KAFKA_PASSWORD,

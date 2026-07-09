@@ -3,7 +3,9 @@ export function validateEnv() {
 		"MONGO_URL",
 		"OWN_DOMAIN",
 		"KAFKA_USERNAME",
+		"KAFKA_BROKERS",
 		"KAFKA_PASSWORD",
+		"KAFKA_CA",
 		"STORAGE_MODE", // either cloud or local, use local for your own s3 like storage server, 
 		// eg "https://github.com/AmalJose664/Deployment-site/tree/main/test-server"
 		// Or use cloud storage like s3 or cloduflare r2 or any other

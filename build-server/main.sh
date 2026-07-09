@@ -14,18 +14,15 @@
 #
 # Credential order passed to builder.js via stdin (must match cleanEnv() in
 # builder.js):
-#   Line 1: CONTAINER_API_TOKEN
-#   Line 2: CLOUD_ACCESSKEY
-#   Line 3: CLOUD_SECRETKEY
-#   Line 4: CLOUD_ENDPOINT
-#   Line 5: KAFKA_USERNAME
-#   Line 6: KAFKA_PASSWORD
 #
 # The .env file is expected to be present at /app/.env inside the container,
 # mounted or written by the API server before the container starts.
 # =============================================================================
 
-export $(cat ./.env | xargs)
+set -a
+source ./.env
+set +a
+
 token="${CONTAINER_API_TOKEN}"
 unset CONTAINER_API_TOKEN  # Remove from env immediately after capture
 
@@ -35,18 +32,21 @@ skey="${CLOUD_SECRETKEY}"
 unset CLOUD_SECRETKEY
 endpoint="${CLOUD_ENDPOINT}"
 unset CLOUD_ENDPOINT
-
 kuser="${KAFKA_USERNAME}"
 unset KAFKA_USERNAME
 kpass="${KAFKA_PASSWORD}"
 unset KAFKA_PASSWORD
+kca="${KAFKA_CA}"
+unset KAFKA_CA
 
 echo "Starting deployment.."
-# Pipe all six secrets to builder.js via stdin in the expected order.
+# Pipe all seven secrets to builder.js via stdin in the expected order.
 # builder.js reads them with readStdin() / cleanEnv() and zeroes them out
 # after use.
-printf "%s\n%s\n%s\n%s\n%s\n%s\n" \
-  "$token" "$akey" "$skey" "$endpoint" "$kuser" "$kpass" | node /app/builder.js --env-file=.env
+printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n" \
+  "$token" "$akey" "$skey" "$endpoint" "$kuser" "$kpass" "$kca" | node /app/builder.js --env-file=.env
+# printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n" \
+#   "$token" "$akey" "$skey" "$endpoint" "$kuser" "$kpass" "$kca" | node builder.js --env-file=.env
 
 # printf "%s\n" \
 #   "no token" | node /app/builder.js

@@ -21,25 +21,25 @@ export const EVENT_REGISTRY = {
 		"deployment.logs": {
 			mode: "batch",
 			topic: "deployment.logs", // <------- Actual kafka topic name
-			handler: DeploymentEventHandler.handleLogsBatch,
+			handler: DeploymentEventHandler.handleLogsBatch,    //  Saves logs to DB as batch
 			schema: DeploymentLogEventSchema,
-			processFn: DeploymentEventHandler.handlerMessageEmitting,
-			consumer: consumerLogsMessages,
+			processFn: DeploymentEventHandler.handlerMessageEmitting, // Emits logs to other instances and frontend
+			consumer: consumerLogsMessages,   // consumer
 		},
 		"deployment.updates": {
 			mode: "single",
 			topic: "deployment.updates", // <------- Actual kafka topic name
-			handler: DeploymentEventHandler.handleUpdates,
-			processFn: processLogUpdates,
+			handler: DeploymentEventHandler.handleUpdates,   // Emits updates received to other instances, frontend and also to DB
 			schema: DeploymentUpdatesEventSchema,
-			consumer: consumerLogsUpdates,
+			processFn: processLogUpdates,     // Validates updates received and then passes to processFn
+			consumer: consumerLogsUpdates,    // consumer
 		},
 	},
 	analytics: {
 		"project.analytics": {
 			mode: "batch",
 			topic: "project.analytics", // <------- Actual kafka topic name
-			handler: ProjectAnalyticsHandler.handleDataBatch,
+			handler: ProjectAnalyticsHandler.handleDataBatch,  // Add analytics to DB as batch
 			schema: analyticsEventSchema,
 			consumer: consumerAnalyticsProjects,
 		},
@@ -113,15 +113,15 @@ async function consumerLogsUpdates(
 			const data = JSON.parse(msg.value?.toString() as any);
 
 			await config.processFn(data, config);
-			resolveOffset(msg.offset);
+			// resolveOffset(msg.offset);
 			lastOffset = msg.offset;
 		} catch (error: any) {
 			console.error("Failed to process message:", error); // send to dlq task-------, Not best to discard the data, Use dlqs for error handling
-			resolveOffset(msg.offset);
+			// resolveOffset(msg.offset);
 			lastOffset = msg.offset;
 		}
 	}
-	lastOffset && commitOffsetsIfNecessary(lastOffset as unknown as Offsets);
+	// lastOffset && commitOffsetsIfNecessary(lastOffset as unknown as Offsets);
 	await heartbeat();
 }
 
@@ -151,16 +151,16 @@ async function consumerLogsMessages(
 			logsCollectedFromBatch.push(mappedData);
 			if (index % 50 === 0) await heartbeat();
 			config.processFn(parsedData, config);
-			resolveOffset(msg.offset);
+			// resolveOffset(msg.offset);
 		} catch (error: any) {
 			console.error("Failed to process message:", error); // send to dlq task-------
-			resolveOffset(msg.offset);
+			// resolveOffset(msg.offset);
 		}
 		index += 1;
 	}
 
 	config.handler(logsCollectedFromBatch, false);
-	commitOffsetsIfNecessary();
+	// commitOffsetsIfNecessary();
 	await heartbeat();
 }
 

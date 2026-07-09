@@ -31,16 +31,20 @@ class KafkaEventConsumer implements IKafkaEventConsumer {
 			console.log(" Kafka consumers connected");
 
 			const [logsTopics, analyticsTopics] = getAllTopics();
-			await this.logsConsumer.subscribe({ topics: logsTopics });
+			await this.logsConsumer.subscribe({ topics: logsTopics, });
 			await this.analyticsConsumer.subscribe({ topics: analyticsTopics });
 			console.log(` Subscribed to topics:`, [...logsTopics, ...analyticsTopics]);
 
 			await this.logsConsumer.run({
-				autoCommit: false,
+				autoCommit: true,
+				autoCommitInterval: 10000,
+				eachBatchAutoResolve: true,
 				eachBatch: universalKafkaHandler,
 			});
 			await this.analyticsConsumer.run({
 				autoCommit: true,
+				autoCommitInterval: 10000,
+				eachBatchAutoResolve: true,
 				eachBatch: universalKafkaHandler,
 			});
 

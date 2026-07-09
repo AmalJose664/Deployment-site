@@ -37,6 +37,8 @@ const envSchema = z.object({
 
 	KAFKA_USERNAME: z.string(),
 	KAFKA_PASSWORD: z.string(),
+	KAFKA_CA: z.string().transform((i) => i.replace(/\\n/g, "\n")),
+	KAFKA_BROKERS: z.string(),
 
 	CLICKHOUSE_USERNAME: z.string(),
 	CLICKHOUSE_PASSWORD: z.string(),

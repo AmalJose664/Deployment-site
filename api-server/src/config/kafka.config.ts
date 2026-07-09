@@ -3,8 +3,10 @@ import { Kafka } from "kafkajs";
 
 export const kafka = new Kafka({
 	clientId: `api-server`,
-	brokers: ["pkc-l7pr2.ap-south-1.aws.confluent.cloud:9092"],
-	ssl: true,
+	brokers: ENVS.KAFKA_BROKERS.split(",").filter(Boolean),
+	ssl: {
+		ca: ENVS.KAFKA_CA
+	},
 	sasl: {
 		mechanism: "plain",
 		username: ENVS.KAFKA_USERNAME as string,

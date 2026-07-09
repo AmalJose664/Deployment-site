@@ -2,8 +2,10 @@ import { Kafka } from "kafkajs";
 
 export const kafka = new Kafka({
 	clientId: `api-server`,
-	brokers: ["pkc-l7pr2.ap-south-1.aws.confluent.cloud:9092"],
-	ssl: true,
+	brokers: ["kafka-lynfera-renderstest446446-7987.f.aivencloud.com:11100"],
+	ssl: {
+		ca: process.env.KAFKA_CA?.replace(/\\n/g, "\n") as string,
+	},
 	sasl: {
 		mechanism: "plain",
 		username: process.env.KAFKA_USERNAME as string,
