@@ -39,6 +39,9 @@ RUN chmod 700 /app \
 
 RUN chown -R builder:builder /app
 
+RUN passwd -l root \
+ && chmod u-s /bin/su
+
 USER builder
 COPY package*.json .
 RUN npm ci && npm cache clean --force
