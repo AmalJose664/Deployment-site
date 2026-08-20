@@ -108,8 +108,10 @@ class WebhookController implements IWebhookController {
 							await this.webhookService.webhookRepositoryAddRemove(body.repositories_added, body.repositories_removed);
 							break;
 					}
+					break;
 				}
 				default: {
+					console.log("default gh controller", eventType);
 					console.log("Github webhook req: ", body.action, body.repository.id, eventType);
 				}
 			}

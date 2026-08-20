@@ -146,7 +146,8 @@ class ProjectService implements IProjectService {
 			return null;
 		}
 		const project = await this.projectRepository.updateProject(id, userId, newData);
-		if (dto.hasOwnProperty("isDisabled") && project) {
+
+		if ((dto.hasOwnProperty("isDisabled") || dto.hasOwnProperty("rewriteNonFilePaths")) && project) {
 			await this.cacheInvalidator.publishInvalidation("project", project.subdomain);
 		}
 
